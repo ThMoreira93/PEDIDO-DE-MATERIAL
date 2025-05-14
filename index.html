@@ -282,8 +282,14 @@
         data: new Date().toISOString()
       };
       db.collection('pedidos').add(pedido)
-      alert('Pedido enviado com sucesso! Nº: ' + pedido.numero);
-      location.reload();
+      .then(() => {
+        alert('Pedido enviado com sucesso! Nº: ' + pedido.numero);
+        location.reload();
+      })
+      .catch((error) => {
+        console.error('Erro ao enviar pedido:', error);
+        alert('Erro ao enviar pedido.');
+      });
     }
   </script>
 </body>
