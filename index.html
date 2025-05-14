@@ -292,5 +292,53 @@
       });
     }
   </script>
+
+  <hr>
+  <h2 style="text-align:center; color:#007BFF;">Consultar Status do Pedido</h2>
+  <div style="max-width:600px; margin:auto;">
+    <label for="consultaNumero">Digite o número do pedido:</label>
+    <input type="number" id="consultaNumero" placeholder="Ex: 123456" style="width:100%; padding:10px; margin-top:5px;" />
+    <button onclick="consultarPedido()" style="margin-top:10px; background-color:#17a2b8;">Consultar</button>
+    <div id="resultadoConsulta" style="margin-top:20px; padding:15px; background:#f8f9fa; border-radius:10px; display:none;"></div>
+  </div>
+
+  <script>
+    function consultarPedido() {
+      const numero = document.getElementById('consultaNumero').value;
+      const resultado = document.getElementById('resultadoConsulta');
+      if (!numero) {
+        alert('Digite o número do pedido!');
+        return;
+      }
+
+      db.collection('pedidos').where('numero', '==', parseInt(numero)).get()
+        .then(snapshot => {
+          if (snapshot.empty) {
+            resultado.innerHTML = '<p style="color:red;">Pedido não encontrado.</p>';
+            resultado.style.display = 'block';
+            return;
+          }
+
+          snapshot.forEach(doc => {
+            const p = doc.data();
+            resultado.innerHTML = `
+              <p><strong>Colaborador:</strong> ${p.colaborador}</p>
+              <p><strong>Telefone:</strong> ${p.telefone}</p>
+              <p><strong>Status:</strong> <span style="color:#28a745; font-weight:bold;">${p.status}</span></p>
+              <p><strong>Materiais:</strong><br>${p.materiais.map(m => '- ' + m.material + ' (Qtd: ' + m.quantidade + ')').join('<br>')}</p>
+              <p><strong>Observações:</strong> ${p.observacoes}</p>
+              <p><strong>Data do Pedido:</strong> ${new Date(p.data).toLocaleString()}</p>
+            `;
+            resultado.style.display = 'block';
+          });
+        })
+        .catch(error => {
+          console.error(error);
+          resultado.innerHTML = '<p style="color:red;">Erro ao buscar pedido.</p>';
+          resultado.style.display = 'block';
+        });
+    }
+  </script>
 </body>
 </html>
+
