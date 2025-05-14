@@ -89,24 +89,7 @@
           todosPedidos.push(pedido);
         });
         renderizarPedidos(todosPedidos);
-          const pedido = doc.data();
-          const div = document.createElement("div");
-          div.className = "pedido";
-          div.innerHTML = `
-            <h3>Pedido #${pedido.numero}</h3>
-            <p><strong>Colaborador:</strong> ${pedido.colaborador}</p>
-            <p><strong>Telefone:</strong> ${pedido.telefone}</p>
-            <p><strong>Data:</strong> ${new Date(pedido.data).toLocaleString()}</p>
-            <p><strong>Observações:</strong> ${pedido.observacoes}</p>
-            <p><strong>Materiais:</strong><br>${pedido.materiais.map(m => `- ${m.material} (Qtd: ${m.quantidade})`).join("<br>")}</p>
-            <label>Status:
-              <select onchange="atualizarStatus('${doc.id}', this.value)">
-                ${gerarOpcoesStatus(pedido.status)}
-              </select>
-            </label>
-            <div class="status">Status atual: ${pedido.status}</div>
-          `;
-          lista.appendChild(div);
+
         });
       });
     }
