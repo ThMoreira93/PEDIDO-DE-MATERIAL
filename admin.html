@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel de Administração</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f3f3f3;
+    }
+    h1 {
+      color: #007BFF;
+      text-align: center;
+    }
+    .pedido {
+      background-color: #fff;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .pedido h3 {
+      margin-top: 0;
+      color: #28a745;
+    }
+    select, button {
+      margin-top: 10px;
+      padding: 6px 10px;
+    }
+    .status {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="loginContainer">
+    <h2 style="text-align:center;">Login de Administrador</h2>
+    <form onsubmit="return login(event)" style="max-width: 400px; margin:auto;">
+      <label>Usuário:</label>
+      <input type="text" id="user" required style="width:100%; padding:8px;" />
+      <label>Senha:</label>
+      <input type="password" id="pass" required style="width:100%; padding:8px;" />
+      <button type="submit" style="margin-top: 15px;">Entrar</button>
+    </form>
+  </div>
+  <div id="conteudo" style="display:none;">
+
+  <h1>Administração de Pedidos</h1>
+  <button onclick="exportarCSV()" style="margin-bottom:15px;">Exportar para Excel</button>
+<div style="margin-bottom:20px;">
+      <input type="text" id="buscaTexto" placeholder="Buscar por nome, telefone ou número..." style="width:60%; padding:8px;" oninput="filtrarPedidos()" />
+      <select id="filtroStatus" onchange="filtrarPedidos()" style="padding:8px;">
+        <option value="">Todos os status</option>
+        <option>Solicitação Recebida</option>
+        <option>Reserva Gerada</option>
+        <option>Aguardando Verba</option>
+        <option>Reserva Apropriada</option>
+        <option>Disponível para Retirada</option>
+      </select>
+    </div>
+    <div id="listaPedidos">Carregando pedidos...</div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCv7vfGMSobE1n0M1CECl46LdMy3pdrxh4",
+      authDomain: "pedido-de-material---ilheus.firebaseapp.com",
+      projectId: "pedido-de-material---ilheus",
+      storageBucket: "pedido-de-material---ilheus.firebasestorage.app",
+      messagingSenderId: "155845988594",
+      appId: "1:155845988594:web:322f34f9790f605a92006b"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let dadosPedidos = [];
+    function carregarPedidos() {
+      const lista = document.getElementById("listaPedidos");
+      db.collection("pedidos").orderBy("data", "desc").onSnapshot(snapshot => {
+        lista.innerHTML = "";
+        const todosPedidos = [];
+        snapshot.forEach(doc => {
+          const pedido = doc.data();
+          pedido._id = doc.id;
+          todosPedidos.push(pedido);
+        });
+        renderizarPedidos(todosPedidos);
+          const pedido = doc.data();
+          const div = document.createElement("div");
+          div.className = "pedido";
+          div.innerHTML = `
+            <h3>Pedido #${pedido.numero}</h3>
+            <p><strong>Colaborador:</strong> ${pedido.colaborador}</p>
+            <p><strong>Telefone:</strong> ${pedido.telefone}</p>
+            <p><strong>Data:</strong> ${new Date(pedido.data).toLocaleString()}</p>
+            <p><strong>Observações:</strong> ${pedido.observacoes}</p>
+            <p><strong>Materiais:</strong><br>${pedido.materiais.map(m => `- ${m.material} (Qtd: ${m.quantidade})`).join("<br>")}</p>
+            <label>Status:
+              <select onchange="atualizarStatus('${doc.id}', this.value)">
+                ${gerarOpcoesStatus(pedido.status)}
+              </select>
+            </label>
+            <div class="status">Status atual: ${pedido.status}</div>
+          `;
+          lista.appendChild(div);
+        });
+      });
+    }
+
+    function gerarOpcoesStatus(statusAtual) {
+      const statusList = [
+        "Solicitação Recebida",
+        "Reserva Gerada",
+        "Aguardando Verba",
+        "Reserva Apropriada",
+        "Disponível para Retirada"
+      ];
+      return statusList.map(status => 
+        `<option value="${status}" ${status === statusAtual ? "selected" : ""}>${status}</option>`
+      ).join('');
+    }
+
+    function renderizarPedidos(pedidos) {
+      const lista = document.getElementById("listaPedidos");
+      lista.innerHTML = "";
+      pedidos.forEach(pedido => {
+        const div = document.createElement("div");
+        div.className = "pedido";
+        div.innerHTML = `
+          <h3>Pedido #${pedido.numero}</h3>
+          <p><strong>Colaborador:</strong> ${pedido.colaborador}</p>
+          <p><strong>Telefone:</strong> ${pedido.telefone}</p>
+          <p><strong>Data:</strong> ${new Date(pedido.data).toLocaleString()}</p>
+          <p><strong>Observações:</strong> ${pedido.observacoes}</p>
+          <p><strong>Materiais:</strong><br>${pedido.materiais.map(m => `- ${m.material} (Qtd: ${m.quantidade})`).join("<br>")}</p>
+          <label>Status:
+            <select onchange="atualizarStatus('${pedido._id}', this.value)">
+              ${gerarOpcoesStatus(pedido.status)}
+            </select>
+          </label>
+          <div class="status">Status atual: ${pedido.status}</div>
+        `;
+        lista.appendChild(div);
+      });
+      dadosPedidos = pedidos;
+    }
+
+    function filtrarPedidos() {
+      const busca = document.getElementById("buscaTexto").value.toLowerCase();
+      const status = document.getElementById("filtroStatus").value;
+      const filtrados = dadosPedidos.filter(p =>
+        (!status || p.status === status) &&
+        (
+          p.colaborador.toLowerCase().includes(busca) ||
+          p.telefone.toLowerCase().includes(busca) ||
+          String(p.numero).includes(busca)
+        )
+      );
+      renderizarPedidos(filtrados);
+    }
+
+    function atualizarStatus(id, novoStatus) {
+      db.collection("pedidos").doc(id).update({ status: novoStatus });
+    }
+
+    carregarPedidos();
+  </script>
+
+  </div>
+  <script>
+    function login(event) {
+      event.preventDefault();
+      const usuario = document.getElementById('user').value;
+      const senha = document.getElementById('pass').value;
+      if (usuario === 'CLB354374' && senha === 'debora@01') {
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('conteudo').style.display = 'block';
+      } else {
+        alert('Usuário ou senha incorretos.');
+      }
+    }
+
+    function exportarCSV() {
+      db.collection("pedidos").get().then(snapshot => {
+        let csv = "Número,Colaborador,Telefone,Status,Data,Observações,Materiais\n";
+        const todosPedidos = [];
+        snapshot.forEach(doc => {
+          const pedido = doc.data();
+          pedido._id = doc.id;
+          todosPedidos.push(pedido);
+        });
+        renderizarPedidos(todosPedidos);
+          const p = doc.data();
+          const materiais = p.materiais.map(m => m.material + " (Qtd: " + m.quantidade + ")").join(" | ");
+          csv += `${p.numero},"${p.colaborador}","${p.telefone}","${p.status}","${new Date(p.data).toLocaleString()}","${p.observacoes || ''}","${materiais}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "pedidos.csv";
+        link.click();
+      });
+    }
+  </script>
+</body>
+</html>
+
+</html>
