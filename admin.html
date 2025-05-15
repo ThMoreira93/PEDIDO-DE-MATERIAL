@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Painel de Administração</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Painel de Administração</title>
+<style>
     body { font-family: Arial, sans-serif; padding: 20px; background-color: #f3f3f3; }
     h1 { color: #007BFF; text-align: center; }
     .pedido {
@@ -18,42 +19,47 @@
   </style>
 </head>
 <body onload="verificaLogin()">
-  <div id="loginContainer">
-    <h2 style="text-align:center;">Login de Administrador</h2>
-    <form onsubmit="return login(event)" style="max-width: 400px; margin:auto;">
-      <label>Usuário:</label>
-      <input type="text" id="user" required style="width:100%; padding:8px;" />
-      <label>Senha:</label>
-      <input type="password" id="pass" required style="width:100%; padding:8px;" />
-      <button type="submit" style="margin-top: 15px;">Entrar</button>
-    </form>
+<div id="loginContainer" style="display:block;">
+<h2 style="text-align:center;">Login de Administrador</h2>
+<form onsubmit="return login(event)" style="max-width: 400px; margin:auto;">
+<label>Usuário:</label>
+<input id="user" required="" style="width:100%; padding:8px;" type="text"/>
+<label>Senha:</label>
+<input id="pass" required="" style="width:100%; padding:8px;" type="password"/>
+<button style="margin-top: 15px;" type="submit">Entrar</button>
+</form>
 <p id="loginErro" style="color:red; text-align:center; display:none;">Usuário ou senha incorretos.</p>
-  </div>
+</div>
+<div id="conteudo" style="display:none;">
+<canvas id="graficoStatus" style="max-width:500px;margin:30px auto;display:block;"></canvas>
+<div style="margin-top: 15px;">
+<input accept=".xlsx" id="arquivoStatus" type="file"/>
+<button onclick="atualizarStatusEmMassa()">Atualizar Status</button>
+<a download="" href="Modelo_Atualizacao_Status.xlsx" style="margin-left:15px;">Baixar Modelo</a>
+</div>
 
-  <div id="conteudo">
-    <div style="margin-bottom:30px;">
-      <h2>Alterar Status em Massa</h2>
-      <input type="file" id="arquivoStatus" accept=".csv" onchange="importarStatusCSV()" />
-    </div>
-    <h1>Administração de Pedidos</h1>
-    <div style="margin-bottom:20px;">
-      <input type="text" id="buscaTexto" placeholder="Buscar por nome, telefone ou número..." style="width:60%; padding:8px;" oninput="filtrarPedidos()" />
-      <select id="filtroStatus" onchange="filtrarPedidos()" style="padding:8px;">
-        <option value="">Todos os status</option>
-        <option>Solicitação Recebida</option>
-        <option>Reserva Gerada</option>
-        <option>Aguardando Verba</option>
-        <option>Reserva Apropriada</option>
-        <option>Disponível para Retirada</option>
-      </select>
-      <button onclick="exportarCSV()" style="float:right;">Exportar para Excel</button>
-    </div>
-    <div id="listaPedidos">Carregando pedidos...</div>
-  </div>
-
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+<div style="margin-bottom:30px;">
+<h2>Alterar Status em Massa</h2>
+<input accept=".csv" id="arquivoStatus" onchange="importarStatusCSV()" type="file"/>
+</div>
+<h1>Administração de Pedidos</h1>
+<div style="margin-bottom:20px;">
+<input id="buscaTexto" oninput="filtrarPedidos()" placeholder="Buscar por nome, telefone ou número..." style="width:60%; padding:8px;" type="text"/>
+<select id="filtroStatus" onchange="filtrarPedidos()" style="padding:8px;">
+<option value="">Todos os status</option>
+<option>Solicitação Recebida</option>
+<option>Reserva Gerada</option>
+<option>Aguardando Verba</option>
+<option>Reserva Apropriada</option>
+<option>Disponível para Retirada</option>
+</select>
+<button onclick="exportarCSV()" style="float:right;">Exportar para Excel</button>
+</div>
+<div id="listaPedidos">Carregando pedidos...</div>
+</div>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
 <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCv7vfGMSobE1n0M1CECl46LdMy3pdrxh4",
@@ -191,5 +197,63 @@
       });
     }
   </script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script>
+function gerarGraficoStatus(pedidos) {
+  const contagem = {
+    "Solicitação Recebida": 0,
+    "Reserva Gerada": 0,
+    "Aguardando Verba": 0,
+    "Reserva Apropriada": 0,
+    "Disponível para Retirada": 0,
+    "Material Entregue": 0
+  };
+  pedidos.forEach(p => contagem[p.status] = (contagem[p.status] || 0) + 1);
+  const ctx = document.getElementById("graficoStatus").getContext("2d");
+  new Chart(ctx, {
+    type: "pie",
+    data: {
+      labels: Object.keys(contagem),
+      datasets: [{
+        data: Object.values(contagem),
+        backgroundColor: ["#28a745", "#ffc107", "#17a2b8", "#ff5722", "#6c757d", "#007bff"]
+      }]
+    },
+    options: {
+      plugins: {
+        datalabels: {
+          color: "#fff",
+          font: { weight: "bold" },
+          formatter: value => value
+        }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
+
+document.getElementById("filtroStatus").addEventListener("change", function() {
+  const status = this.value;
+  const texto = document.getElementById("buscaTexto").value.toLowerCase();
+  const filtrado = todosPedidos.filter(p => {
+    const combinaStatus = !status || p.status === status;
+    const combinaTexto = !texto || p.colaborador?.toLowerCase().includes(texto) || p.telefone?.includes(texto) || p.numero?.includes(texto);
+    return combinaStatus && combinaTexto;
+  });
+  renderizarPedidos(filtrado);
+  gerarGraficoStatus(filtrado);
+});
+
+document.getElementById("buscaTexto").addEventListener("input", function() {
+  document.getElementById("filtroStatus").dispatchEvent(new Event("change"));
+});
+
+function atualizarStatusEmMassa() {
+  alert("Função de importação em massa será conectada em seguida.");
+}
+</script>
 </body>
+
 </html>
