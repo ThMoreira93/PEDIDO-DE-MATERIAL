@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="pt-br">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Painel de Administração</title>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel de Administração</title>
+  <style>
     body { font-family: Arial, sans-serif; padding: 20px; background-color: #f3f3f3; }
     h1 { color: #007BFF; text-align: center; }
     .pedido {
@@ -15,48 +14,46 @@
     .pedido h3 { margin-top: 0; color: #28a745; }
     select, button, input { margin-top: 10px; padding: 6px 10px; }
     .status { font-weight: bold; margin-top: 10px; }
-    #conteudo { display: block; }
+    #conteudo { display: none; }
   </style>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body onload="verificaLogin()">
-<div id="loginContainer">
-<h2 style="text-align:center;">Login de Administrador</h2>
-<form onsubmit="return login(event)" style="max-width: 400px; margin:auto;">
-<label>Usuário:</label>
-<input id="user" required="" style="width:100%; padding:8px;" type="text"/>
-<label>Senha:</label>
-<input id="pass" required="" style="width:100%; padding:8px;" type="password"/>
-<button style="margin-top: 15px;" type="submit">Entrar</button>
-</form>
+  <div id="loginContainer">
+    <h2 style="text-align:center;">Login de Administrador</h2>
+    <form onsubmit="return login(event)" style="max-width: 400px; margin:auto;">
+      <label>Usuário:</label>
+      <input type="text" id="user" required style="width:100%; padding:8px;" />
+      <label>Senha:</label>
+      <input type="password" id="pass" required style="width:100%; padding:8px;" />
+      <button type="submit" style="margin-top: 15px;">Entrar</button>
+    </form>
 <p id="loginErro" style="color:red; text-align:center; display:none;">Usuário ou senha incorretos.</p>
-</div><div id="conteudo" style="display:none;">
-<div style="margin-bottom:30px;">
-<h2>Alterar Status em Massa</h2>
-<input accept=".csv" id="arquivoStatus" onchange="importarStatusCSV()" type="file"/>
-</div>
-<h1>Administração de Pedidos</h1>
-<div style="margin-bottom:20px;">
-<input id="buscaTexto" oninput="filtrarPedidos()" placeholder="Buscar por nome, telefone ou número..." style="width:60%; padding:8px;" type="text"/>
-<select id="filtroStatus" onchange="filtrarPedidos()" style="padding:8px;">
-<option value="">Todos os status</option>
-<option>Solicitação Recebida</option>
-<option>Reserva Gerada</option>
-<option>Aguardando Verba</option>
-<option>Reserva Apropriada</option>
-<option>Disponível para Retirada</option>
-</select>
-<button onclick="exportarCSV()" style="float:right;">Exportar para Excel</button>
-</div>
-<h2 style="margin-top:40px;">Dashboard de Pedidos</h2>
-<canvas id="graficoStatus" style="max-width: 600px; margin: 20px auto;"></canvas>
-<canvas id="graficoColaborador" style="max-width: 600px; margin: 20px auto;"></canvas>
-<div id="listaPedidos">
-    Carregando pedidos...</div>
-</div>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  </div>
+
+  <div id="conteudo">
+    <div style="margin-bottom:30px;">
+      <h2>Alterar Status em Massa</h2>
+      <input type="file" id="arquivoStatus" accept=".csv" onchange="importarStatusCSV()" />
+    </div>
+    <h1>Administração de Pedidos</h1>
+    <div style="margin-bottom:20px;">
+      <input type="text" id="buscaTexto" placeholder="Buscar por nome, telefone ou número..." style="width:60%; padding:8px;" oninput="filtrarPedidos()" />
+      <select id="filtroStatus" onchange="filtrarPedidos()" style="padding:8px;">
+        <option value="">Todos os status</option>
+        <option>Solicitação Recebida</option>
+        <option>Reserva Gerada</option>
+        <option>Aguardando Verba</option>
+        <option>Reserva Apropriada</option>
+        <option>Disponível para Retirada</option>
+      </select>
+      <button onclick="exportarCSV()" style="float:right;">Exportar para Excel</button>
+    </div>
+    <div id="listaPedidos">Carregando pedidos...</div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
 <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCv7vfGMSobE1n0M1CECl46LdMy3pdrxh4",
@@ -74,61 +71,13 @@
       if (ultimoLogin && new Date().getTime() - parseInt(ultimoLogin) < 30 * 60 * 1000) {
         document.getElementById('loginContainer').style.display = 'none';
         document.getElementById('conteudo').style.display = 'block';
-        carregarPedidos();
+        console.log('Login bem-sucedido. Carregando pedidos...'); carregarPedidos();
       }
     }
 
     function login(event) {
-      event.preventDefault();
-      const usuario = document.getElementById('user').value;
-      const senha = document.getElementById('pass').value;
-      if (usuario === 'CLB354374' && senha === 'debora@01') {
-        localStorage.setItem("loginOK", new Date().getTime());
-        document.getElementById('loginContainer').style.display = 'none';
-        document.getElementById('conteudo').style.display = 'block';
-        carregarPedidos();
-      
-    }
+  console.log("Tentando logar...");
 
-    function importarStatusCSV() {
-      const input = document.getElementById('arquivoStatus');
-      if (!input.files.length) return alert("Selecione um arquivo CSV");
-      Papa.parse(input.files[0], {
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-          results.data.forEach(row => {
-            const numero = parseInt(row["Número do Pedido"]);
-            const novoStatus = row["Novo Status"];
-            if (!numero || !novoStatus) return;
-
-            db.collection("pedidos").where("numero", "==", numero).get().then(snapshot => {
-              snapshot.forEach(doc => {
-                const registro = {
-                  status: novoStatus,
-                  data: new Date().toISOString()
-                };
-                db.collection("pedidos").doc(doc.id).update({
-                  status: novoStatus,
-                  historico: firebase.firestore.FieldValue.arrayUnion(registro)
-                });
-              });
-            });
-          });
-          alert("Status atualizados com sucesso.");
-        }
-      });
-    }
-      event.preventDefault();
-      const usuario = document.getElementById('user').value;
-      const senha = document.getElementById('pass').value;
-      if (usuario === 'CLB354374' && senha === 'debora@01') {
-        document.getElementById('loginContainer').style.display = 'none';
-        document.getElementById('conteudo').style.display = 'block';
-        carregarPedidos();
-      } else {
-        alert('Usuário ou senha incorretos.');
-      }
     }
 
     let dadosPedidos = [];
@@ -144,10 +93,7 @@
       });
     }
 
-    
     function renderizarPedidos(pedidos) {
-      renderizarGraficos(pedidos);
-    
       const lista = document.getElementById("listaPedidos");
       lista.innerHTML = "";
       pedidos.forEach(pedido => {
@@ -235,69 +181,3 @@
   </script>
 </body>
 </html>
-<script>
-function renderizarGraficos(pedidos) {
-  const porStatus = {};
-  const porColaborador = {};
-  pedidos.forEach(p => {
-    porStatus[p.status] = (porStatus[p.status] || 0) + 1;
-    porColaborador[p.colaborador] = (porColaborador[p.colaborador] || 0) + 1;
-  });
-
-  const ctx1 = document.getElementById("graficoStatus").getContext("2d");
-  new Chart(ctx1, {
-    type: "pie",
-    data: {
-      labels: Object.keys(porStatus),
-      datasets: [{
-        label: "Pedidos por Status",
-        data: Object.values(porStatus),
-        backgroundColor: ["#007bff", "#28a745", "#ffc107", "#17a2b8", "#dc3545"]
-      }]
-    }
-  });
-
-  const ctx2 = document.getElementById("graficoColaborador").getContext("2d");
-  new Chart(ctx2, {
-    type: "bar",
-    data: {
-      labels: Object.keys(porColaborador),
-      datasets: [{
-        label: "Pedidos por Colaborador",
-        data: Object.values(porColaborador),
-        backgroundColor: "#007bff"
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      plugins: {
-        legend: { display: false }
-      }
-    }
-  });
-}
-
-
-function verificaLogin() {
-  const ultimoLogin = localStorage.getItem("loginOK");
-  if (ultimoLogin && new Date().getTime() - parseInt(ultimoLogin) < 30 * 60 * 1000) {
-    document.getElementById('loginContainer').style.display = 'none';
-    document.getElementById('conteudo').style.display = 'block';
-    carregarPedidos();
-  }
-}
-
-function login(event) {
-  event.preventDefault();
-  const usuario = document.getElementById('user').value;
-  const senha = document.getElementById('pass').value;
-  if (usuario === 'CLB354374' && senha === 'debora@01') {
-    localStorage.setItem("loginOK", new Date().getTime());
-    document.getElementById('loginContainer').style.display = 'none';
-    document.getElementById('conteudo').style.display = 'block';
-    carregarPedidos();
-  } else {
-    document.getElementById('loginErro').style.display = 'block';
-  }
-}
-</script>
