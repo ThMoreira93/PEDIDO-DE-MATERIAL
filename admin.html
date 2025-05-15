@@ -20,13 +20,14 @@
 <body>
   <div id="loginContainer">
     <h2 style="text-align:center;">Login de Administrador</h2>
-    <form onsubmit="return login(event)" style="max-width: 400px; margin:auto;">
+    <form onsubmit="return login(event)" style="max-width: 400px; margin:auto;" style="max-width: 400px; margin:auto;">
       <label>Usuário:</label>
       <input type="text" id="user" required style="width:100%; padding:8px;" />
       <label>Senha:</label>
       <input type="password" id="pass" required style="width:100%; padding:8px;" />
       <button type="submit" style="margin-top: 15px;">Entrar</button>
     </form>
+<p id="loginErro" style="color:red; text-align:center; display:none;">Usuário ou senha incorretos.</p>
   </div>
 
   <div id="conteudo">
@@ -69,7 +70,7 @@
         document.getElementById('conteudo').style.display = 'block';
         carregarPedidos();
       } else {
-        alert('Usuário ou senha incorretos.');
+        document.getElementById('loginErro').style.display = 'block';
       }
     }
 
