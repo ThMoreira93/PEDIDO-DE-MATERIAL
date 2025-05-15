@@ -5,34 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Painel de Administração</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f3f3f3;
-    }
-    h1 {
-      color: #007BFF;
-      text-align: center;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; background-color: #f3f3f3; }
+    h1 { color: #007BFF; text-align: center; }
     .pedido {
-      background-color: #fff;
-      padding: 15px;
-      margin-bottom: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      background-color: #fff; padding: 15px; margin-bottom: 15px;
+      border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
-    .pedido h3 {
-      margin-top: 0;
-      color: #28a745;
-    }
-    select, button {
-      margin-top: 10px;
-      padding: 6px 10px;
-    }
-    .status {
-      font-weight: bold;
-      margin-top: 10px;
-    }
+    .pedido h3 { margin-top: 0; color: #28a745; }
+    select, button, input { margin-top: 10px; padding: 6px 10px; }
+    .status { font-weight: bold; margin-top: 10px; }
+    #conteudo { display: none; }
   </style>
 </head>
 <body>
@@ -46,11 +28,10 @@
       <button type="submit" style="margin-top: 15px;">Entrar</button>
     </form>
   </div>
-  <div id="conteudo" style="display:none;">
 
-  <h1>Administração de Pedidos</h1>
-  <button onclick="exportarCSV()" style="margin-bottom:15px;">Exportar para Excel</button>
-<div style="margin-bottom:20px;">
+  <div id="conteudo">
+    <h1>Administração de Pedidos</h1>
+    <div style="margin-bottom:20px;">
       <input type="text" id="buscaTexto" placeholder="Buscar por nome, telefone ou número..." style="width:60%; padding:8px;" oninput="filtrarPedidos()" />
       <select id="filtroStatus" onchange="filtrarPedidos()" style="padding:8px;">
         <option value="">Todos os status</option>
@@ -60,8 +41,10 @@
         <option>Reserva Apropriada</option>
         <option>Disponível para Retirada</option>
       </select>
+      <button onclick="exportarCSV()" style="float:right;">Exportar para Excel</button>
     </div>
     <div id="listaPedidos">Carregando pedidos...</div>
+  </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
@@ -77,11 +60,22 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
+    function login(event) {
+      event.preventDefault();
+      const usuario = document.getElementById('user').value;
+      const senha = document.getElementById('pass').value;
+      if (usuario === 'CLB354374' && senha === 'debora@01') {
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('conteudo').style.display = 'block';
+        carregarPedidos();
+      } else {
+        alert('Usuário ou senha incorretos.');
+      }
+    }
+
     let dadosPedidos = [];
     function carregarPedidos() {
-      const lista = document.getElementById("listaPedidos");
       db.collection("pedidos").orderBy("data", "desc").onSnapshot(snapshot => {
-        lista.innerHTML = "";
         const todosPedidos = [];
         snapshot.forEach(doc => {
           const pedido = doc.data();
@@ -89,22 +83,7 @@
           todosPedidos.push(pedido);
         });
         renderizarPedidos(todosPedidos);
-
-        });
       });
-    }
-
-    function gerarOpcoesStatus(statusAtual) {
-      const statusList = [
-        "Solicitação Recebida",
-        "Reserva Gerada",
-        "Aguardando Verba",
-        "Reserva Apropriada",
-        "Disponível para Retirada"
-      ];
-      return statusList.map(status => 
-        `<option value="${status}" ${status === statusAtual ? "selected" : ""}>${status}</option>`
-      ).join('');
     }
 
     function renderizarPedidos(pedidos) {
@@ -132,6 +111,23 @@
       dadosPedidos = pedidos;
     }
 
+    function gerarOpcoesStatus(statusAtual) {
+      const statusList = [
+        "Solicitação Recebida",
+        "Reserva Gerada",
+        "Aguardando Verba",
+        "Reserva Apropriada",
+        "Disponível para Retirada"
+      ];
+      return statusList.map(status =>
+        `<option value="${status}" ${status === statusAtual ? "selected" : ""}>${status}</option>`
+      ).join('');
+    }
+
+    function atualizarStatus(id, novoStatus) {
+      db.collection("pedidos").doc(id).update({ status: novoStatus });
+    }
+
     function filtrarPedidos() {
       const busca = document.getElementById("buscaTexto").value.toLowerCase();
       const status = document.getElementById("filtroStatus").value;
@@ -146,37 +142,10 @@
       renderizarPedidos(filtrados);
     }
 
-    function atualizarStatus(id, novoStatus) {
-      db.collection("pedidos").doc(id).update({ status: novoStatus });
-    }
-
-    carregarPedidos();
-  </script>
-
-  </div>
-  <script>
-    function login(event) {
-      event.preventDefault();
-      const usuario = document.getElementById('user').value;
-      const senha = document.getElementById('pass').value;
-      if (usuario === 'CLB354374' && senha === 'debora@01') {
-        document.getElementById('loginContainer').style.display = 'none';
-        document.getElementById('conteudo').style.display = 'block';
-      } else {
-        alert('Usuário ou senha incorretos.');
-      }
-    }
-
     function exportarCSV() {
       db.collection("pedidos").get().then(snapshot => {
         let csv = "Número,Colaborador,Telefone,Status,Data,Observações,Materiais\n";
-        const todosPedidos = [];
         snapshot.forEach(doc => {
-          const pedido = doc.data();
-          pedido._id = doc.id;
-          todosPedidos.push(pedido);
-        });
-        renderizarPedidos(todosPedidos);
           const p = doc.data();
           const materiais = p.materiais.map(m => m.material + " (Qtd: " + m.quantidade + ")").join(" | ");
           csv += `${p.numero},"${p.colaborador}","${p.telefone}","${p.status}","${new Date(p.data).toLocaleString()}","${p.observacoes || ''}","${materiais}"\n`;
@@ -191,6 +160,4 @@
     }
   </script>
 </body>
-</html>
-
 </html>
