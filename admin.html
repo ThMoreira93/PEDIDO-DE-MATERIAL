@@ -76,9 +76,21 @@
     }
 
     function login(event) {
+  event.preventDefault();
   console.log("Tentando logar...");
-
-    }
+  const usuario = document.getElementById('user').value;
+  const senha = document.getElementById('pass').value;
+  if (usuario === 'CLB354374' && senha === 'novo') {
+    localStorage.setItem("loginOK", new Date().getTime());
+    document.getElementById('loginContainer').style.display = 'none';
+    document.getElementById('conteudo').style.display = 'block';
+    console.log('Login bem-sucedido. Carregando pedidos...');
+    carregarPedidos();
+  } else {
+    console.log('Login falhou.');
+    document.getElementById('loginErro').style.display = 'block';
+  }
+}
 
     let dadosPedidos = [];
     function carregarPedidos() {
