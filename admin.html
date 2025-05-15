@@ -1,206 +1,121 @@
-<!DOCTYPE html>
 
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Painel de Administração</title>
-<style>
-    body { font-family: Arial, sans-serif; padding: 20px; background-color: #f3f3f3; }
-    h1 { color: #007BFF; text-align: center; }
-    .pedido {
-      background-color: #fff; padding: 15px; margin-bottom: 15px;
-      border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-    .pedido h3 { margin-top: 0; color: #28a745; }
-    select, button, input { margin-top: 10px; padding: 6px 10px; }
-    .status { font-weight: bold; margin-top: 10px; }
-    #conteudo { display: none; }
-  </style>
+  <meta charset="UTF-8">
+  <title>Painel Admin</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body onload="verificaLogin()">
+
 <div id="loginContainer" style="display:block;">
-<h2 style="text-align:center;">Login de Administrador</h2>
-<form onsubmit="return login(event)" style="max-width: 400px; margin:auto;">
-<label>Usuário:</label>
-<input id="user" required="" style="width:100%; padding:8px;" type="text"/>
-<label>Senha:</label>
-<input id="pass" required="" style="width:100%; padding:8px;" type="password"/>
-<button style="margin-top: 15px;" type="submit">Entrar</button>
-</form>
-<p id="loginErro" style="color:red; text-align:center; display:none;">Usuário ou senha incorretos.</p>
+  <h2>Login</h2>
+  <form onsubmit="return login(event)">
+    <input type="text" id="user" placeholder="Usuário" required />
+    <input type="password" id="pass" placeholder="Senha" required />
+    <button type="submit">Entrar</button>
+  </form>
+  <p id="loginErro" style="color:red; display:none;">Usuário ou senha incorretos.</p>
 </div>
+
 <div id="conteudo" style="display:none;">
-<canvas id="graficoStatus" style="max-width:500px;margin:30px auto;display:block;"></canvas>
-<div style="margin-top: 15px;">
-<input accept=".xlsx" id="arquivoStatus" type="file"/>
-<button onclick="atualizarStatusEmMassa()">Atualizar Status</button>
-<a download="" href="Modelo_Atualizacao_Status.xlsx" style="margin-left:15px;">Baixar Modelo</a>
+  <h2>Status dos Pedidos</h2>
+  <canvas id="graficoStatus" style="max-width:500px;margin:30px auto;display:block;"></canvas>
+
+  <div style="margin-top: 15px;">
+    <input type="file" id="arquivoStatus" accept=".xlsx">
+    <button onclick="atualizarStatusEmMassa()">Atualizar Status</button>
+    <a href="Modelo_Atualizacao_Status.xlsx" download style="margin-left:15px;">Baixar Modelo</a>
+  </div>
+
+  <input id="buscaTexto" placeholder="Buscar..." />
+  <select id="filtroStatus">
+    <option value="">Todos os Status</option>
+    <option>Solicitação Recebida</option>
+    <option>Reserva Gerada</option>
+    <option>Aguardando Verba</option>
+    <option>Reserva Apropriada</option>
+    <option>Disponível para Retirada</option>
+    <option>Material Entregue</option>
+  </select>
+
+  <div id="listaPedidos" style="margin-top:20px;"></div>
 </div>
 
-<div style="margin-bottom:30px;">
-<h2>Alterar Status em Massa</h2>
-<input accept=".csv" id="arquivoStatus" onchange="importarStatusCSV()" type="file"/>
-</div>
-<h1>Administração de Pedidos</h1>
-<div style="margin-bottom:20px;">
-<input id="buscaTexto" oninput="filtrarPedidos()" placeholder="Buscar por nome, telefone ou número..." style="width:60%; padding:8px;" type="text"/>
-<select id="filtroStatus" onchange="filtrarPedidos()" style="padding:8px;">
-<option value="">Todos os status</option>
-<option>Solicitação Recebida</option>
-<option>Reserva Gerada</option>
-<option>Aguardando Verba</option>
-<option>Reserva Apropriada</option>
-<option>Disponível para Retirada</option>
-</select>
-<button onclick="exportarCSV()" style="float:right;">Exportar para Excel</button>
-</div>
-<div id="listaPedidos">Carregando pedidos...</div>
-</div>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
 <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCv7vfGMSobE1n0M1CECl46LdMy3pdrxh4",
-      authDomain: "pedido-de-material---ilheus.firebaseapp.com",
-      projectId: "pedido-de-material---ilheus",
-      storageBucket: "pedido-de-material---ilheus.firebasestorage.app",
-      messagingSenderId: "155845988594",
-      appId: "1:155845988594:web:322f34f9790f605a92006b"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+const firebaseConfig = {
+  apiKey: "AIzaSyCv7vfGMSobE1n0M1CECl46LdMy3pdrxh4",
+  authDomain: "pedido-de-material---ilheus.firebaseapp.com",
+  projectId: "pedido-de-material---ilheus",
+  storageBucket: "pedido-de-material---ilheus.firebasestorage.app",
+  messagingSenderId: "155845988594",
+  appId: "1:155845988594:web:322f34f9790f605a92006b"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-    function verificaLogin() {
-      const ultimoLogin = localStorage.getItem("loginOK");
-      if (ultimoLogin && new Date().getTime() - parseInt(ultimoLogin) < 30 * 60 * 1000) {
-        document.getElementById('loginContainer').style.display = 'none';
-        document.getElementById('conteudo').style.display = 'block';
-        console.log('Login bem-sucedido. Carregando pedidos...'); carregarPedidos();
-      }
-    }
+let dadosPedidos = [];
+let todosPedidos = [];
 
-    function login(event) {
+function login(event) {
   event.preventDefault();
-  console.log("Tentando logar...");
-  const usuario = document.getElementById('user').value;
-  const senha = document.getElementById('pass').value;
-  if (usuario === 'CLB354374' && senha === 'novo') {
+  const usuario = document.getElementById("user").value;
+  const senha = document.getElementById("pass").value;
+  if (usuario === "CLB354374" && senha === "novo") {
     localStorage.setItem("loginOK", new Date().getTime());
-    document.getElementById('loginContainer').style.display = 'none';
-    document.getElementById('conteudo').style.display = 'block';
-    console.log('Login bem-sucedido. Carregando pedidos...');
+    document.getElementById("loginContainer").style.display = "none";
+    document.getElementById("conteudo").style.display = "block";
     carregarPedidos();
   } else {
-    console.log('Login falhou.');
-    document.getElementById('loginErro').style.display = 'block';
+    document.getElementById("loginErro").style.display = "block";
   }
 }
 
-    let dadosPedidos = [];
-    function carregarPedidos() {
-      db.collection("pedidos").orderBy("data", "desc").onSnapshot(snapshot => {
-        const todosPedidos = [];
-        snapshot.forEach(doc => {
-          const pedido = doc.data();
-          pedido._id = doc.id;
-          todosPedidos.push(pedido);
-        });
-        renderizarPedidos(todosPedidos);
-      });
-    }
+function verificaLogin() {
+  const login = localStorage.getItem("loginOK");
+  if (login && new Date().getTime() - parseInt(login) < 30 * 60 * 1000) {
+    document.getElementById("loginContainer").style.display = "none";
+    document.getElementById("conteudo").style.display = "block";
+    carregarPedidos();
+  }
+}
 
-    function renderizarPedidos(pedidos) {
-      const lista = document.getElementById("listaPedidos");
-      lista.innerHTML = "";
-      pedidos.forEach(pedido => {
-        const div = document.createElement("div");
-        div.className = "pedido";
-        div.innerHTML = `
-          <h3>Pedido #${pedido.numero}</h3>
-          <p><strong>Colaborador:</strong> ${pedido.colaborador}</p>
-          <p><strong>Telefone:</strong> ${pedido.telefone}</p>
-          <p><strong>Data:</strong> ${new Date(pedido.data).toLocaleString()}</p>
-          <p><strong>Observações:</strong> ${pedido.observacoes}</p>
-          <p><strong>Materiais:</strong><br>${pedido.materiais.map(m => `- ${m.material} (Qtd: ${m.quantidade})`).join("<br>")}</p>
-          <label>Status:
-            <select onchange="atualizarStatus('${pedido._id}', this.value)">
-              ${gerarOpcoesStatus(pedido.status)}
-            </select>
-          </label>
-          <div class="status">Status atual: ${pedido.status}</div><details><summary>Histórico</summary>${(pedido.historico || []).map(h => `<p>${new Date(h.data).toLocaleString()} → ${h.status}</p>`).join("")}</details>
-        `;
-        lista.appendChild(div);
-      });
-      dadosPedidos = pedidos;
-    }
+function carregarPedidos() {
+  db.collection("pedidos").orderBy("data", "desc").onSnapshot(snapshot => {
+    dadosPedidos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    todosPedidos = dadosPedidos;
+    renderizarPedidos(dadosPedidos);
+    gerarGraficoStatus(dadosPedidos);
+  });
+}
 
-    function gerarOpcoesStatus(statusAtual) {
-      const statusList = [
-        "Solicitação Recebida",
-        "Reserva Gerada",
-        "Aguardando Verba",
-        "Reserva Apropriada",
-        "Disponível para Retirada"
-      ];
-      return statusList.map(status =>
-        `<option value="${status}" ${status === statusAtual ? "selected" : ""}>${status}</option>`
-      ).join('');
-    }
+function renderizarPedidos(pedidos) {
+  const div = document.getElementById("listaPedidos");
+  div.innerHTML = "";
+  pedidos.forEach(p => {
+    const el = document.createElement("div");
+    el.style.background = "#fff";
+    el.style.borderLeft = "5px solid #28a745";
+    el.style.borderRadius = "8px";
+    el.style.marginBottom = "15px";
+    el.style.padding = "15px";
+    el.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
+    el.innerHTML = `
+      <b>Número:</b> ${p.numero}<br>
+      <b>Colaborador:</b> ${p.colaborador}<br>
+      <b>Status:</b> ${p.status}<br>
+      <b>Data:</b> ${new Date(p.data).toLocaleString()}<br>
+      <b>Observações:</b> ${p.observacoes || ""}<br>
+      <b>Materiais:</b><ul>${p.materiais.map(m => `<li>${m.material} — ${m.quantidade}</li>`).join("")}</ul>
+    `;
+    div.appendChild(el);
+  });
+}
 
-    function atualizarStatus(id, novoStatus) {
-      
-      const registro = {
-        status: novoStatus,
-        data: new Date().toISOString()
-      };
-      db.collection("pedidos").doc(id).update({
-        status: novoStatus,
-        historico: firebase.firestore.FieldValue.arrayUnion(registro)
-      });
-    
-    }
-
-    function filtrarPedidos() {
-      const busca = document.getElementById("buscaTexto").value.toLowerCase();
-      const status = document.getElementById("filtroStatus").value;
-      const filtrados = dadosPedidos.filter(p =>
-        (!status || p.status === status) &&
-        (
-          p.colaborador.toLowerCase().includes(busca) ||
-          p.telefone.toLowerCase().includes(busca) ||
-          String(p.numero).includes(busca)
-        )
-      );
-      renderizarPedidos(filtrados);
-    }
-
-    function exportarCSV() {
-      db.collection("pedidos").get().then(snapshot => {
-        let csv = "Número do Pedido,Colaborador,Telefone,Status,Data,Observações,Item,Quantidade\n";
-        snapshot.forEach(doc => {
-          const p = doc.data();
-          const materiais = p.materiais.map(m => m.material + " (Qtd: " + m.quantidade + ")").join(" | ");
-          
-        p.materiais.forEach(mat => {
-          csv += `${p.numero},"${p.colaborador}","${p.telefone}","${p.status}","${new Date(p.data).toLocaleString()}","${p.observacoes || ''}","${mat.material}",${mat.quantidade}\n`;
-        });
-    
-        });
-
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "pedidos.csv";
-        link.click();
-      });
-    }
-  </script>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-<script>
 function gerarGraficoStatus(pedidos) {
   const contagem = {
     "Solicitação Recebida": 0,
@@ -251,9 +166,54 @@ document.getElementById("buscaTexto").addEventListener("input", function() {
 });
 
 function atualizarStatusEmMassa() {
-  alert("Função de importação em massa será conectada em seguida.");
+  const fileInput = document.getElementById("arquivoStatus");
+  const file = fileInput.files[0];
+  if (!file) {
+    alert("Selecione um arquivo Excel.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: "array" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet);
+
+    if (!rows || !rows.length) {
+      alert("Planilha vazia ou inválida.");
+      return;
+    }
+
+    let atualizados = 0;
+    const promises = rows.map(row => {
+      const numero = String(row["Número do Pedido"]).trim();
+      const novoStatus = String(row["Novo Status"]).trim();
+
+      return db.collection("pedidos").where("numero", "==", numero).get()
+        .then(snapshot => {
+          if (!snapshot.empty) {
+            const batch = db.batch();
+            snapshot.forEach(doc => {
+              batch.update(doc.ref, { status: novoStatus });
+            });
+            atualizados++;
+            return batch.commit();
+          }
+        });
+    });
+
+    Promise.all(promises).then(() => {
+      alert(`Atualização concluída. ${atualizados} pedido(s) modificados.`);
+      fileInput.value = "";
+    }).catch(err => {
+      console.error("Erro ao atualizar pedidos:", err);
+      alert("Erro ao atualizar pedidos.");
+    });
+  };
+
+  reader.readAsArrayBuffer(file);
 }
 </script>
 </body>
-
 </html>
