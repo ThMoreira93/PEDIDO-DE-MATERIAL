@@ -3,7 +3,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin - Painel de Pedidos</title>
+  <title>Painel Admin - Pedido de Material</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,75 +12,85 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f0fdf4;
-      padding: 20px;
+      background: #f9f9f9;
       margin: 0;
+      padding: 20px;
     }
     #loginContainer, #conteudo {
       max-width: 1000px;
-      margin: 0 auto;
-      background: #ffffff;
+      margin: auto;
+      background: white;
       padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
-    h1, h2 {
+    h2 {
       text-align: center;
       color: #2e7d32;
     }
     input, select, button {
       width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      margin-bottom: 15px;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 14px;
       border-radius: 6px;
       border: 1px solid #ccc;
-      font-size: 14px;
-      box-sizing: border-box;
     }
     button {
-      background-color: #2e7d32;
+      background: #2e7d32;
       color: white;
       font-weight: bold;
-      transition: background 0.3s;
-      cursor: pointer;
     }
     button:hover {
-      background-color: #1b5e20;
+      background: #1b5e20;
     }
     .pedido {
-      background-color: #f9f9f9;
       padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      border-left: 6px solid #2e7d32;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-    #graficoStatus {
-      max-width: 400px;
-      margin: 30px auto;
-      background: #fff;
+      margin: 20px 0;
+      background: #f4f4f4;
+      border-left: 6px solid #007bff;
       border-radius: 8px;
-      padding: 10px;
     }
-    .hidden { display: none; }
+    .numero-pedido {
+      color: #ff9800;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .status-pedido {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .status-Solicitação\ Recebida { background: #9c27b0; }
+    .status-Reserva\ Gerada { background: #007bff; }
+    .status-Aguardando\ Verba { background: #e53935; }
+    .status-Reserva\ Apropriada { background: #ec407a; }
+    .status-Disponível\ para\ Retirada { background: #2e7d32; }
+    .status-Material\ Entregue { background: #757575; }
+    #graficoStatus {
+      max-width: 500px;
+      margin: 30px auto;
+    }
   </style>
 </head>
 <body onload="verificaLogin()">
 
 <div id="loginContainer">
   <h2>Login</h2>
-  <form onsubmit="return login(event)">
+  <form onsubmit="login(event); return false;">
     <input type="text" id="user" placeholder="Usuário" required />
     <input type="password" id="pass" placeholder="Senha" required />
     <button type="submit">Entrar</button>
+    <p id="loginErro" style="color:red; display:none;">Usuário ou senha incorretos.</p>
   </form>
-  <p id="loginErro" style="color:red; display:none;">Usuário ou senha incorretos.</p>
 </div>
 
-<div id="conteudo" class="hidden">
+<div id="conteudo" style="display:none;">
   <h2>Painel de Pedidos</h2>
-  <input id="buscaTexto" placeholder="Buscar por nome, número ou telefone" />
+  <input id="buscaTexto" placeholder="Buscar pedido..." />
   <select id="filtroStatus">
     <option value="">Todos os Status</option>
     <option>Solicitação Recebida</option>
@@ -90,14 +100,12 @@
     <option>Disponível para Retirada</option>
     <option>Material Entregue</option>
   </select>
-
-  <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
     <input type="file" id="arquivoStatus" />
     <button onclick="atualizarStatusEmMassa()">Atualizar em Massa</button>
-    <button onclick="exportarExcel()">Exportar para Excel</button>
+    <button onclick="exportarExcel()">Exportar Excel</button>
     <a href="Modelo_Atualizacao_Status.xlsx" download><button>Baixar Modelo</button></a>
   </div>
-
   <canvas id="graficoStatus"></canvas>
   <div id="listaPedidos" style="margin-top:30px;"></div>
 </div>
@@ -117,13 +125,12 @@ const db = firebase.firestore();
 let todosPedidos = [];
 
 function login(event) {
-  event.preventDefault();
   const u = document.getElementById("user").value;
   const p = document.getElementById("pass").value;
   if (u === "CLB354374" && p === "novo") {
-    localStorage.setItem("loginOK", new Date().getTime());
-    document.getElementById("loginContainer").classList.add("hidden");
-    document.getElementById("conteudo").classList.remove("hidden");
+    localStorage.setItem("loginOK", Date.now());
+    document.getElementById("loginContainer").style.display = "none";
+    document.getElementById("conteudo").style.display = "block";
     carregarPedidos();
   } else {
     document.getElementById("loginErro").style.display = "block";
@@ -131,17 +138,17 @@ function login(event) {
 }
 
 function verificaLogin() {
-  const login = localStorage.getItem("loginOK");
-  if (login && new Date().getTime() - parseInt(login) < 1800000) {
-    document.getElementById("loginContainer").classList.add("hidden");
-    document.getElementById("conteudo").classList.remove("hidden");
+  const l = localStorage.getItem("loginOK");
+  if (l && Date.now() - l < 1800000) {
+    document.getElementById("loginContainer").style.display = "none";
+    document.getElementById("conteudo").style.display = "block";
     carregarPedidos();
   }
 }
 
 function carregarPedidos() {
-  db.collection("pedidos").orderBy("data", "desc").onSnapshot(snapshot => {
-    todosPedidos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  db.collection("pedidos").orderBy("data", "desc").onSnapshot(snap => {
+    todosPedidos = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     renderizarPedidos(todosPedidos);
     gerarGraficoStatus(todosPedidos);
   });
@@ -153,72 +160,67 @@ function renderizarPedidos(lista) {
   lista.forEach(p => {
     const el = document.createElement("div");
     el.className = "pedido";
-    const options = ["Solicitação Recebida", "Reserva Gerada", "Aguardando Verba", "Reserva Apropriada", "Disponível para Retirada", "Material Entregue"]
-      .map(s => `<option value="${s}" ${s === p.status ? "selected" : ""}>${s}</option>`).join("");
+    const historico = (p.historico || []).map(h => `<li>${new Date(h.data).toLocaleString()} - ${h.status}</li>`).join("");
     el.innerHTML = `
-      <b>Pedido:</b> ${p.numero}<br>
+      <div class="numero-pedido">Pedido: ${p.numero}</div>
       <b>Colaborador:</b> ${p.colaborador}<br>
-      <b>Status:</b> ${p.status}<br>
+      <span class="status-pedido status-${p.status}">${p.status}</span><br>
       <b>Data:</b> ${new Date(p.data).toLocaleString()}<br>
       <b>Materiais:</b><ul>${p.materiais.map(m => `<li>${m.material} - ${m.quantidade}</li>`).join("")}</ul>
-      <select id="status_${p.id}">${options}</select>
-      <button onclick="atualizarStatusIndividual('${p.id}')">Alterar Status</button>
+      <b>Histórico:</b><ul>${historico}</ul>
+      <select id="status_${p.id}">
+        ${["Solicitação Recebida", "Reserva Gerada", "Aguardando Verba", "Reserva Apropriada", "Disponível para Retirada", "Material Entregue"]
+          .map(s => `<option value="${s}" ${s === p.status ? "selected" : ""}>${s}</option>`).join("")}
+      </select>
+      <button onclick="atualizarStatusIndividual('${p.id}')">Alterar</button>
     `;
     div.appendChild(el);
   });
 }
 
-function aplicarFiltros() {
-  const status = document.getElementById("filtroStatus").value.trim();
-  const texto = document.getElementById("buscaTexto").value.trim().toLowerCase();
-  const filtrado = todosPedidos.filter(p => {
-    const matchStatus = !status || p.status === status;
-    const matchTexto = !texto || p.colaborador?.toLowerCase().includes(texto) || p.numero?.includes(texto) || p.telefone?.includes(texto);
-    return matchStatus && matchTexto;
-  });
-  renderizarPedidos(filtrado);
-  gerarGraficoStatus(filtrado);
-}
-
-document.getElementById("filtroStatus").addEventListener("change", aplicarFiltros);
-document.getElementById("buscaTexto").addEventListener("input", aplicarFiltros);
-
 function atualizarStatusIndividual(id) {
   const novo = document.getElementById("status_" + id).value;
   const ref = db.collection("pedidos").doc(id);
   ref.get().then(doc => {
-    if (doc.exists) {
-      const historico = doc.data().historico || [];
-      historico.push({ status: novo, data: new Date().toISOString() });
-      ref.update({ status: novo, historico });
-    }
+    const hist = doc.data().historico || [];
+    hist.push({ status: novo, data: new Date().toISOString() });
+    ref.ref.update({ status: novo, historico: hist });
   });
 }
+
+function aplicarFiltros() {
+  const status = document.getElementById("filtroStatus").value;
+  const texto = document.getElementById("buscaTexto").value.toLowerCase();
+  const filtrado = todosPedidos.filter(p =>
+    (!status || p.status === status) &&
+    (!texto || p.colaborador.toLowerCase().includes(texto) || p.numero.includes(texto))
+  );
+  renderizarPedidos(filtrado);
+  gerarGraficoStatus(filtrado);
+}
+document.getElementById("filtroStatus").addEventListener("change", aplicarFiltros);
+document.getElementById("buscaTexto").addEventListener("input", aplicarFiltros);
 
 function atualizarStatusEmMassa() {
   const file = document.getElementById("arquivoStatus").files[0];
   if (!file) return alert("Selecione um arquivo.");
   const reader = new FileReader();
   reader.onload = function(e) {
-    const wb = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
-    const sheet = wb.Sheets[wb.SheetNames[0]];
-    const dados = XLSX.utils.sheet_to_json(sheet);
-    const promessas = dados.map(row => {
-      const numero = String(row["Número do Pedido"]).trim();
-      const novoStatus = String(row["Novo Status"]).trim();
-      return db.collection("pedidos").where("numero", "==", numero).get().then(snapshot => {
-        if (!snapshot.empty) {
+    const dados = XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(e.target.result), { type: "array" }).Sheets.Sheet1);
+    const promessas = dados.map(row =>
+      db.collection("pedidos").where("numero", "==", String(row["Número do Pedido"])).get().then(snap => {
+        if (!snap.empty) {
           const batch = db.batch();
-          snapshot.forEach(doc => {
+          snap.forEach(doc => {
             const hist = doc.data().historico || [];
-            hist.push({ status: novoStatus, data: new Date().toISOString() });
-            batch.update(doc.ref, { status: novoStatus, historico: hist });
+            hist.push({ status: row["Novo Status"], data: new Date().toISOString() });
+            batch.update(doc.ref, { status: row["Novo Status"], historico: hist });
           });
           return batch.commit();
         }
-      });
-    });
-    Promise.all(promessas).then(() => alert("Status atualizados com sucesso!"));
+      })
+    );
+    Promise.all(promessas).then(() => alert("Atualizado com sucesso"));
   };
   reader.readAsArrayBuffer(file);
 }
@@ -226,19 +228,17 @@ function atualizarStatusEmMassa() {
 function exportarExcel() {
   const wb = XLSX.utils.book_new();
   const linhas = [];
-  todosPedidos.forEach(p => {
-    p.materiais.forEach(m => {
-      linhas.push({
-        "Número do Pedido": p.numero,
-        "Colaborador": p.colaborador,
-        "Status": p.status,
-        "Material": m.material,
-        "Quantidade": m.quantidade,
-        "Observações": p.observacoes || "",
-        "Data": new Date(p.data).toLocaleString()
-      });
-    });
-  });
+  todosPedidos.forEach(p =>
+    p.materiais.forEach(m => linhas.push({
+      "Número do Pedido": p.numero,
+      "Colaborador": p.colaborador,
+      "Status": p.status,
+      "Material": m.material,
+      "Quantidade": m.quantidade,
+      "Observações": p.observacoes || "",
+      "Data": new Date(p.data).toLocaleString()
+    }))
+  );
   const ws = XLSX.utils.json_to_sheet(linhas);
   XLSX.utils.book_append_sheet(wb, ws, "Pedidos");
   XLSX.writeFile(wb, "Pedidos_Materiais.xlsx");
@@ -254,18 +254,23 @@ function gerarGraficoStatus(pedidos) {
     "Material Entregue": 0
   };
   pedidos.forEach(p => contagem[p.status] = (contagem[p.status] || 0) + 1);
-  const ctx = document.getElementById("graficoStatus").getContext("2d");
-  new Chart(ctx, {
+  new Chart(document.getElementById("graficoStatus"), {
     type: "pie",
     data: {
       labels: Object.keys(contagem),
       datasets: [{
         data: Object.values(contagem),
-        backgroundColor: ["#2e7d32", "#66bb6a", "#a5d6a7", "#81c784", "#c8e6c9", "#1b5e20"]
+        backgroundColor: ["#9c27b0", "#007bff", "#e53935", "#ec407a", "#2e7d32", "#757575"]
       }]
     },
     options: {
-      plugins: { datalabels: { color: "#fff", font: { weight: "bold" }, formatter: v => v } }
+      plugins: {
+        datalabels: {
+          color: "#fff",
+          font: { weight: "bold" },
+          formatter: v => v
+        }
+      }
     },
     plugins: [ChartDataLabels]
   });
