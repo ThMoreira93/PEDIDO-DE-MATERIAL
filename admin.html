@@ -4,14 +4,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Painel Admin - Pedido de Materiais</title>
+  <title>Admin - Pedido de Materiais</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
+    body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f4f4f4; padding: 20px; }
     #loginContainer, #conteudo {
       max-width: 1000px; margin: auto; background: white; padding: 30px;
       border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
@@ -26,8 +26,8 @@
     }
     button:hover { background-color: #0056b3; }
     .pedido {
-      padding: 20px; margin: 20px 0; background: #f9f9f9;
-      border-left: 6px solid #007bff; border-radius: 8px;
+      background: #fff; border-left: 6px solid #007bff; padding: 20px;
+      margin: 20px 0; border-radius: 8px;
     }
     .numero-pedido {
       font-weight: bold; color: #ff9800; font-size: 18px;
@@ -42,15 +42,13 @@
     .Reserva\ Apropriada { background-color: #ec407a; }
     .Disponível\ para\ Retirada { background-color: #2e7d32; }
     .Material\ Entregue { background-color: #757575; }
-    #graficoStatus {
-      max-width: 400px; margin: 30px auto;
-    }
+    #graficoStatus { max-width: 400px; margin: 30px auto; }
   </style>
 </head>
 <body onload="verificaLogin()">
 <div id="loginContainer">
   <h2>Login</h2>
-  <form onsubmit="login(event); return false;">
+  <form onsubmit="realizarLogin(event)">
     <input type="text" id="user" placeholder="Usuário" required />
     <input type="password" id="pass" placeholder="Senha" required />
     <button type="submit">Entrar</button>
@@ -91,7 +89,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 let todosPedidos = [];
 
-function login(e) {
+function realizarLogin(e) {
   e.preventDefault();
   const u = document.getElementById("user").value;
   const p = document.getElementById("pass").value;
@@ -127,7 +125,7 @@ function renderizarPedidos(lista) {
   div.innerHTML = "";
   lista.forEach(p => {
     const historico = (p.historico || []).map(h => `<li>${new Date(h.data).toLocaleString()} - ${h.status}</li>`).join("");
-    const statusClass = p.status.replace(/ /g, "\ ");
+    const statusClass = p.status.replace(/ /g, "\\ ");
     const el = document.createElement("div");
     el.className = "pedido";
     el.innerHTML = `
@@ -139,15 +137,26 @@ function renderizarPedidos(lista) {
       <b>Materiais:</b>
       <ul>${p.materiais.map(m => `<li>${m.material} (Qtd: ${m.quantidade})</li>`).join("")}</ul>
       <div class="status ${statusClass}">${p.status}</div>
-      <select id="status_${p.id}">
+      <select onchange="atualizarStatusIndividual('${p.id}', this.value)">
         ${["Solicitação Recebida", "Reserva Gerada", "Aguardando Verba", "Reserva Apropriada", "Disponível para Retirada", "Material Entregue"]
           .map(s => `<option value="${s}" ${s === p.status ? "selected" : ""}>${s}</option>`).join("")}
       </select>
-      <button onclick="atualizarStatusIndividual('${p.id}')">Alterar</button>
       <b>Histórico:</b>
       <ul>${historico}</ul>
     `;
     div.appendChild(el);
+  });
+}
+
+function atualizarStatusIndividual(id, valor) {
+  const ref = db.collection("pedidos").doc(id);
+  ref.get().then(doc => {
+    if (doc.exists) {
+      const dados = doc.data();
+      const historico = dados.historico || [];
+      historico.push({ status: valor, data: new Date().toISOString() });
+      ref.update({ status: valor, historico: historico });
+    }
   });
 }
 
@@ -164,16 +173,6 @@ function aplicarFiltros() {
 
 document.getElementById("buscaTexto").addEventListener("input", aplicarFiltros);
 document.getElementById("filtroStatus").addEventListener("change", aplicarFiltros);
-
-function atualizarStatusIndividual(id) {
-  const novo = document.getElementById("status_" + id).value;
-  const ref = db.collection("pedidos").doc(id);
-  ref.get().then(doc => {
-    const hist = doc.data().historico || [];
-    hist.push({ status: novo, data: new Date().toISOString() });
-    ref.ref.update({ status: novo, historico: hist });
-  });
-}
 
 function atualizarStatusEmMassa() {
   const file = document.getElementById("arquivoStatus").files[0];
