@@ -42,6 +42,7 @@
     .Reserva\ Apropriada { background-color: #ec407a; }
     .Disponível\ para\ Retirada { background-color: #2e7d32; }
     .Material\ Entregue { background-color: #757575; }
+    .Pedido\ Cancelado { background-color: #f44336; }
     #graficoStatus { max-width: 400px; margin: 30px auto; }
   </style>
 </head>
@@ -67,6 +68,7 @@
     <option>Reserva Apropriada</option>
     <option>Disponível para Retirada</option>
     <option>Material Entregue</option>
+    <option>Pedido Cancelado</option>
   </select>
   <input type="file" id="arquivoStatus" />
   <button onclick="atualizarStatusEmMassa()">Atualizar em Massa</button>
@@ -135,12 +137,37 @@ function renderizarPedidos(lista) {
       <b>Data:</b> ${new Date(p.data).toLocaleString()}<br>
       <b>Observações:</b> ${p.observacoes || ""}<br>
       <b>Materiais:</b>
-      <ul>${p.materiais.map(m => `<li>${m.material} (Qtd: ${m.quantidade})</li>`).join("")}</ul>
-      <div class="status ${statusClass}">${p.status}</div>
-      <select onchange="atualizarStatusIndividual('${p.id}', this.value)">
-        ${["Solicitação Recebida", "Reserva Gerada", "Aguardando Verba", "Reserva Apropriada", "Disponível para Retirada", "Material Entregue"]
-          .map(s => `<option value="${s}" ${s === p.status ? "selected" : ""}>${s}</option>`).join("")}
-      </select>
+      <table style="width:100%; margin-top:10px; border-collapse:collapse;">
+        <tr style="background-color:#f0f0f0; font-weight:bold;">
+          <td style="padding:8px; border:1px solid #ddd;">Material</td>
+          <td style="padding:8px; border:1px solid #ddd;">Quantidade</td>
+          <td style="padding:8px; border:1px solid #ddd;">Status</td>
+          <td style="padding:8px; border:1px solid #ddd;">Ação</td>
+        </tr>
+        ${p.materiais.map((m, idx) => `
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">${m.material}</td>
+            <td style="padding:8px; border:1px solid #ddd;">${m.quantidade}</td>
+            <td style="padding:8px; border:1px solid #ddd;">
+              <span class="status ${(m.status || p.status).replace(/ /g, "\\ ")}">${m.status || p.status}</span>
+            </td>
+            <td style="padding:8px; border:1px solid #ddd;">
+              <select onchange="atualizarStatusItem('${p.id}', ${idx}, this.value)">
+                ${["Solicitação Recebida", "Reserva Gerada", "Aguardando Verba", "Reserva Apropriada", "Disponível para Retirada", "Material Entregue", "Pedido Cancelado"]
+                  .map(s => `<option value="${s}" ${s === (m.status || p.status) ? "selected" : ""}>${s}</option>`).join("")}
+              </select>
+            </td>
+          </tr>
+        `).join("")}
+      </table>
+      <div style="margin-top:15px;">
+        <b>Status do Pedido:</b>
+        <div class="status ${statusClass}" style="margin-right:10px;">${p.status}</div>
+        <select onchange="atualizarStatusIndividual('${p.id}', this.value)">
+          ${["Solicitação Recebida", "Reserva Gerada", "Aguardando Verba", "Reserva Apropriada", "Disponível para Retirada", "Material Entregue", "Pedido Cancelado"]
+            .map(s => `<option value="${s}" ${s === p.status ? "selected" : ""}>${s}</option>`).join("")}
+        </select>
+      </div>
       <b>Histórico:</b>
       <ul>${historico}</ul>
     `;
@@ -156,6 +183,43 @@ function atualizarStatusIndividual(id, valor) {
       const historico = dados.historico || [];
       historico.push({ status: valor, data: new Date().toISOString() });
       ref.update({ status: valor, historico: historico });
+    }
+  });
+}
+
+function atualizarStatusItem(pedidoId, itemIndex, novoStatus) {
+  const ref = db.collection("pedidos").doc(pedidoId);
+  ref.get().then(doc => {
+    if (doc.exists) {
+      const dados = doc.data();
+      const materiais = dados.materiais || [];
+      
+      // Verificar se o índice é válido
+      if (itemIndex >= 0 && itemIndex < materiais.length) {
+        // Criar ou atualizar o histórico do item
+        if (!materiais[itemIndex].historico) {
+          materiais[itemIndex].historico = [];
+        }
+        
+        // Adicionar entrada ao histórico do item
+        materiais[itemIndex].historico.push({
+          status: novoStatus,
+          data: new Date().toISOString()
+        });
+        
+        // Atualizar o status do item
+        materiais[itemIndex].status = novoStatus;
+        
+        // Atualizar o documento no Firestore
+        ref.update({ materiais: materiais })
+          .then(() => {
+            console.log(`Status do item ${itemIndex} atualizado para: ${novoStatus}`);
+          })
+          .catch(error => {
+            console.error("Erro ao atualizar status do item:", error);
+            alert("Erro ao atualizar o status do item. Tente novamente.");
+          });
+      }
     }
   });
 }
@@ -177,22 +241,132 @@ document.getElementById("filtroStatus").addEventListener("change", aplicarFiltro
 function atualizarStatusEmMassa() {
   const file = document.getElementById("arquivoStatus").files[0];
   if (!file) return alert("Selecione uma planilha.");
+  
+  // Mostrar feedback de processamento
+  alert("Processando planilha. Aguarde...");
+  
   const reader = new FileReader();
   reader.onload = function(e) {
-    const dados = XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(e.target.result), { type: "array" }).Sheets.Sheet1);
-    const promessas = dados.map(row =>
-      db.collection("pedidos").where("numero", "==", parseInt(row["Número do Pedido"])).get().then(snap => {
-        if (!snap.empty) {
-          snap.forEach(doc => {
-            const hist = doc.data().historico || [];
-            hist.push({ status: row["Novo Status"], data: new Date().toISOString() });
-            doc.ref.update({ status: row["Novo Status"], historico: hist });
-          });
+    try {
+      // Ler a planilha
+      const workbook = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
+      
+      // Verificar se a planilha tem a Sheet1
+      if (!workbook.Sheets.Sheet1) {
+        return alert("Formato de planilha inválido. Use o modelo fornecido.");
+      }
+      
+      const dados = XLSX.utils.sheet_to_json(workbook.Sheets.Sheet1);
+      
+      // Verificar se há dados
+      if (dados.length === 0) {
+        return alert("A planilha não contém dados para atualização.");
+      }
+      
+      // Verificar se as colunas necessárias existem
+      if (!dados[0].hasOwnProperty("Número do Pedido") || !dados[0].hasOwnProperty("Novo Status")) {
+        return alert("A planilha não contém as colunas necessárias. Use o modelo fornecido.");
+      }
+      
+      // Array para armazenar resultados
+      let atualizados = 0;
+      let naoEncontrados = 0;
+      let statusInvalidos = 0;
+      
+      // Lista de status válidos
+      const statusValidos = [
+        "Solicitação Recebida", 
+        "Reserva Gerada", 
+        "Aguardando Verba", 
+        "Reserva Apropriada", 
+        "Disponível para Retirada", 
+        "Material Entregue",
+        "Pedido Cancelado"
+      ];
+      
+      const promessas = dados.map(row => {
+        // Verificar se o número do pedido é válido
+        if (!row["Número do Pedido"] || isNaN(parseInt(row["Número do Pedido"]))) {
+          naoEncontrados++;
+          return Promise.resolve();
         }
-      })
-    );
-    Promise.all(promessas).then(() => alert("Pedidos atualizados."));
+        
+        // Verificar se o status é válido
+        if (!row["Novo Status"] || !statusValidos.includes(row["Novo Status"])) {
+          statusInvalidos++;
+          return Promise.resolve();
+        }
+        
+        // Buscar e atualizar o pedido
+        return db.collection("pedidos")
+          .where("numero", "==", parseInt(row["Número do Pedido"]))
+          .get()
+          .then(snap => {
+            if (snap.empty) {
+              naoEncontrados++;
+              return;
+            }
+            
+            const promessasAtualizacao = [];
+            snap.forEach(doc => {
+              const dados = doc.data();
+              const historico = dados.historico || [];
+              historico.push({ 
+                status: row["Novo Status"], 
+                data: new Date().toISOString() 
+              });
+              
+              promessasAtualizacao.push(
+                doc.ref.update({ 
+                  status: row["Novo Status"], 
+                  historico: historico 
+                })
+              );
+            });
+            
+            return Promise.all(promessasAtualizacao).then(() => {
+              atualizados += snap.size;
+            });
+          })
+          .catch(error => {
+            console.error("Erro ao atualizar pedido:", error);
+            return Promise.resolve();
+          });
+      });
+      
+      // Processar todas as promessas e mostrar resultado
+      Promise.all(promessas)
+        .then(() => {
+          let mensagem = `Atualização concluída!\n\n`;
+          mensagem += `- Pedidos atualizados: ${atualizados}\n`;
+          
+          if (naoEncontrados > 0) {
+            mensagem += `- Pedidos não encontrados: ${naoEncontrados}\n`;
+          }
+          
+          if (statusInvalidos > 0) {
+            mensagem += `- Status inválidos: ${statusInvalidos}\n`;
+          }
+          
+          alert(mensagem);
+          
+          // Limpar o input de arquivo
+          document.getElementById("arquivoStatus").value = "";
+        })
+        .catch(error => {
+          console.error("Erro na atualização em massa:", error);
+          alert("Ocorreu um erro durante a atualização. Verifique o console para mais detalhes.");
+        });
+    } catch (error) {
+      console.error("Erro ao processar planilha:", error);
+      alert("Erro ao processar a planilha. Verifique se o formato está correto.");
+    }
   };
+  
+  reader.onerror = function() {
+    alert("Erro ao ler o arquivo. Tente novamente.");
+  };
+  
   reader.readAsArrayBuffer(file);
 }
 
@@ -203,9 +377,10 @@ function exportarExcel() {
     p.materiais.forEach(m => linhas.push({
       "Número do Pedido": p.numero,
       "Colaborador": p.colaborador,
-      "Status": p.status,
+      "Status do Pedido": p.status,
       "Material": m.material,
       "Quantidade": m.quantidade,
+      "Status do Item": m.status || p.status,
       "Observações": p.observacoes || "",
       "Data": new Date(p.data).toLocaleString()
     }))
@@ -222,7 +397,8 @@ function gerarGraficoStatus(pedidos) {
     "Aguardando Verba": 0,
     "Reserva Apropriada": 0,
     "Disponível para Retirada": 0,
-    "Material Entregue": 0
+    "Material Entregue": 0,
+    "Pedido Cancelado": 0
   };
   pedidos.forEach(p => contagem[p.status] = (contagem[p.status] || 0) + 1);
   new Chart(document.getElementById("graficoStatus"), {
@@ -231,7 +407,7 @@ function gerarGraficoStatus(pedidos) {
       labels: Object.keys(contagem),
       datasets: [{
         data: Object.values(contagem),
-        backgroundColor: ["#9c27b0", "#007bff", "#e53935", "#ec407a", "#2e7d32", "#757575"]
+        backgroundColor: ["#9c27b0", "#007bff", "#e53935", "#ec407a", "#2e7d32", "#757575", "#f44336"]
       }]
     },
     options: {
