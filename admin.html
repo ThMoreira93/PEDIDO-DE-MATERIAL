@@ -1,84 +1,1486 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin - Pedido de Materiais</title>
+  <title>Gestão de Materiais - Painel Administrativo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f4f4f4; padding: 20px; }
-    #loginContainer, #conteudo {
-      max-width: 1000px; margin: auto; background: white; padding: 30px;
-      border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    :root {
+      /* Cores primárias */
+      --primary-50: #e3f2fd;
+      --primary-100: #bbdefb;
+      --primary-200: #90caf9;
+      --primary-300: #64b5f6;
+      --primary-400: #42a5f5;
+      --primary-500: #2196f3;  /* Cor principal */
+      --primary-600: #1e88e5;
+      --primary-700: #1976d2;
+      --primary-800: #1565c0;
+      --primary-900: #0d47a1;
+      
+      /* Cores secundárias */
+      --secondary-500: #ff9800;  /* Laranja para destaque */
+      
+      /* Cores neutras */
+      --neutral-50: #fafafa;
+      --neutral-100: #f5f5f5;
+      --neutral-200: #eeeeee;
+      --neutral-300: #e0e0e0;
+      --neutral-400: #bdbdbd;
+      --neutral-500: #9e9e9e;
+      --neutral-600: #757575;
+      --neutral-700: #616161;
+      --neutral-800: #424242;
+      --neutral-900: #212121;
+      
+      /* Cores de status */
+      --status-received: #9c27b0;     /* Solicitação Recebida */
+      --status-generated: #1976d2;    /* Reserva Gerada */
+      --status-waiting: #e53935;      /* Aguardando Verba */
+      --status-appropriated: #ec407a; /* Reserva Apropriada */
+      --status-available: #2e7d32;    /* Disponível para Retirada */
+      --status-delivered: #757575;    /* Material Entregue */
+      --status-canceled: #ff0000;     /* Pedido Cancelado */
+      
+      /* Cores de feedback */
+      --success: #4caf50;
+      --warning: #ff9800;
+      --error: #f44336;
+      --info: #2196f3;
+      
+      /* Tipografia */
+      --font-primary: 'Roboto', sans-serif;
+      --font-secondary: 'Open Sans', sans-serif;
+      
+      /* Espaçamento */
+      --space-1: 0.25rem;  /* 4px */
+      --space-2: 0.5rem;   /* 8px */
+      --space-3: 0.75rem;  /* 12px */
+      --space-4: 1rem;     /* 16px */
+      --space-5: 1.25rem;  /* 20px */
+      --space-6: 1.5rem;   /* 24px */
+      --space-8: 2rem;     /* 32px */
+      --space-10: 2.5rem;  /* 40px */
+      --space-12: 3rem;    /* 48px */
     }
-    h2 { text-align: center; color: #2e7d32; }
-    input, select, button {
-      padding: 10px; margin: 10px 5px 10px 0;
-      font-size: 14px; border-radius: 6px; border: 1px solid #ccc;
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    button {
-      background-color: #007bff; color: white; font-weight: bold; cursor: pointer;
+    
+    body {
+      font-family: var(--font-primary);
+      background-color: var(--neutral-100);
+      color: var(--neutral-800);
+      line-height: 1.5;
     }
-    button:hover { background-color: #0056b3; }
-    .pedido {
-      background: #fff; border-left: 6px solid #007bff; padding: 20px;
-      margin: 20px 0; border-radius: 8px;
+    
+    /* Layout principal */
+    .app-container {
+      display: flex;
+      min-height: 100vh;
     }
-    .numero-pedido {
-      font-weight: bold; color: #ff9800; font-size: 18px;
+    
+    /* Barra lateral */
+    .sidebar {
+      width: 260px;
+      background-color: var(--neutral-900);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
     }
-    .status {
-      display: inline-block; padding: 6px 10px; border-radius: 5px;
-      color: white; font-weight: bold; margin-top: 10px;
+    
+    .sidebar-header {
+      padding: var(--space-4);
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
-    .Solicitação\ Recebida { background-color: #9c27b0; }
-    .Reserva\ Gerada { background-color: #007bff; }
-    .Aguardando\ Verba { background-color: #e53935; }
-    .Reserva\ Apropriada { background-color: #ec407a; }
-    .Disponível\ para\ Retirada { background-color: #2e7d32; }
-    .Material\ Entregue { background-color: #757575; }
-    .Pedido\ Cancelado { background-color: #f44336; }
-    #graficoStatus { max-width: 400px; margin: 30px auto; }
+    
+    .logo {
+      width: 40px;
+      height: 40px;
+      margin-right: var(--space-3);
+    }
+    
+    .sidebar-header h1 {
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+    
+    .sidebar-nav {
+      flex: 1;
+      padding: var(--space-4) 0;
+      overflow-y: auto;
+    }
+    
+    .nav-item {
+      list-style: none;
+    }
+    
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      padding: var(--space-3) var(--space-4);
+      color: var(--neutral-300);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    
+    .nav-item a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    .nav-item.active a {
+      background-color: var(--primary-700);
+      color: white;
+      border-left: 4px solid var(--primary-300);
+    }
+    
+    .nav-item i {
+      margin-right: var(--space-3);
+      width: 20px;
+      text-align: center;
+    }
+    
+    .sidebar-footer {
+      padding: var(--space-4);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      margin-bottom: var(--space-3);
+    }
+    
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      margin-right: var(--space-3);
+      object-fit: cover;
+    }
+    
+    .user-details {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .user-name {
+      font-weight: 500;
+    }
+    
+    .user-role {
+      font-size: 0.75rem;
+      color: var(--neutral-400);
+    }
+    
+    .btn-logout {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: var(--space-2) var(--space-3);
+      background-color: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      color: var(--neutral-300);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-logout:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    .btn-logout i {
+      margin-right: var(--space-2);
+    }
+    
+    /* Conteúdo principal */
+    .main-content {
+      flex: 1;
+      margin-left: 260px;
+      padding: var(--space-4);
+      transition: all 0.3s ease;
+    }
+    
+    .content-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-6);
+    }
+    
+    .page-title h2 {
+      font-size: 1.75rem;
+      font-weight: 500;
+      color: var(--neutral-800);
+      margin-bottom: var(--space-1);
+    }
+    
+    .breadcrumb {
+      font-size: 0.875rem;
+      color: var(--neutral-500);
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+    }
+    
+    .search-container {
+      position: relative;
+      margin-right: var(--space-4);
+    }
+    
+    .search-input {
+      padding: var(--space-2) var(--space-4);
+      padding-left: var(--space-8);
+      border: 1px solid var(--neutral-300);
+      border-radius: 4px;
+      font-size: 0.875rem;
+      width: 240px;
+      transition: all 0.2s ease;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary-400);
+      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+    }
+    
+    .btn-search {
+      position: absolute;
+      left: var(--space-2);
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--neutral-500);
+      cursor: pointer;
+    }
+    
+    /* Botões */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-2) var(--space-4);
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+    
+    .btn i {
+      margin-right: var(--space-2);
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-600);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-700);
+    }
+    
+    .btn-secondary {
+      background-color: var(--neutral-200);
+      color: var(--neutral-800);
+    }
+    
+    .btn-secondary:hover {
+      background-color: var(--neutral-300);
+    }
+    
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      background-color: transparent;
+      border: none;
+      color: var(--neutral-600);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-icon:hover {
+      background-color: var(--neutral-200);
+      color: var(--neutral-800);
+    }
+    
+    .btn-link {
+      color: var(--primary-600);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-link:hover {
+      color: var(--primary-800);
+      text-decoration: underline;
+    }
+    
+    /* Cards */
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      margin-bottom: var(--space-6);
+      overflow: hidden;
+    }
+    
+    .card-header {
+      padding: var(--space-4);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--neutral-200);
+    }
+    
+    .card-header h3 {
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: var(--neutral-800);
+    }
+    
+    .card-actions {
+      display: flex;
+      align-items: center;
+    }
+    
+    .card-body {
+      padding: var(--space-4);
+    }
+    
+    .card-footer {
+      padding: var(--space-4);
+      border-top: 1px solid var(--neutral-200);
+      display: flex;
+      justify-content: flex-end;
+    }
+    
+    /* KPI Cards */
+    .kpi-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+    
+    .kpi-card {
+      display: flex;
+      align-items: center;
+      padding: var(--space-4);
+    }
+    
+    .kpi-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background-color: var(--primary-100);
+      color: var(--primary-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: var(--space-4);
+      font-size: 1.5rem;
+    }
+    
+    .kpi-content {
+      flex: 1;
+    }
+    
+    .kpi-title {
+      font-size: 0.875rem;
+      color: var(--neutral-600);
+      margin-bottom: var(--space-1);
+    }
+    
+    .kpi-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--neutral-900);
+      margin-bottom: var(--space-1);
+    }
+    
+    .kpi-change {
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    .kpi-change.positive {
+      color: var(--success);
+    }
+    
+    .kpi-change.negative {
+      color: var(--error);
+    }
+    
+    /* Grid Layout */
+    .grid-layout {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+    
+    /* Seções */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-4);
+    }
+    
+    .section-header h3 {
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: var(--neutral-800);
+    }
+    
+    /* Tabelas */
+    .table-responsive {
+      overflow-x: auto;
+    }
+    
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .table th, .table td {
+      padding: var(--space-3) var(--space-4);
+      text-align: left;
+      border-bottom: 1px solid var(--neutral-200);
+    }
+    
+    .table th {
+      font-weight: 500;
+      color: var(--neutral-700);
+      background-color: var(--neutral-100);
+      font-size: 0.875rem;
+    }
+    
+    .table tr:hover {
+      background-color: var(--neutral-50);
+    }
+    
+    .table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      line-height: 1.5;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .badge-received {
+      background-color: var(--status-received);
+      color: white;
+    }
+    
+    .badge-generated {
+      background-color: var(--status-generated);
+      color: white;
+    }
+    
+    .badge-waiting {
+      background-color: var(--status-waiting);
+      color: white;
+    }
+    
+    .badge-appropriated {
+      background-color: var(--status-appropriated);
+      color: white;
+    }
+    
+    .badge-available {
+      background-color: var(--status-available);
+      color: white;
+    }
+    
+    .badge-delivered {
+      background-color: var(--status-delivered);
+      color: white;
+    }
+    
+    .badge-canceled {
+      background-color: var(--status-canceled);
+      color: white;
+    }
+    
+    /* Paginação */
+    .pagination {
+      display: flex;
+      align-items: center;
+    }
+    
+    .btn-page {
+      padding: var(--space-1) var(--space-3);
+      margin: 0 var(--space-1);
+      border-radius: 4px;
+      background-color: transparent;
+      border: 1px solid var(--neutral-300);
+      color: var(--neutral-700);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-page:hover {
+      background-color: var(--neutral-100);
+    }
+    
+    .btn-page.active {
+      background-color: var(--primary-600);
+      color: white;
+      border-color: var(--primary-600);
+    }
+    
+    /* Formulários */
+    .form-group {
+      margin-bottom: var(--space-4);
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: var(--space-2);
+      font-weight: 500;
+      font-size: 0.875rem;
+      color: var(--neutral-700);
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--neutral-300);
+      border-radius: 4px;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-400);
+      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+    }
+    
+    .form-select {
+      width: 100%;
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--neutral-300);
+      border-radius: 4px;
+      font-size: 0.875rem;
+      background-color: white;
+      transition: all 0.2s ease;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23616161' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right var(--space-3) center;
+      background-size: 16px;
+    }
+    
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary-400);
+      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+    }
+    
+    /* Notificações */
+    .notification-container {
+      position: fixed;
+      top: var(--space-4);
+      right: var(--space-4);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    
+    .notification {
+      display: flex;
+      align-items: center;
+      padding: var(--space-3) var(--space-4);
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      background-color: white;
+      max-width: 320px;
+      animation: slideIn 0.3s ease forwards;
+    }
+    
+    .notification-hiding {
+      animation: slideOut 0.3s ease forwards;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    .notification-icon {
+      margin-right: var(--space-3);
+      font-size: 1.25rem;
+    }
+    
+    .notification-content {
+      flex: 1;
+    }
+    
+    .notification-title {
+      font-weight: 500;
+      margin-bottom: var(--space-1);
+      font-size: 0.875rem;
+    }
+    
+    .notification-message {
+      font-size: 0.75rem;
+      color: var(--neutral-600);
+    }
+    
+    .notification-close {
+      background: none;
+      border: none;
+      color: var(--neutral-500);
+      cursor: pointer;
+      padding: var(--space-1);
+      margin-left: var(--space-2);
+    }
+    
+    .notification-success .notification-icon {
+      color: var(--success);
+    }
+    
+    .notification-error .notification-icon {
+      color: var(--error);
+    }
+    
+    .notification-warning .notification-icon {
+      color: var(--warning);
+    }
+    
+    .notification-info .notification-icon {
+      color: var(--info);
+    }
+    
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1000;
+    }
+    
+    .modal.show {
+      display: block;
+    }
+    
+    .modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    
+    .modal-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      max-width: 500px;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, -60%); }
+      to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+    
+    .modal-content {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+    
+    .modal-header {
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--neutral-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-title {
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: var(--neutral-800);
+    }
+    
+    .btn-close {
+      background: none;
+      border: none;
+      color: var(--neutral-500);
+      cursor: pointer;
+      font-size: 1.25rem;
+      padding: var(--space-1);
+    }
+    
+    .modal-body {
+      padding: var(--space-4);
+    }
+    
+    .modal-footer {
+      padding: var(--space-4);
+      border-top: 1px solid var(--neutral-200);
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-3);
+    }
+    
+    /* Loading Indicator */
+    .loading-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(33, 150, 243, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--primary-600);
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Login */
+    .login-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background-color: var(--neutral-100);
+      padding: var(--space-4);
+    }
+    
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      padding: var(--space-8);
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: var(--space-6);
+    }
+    
+    .login-logo {
+      width: 64px;
+      height: 64px;
+      margin-bottom: var(--space-4);
+    }
+    
+    .login-title {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--neutral-800);
+      margin-bottom: var(--space-2);
+    }
+    
+    .login-subtitle {
+      font-size: 0.875rem;
+      color: var(--neutral-600);
+    }
+    
+    .login-form {
+      margin-bottom: var(--space-4);
+    }
+    
+    .login-footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--neutral-500);
+    }
+    
+    /* Pedidos */
+    .pedido-card {
+      margin-bottom: var(--space-4);
+    }
+    
+    .pedido-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-3);
+    }
+    
+    .pedido-numero {
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: var(--secondary-500);
+    }
+    
+    .pedido-data {
+      font-size: 0.875rem;
+      color: var(--neutral-600);
+    }
+    
+    .pedido-info {
+      margin-bottom: var(--space-4);
+    }
+    
+    .pedido-info-item {
+      display: flex;
+      margin-bottom: var(--space-2);
+    }
+    
+    .pedido-info-label {
+      font-weight: 500;
+      width: 120px;
+      color: var(--neutral-700);
+    }
+    
+    .pedido-info-value {
+      flex: 1;
+    }
+    
+    .pedido-materiais {
+      margin-bottom: var(--space-4);
+    }
+    
+    .pedido-status {
+      display: flex;
+      align-items: center;
+      margin-top: var(--space-4);
+    }
+    
+    .pedido-status-label {
+      font-weight: 500;
+      margin-right: var(--space-3);
+    }
+    
+    .pedido-status-select {
+      margin-left: var(--space-3);
+    }
+    
+    .pedido-historico {
+      margin-top: var(--space-4);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--neutral-200);
+    }
+    
+    .pedido-historico-titulo {
+      font-weight: 500;
+      margin-bottom: var(--space-2);
+    }
+    
+    .pedido-historico-lista {
+      list-style: none;
+      padding-left: var(--space-4);
+    }
+    
+    .pedido-historico-item {
+      position: relative;
+      padding-left: var(--space-4);
+      padding-bottom: var(--space-3);
+      font-size: 0.875rem;
+    }
+    
+    .pedido-historico-item::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--primary-500);
+    }
+    
+    .pedido-historico-item::after {
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: 14px;
+      bottom: 0;
+      width: 2px;
+      background-color: var(--neutral-300);
+    }
+    
+    .pedido-historico-item:last-child::after {
+      display: none;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 992px) {
+      .sidebar {
+        width: 64px;
+      }
+      
+      .sidebar-header h1,
+      .nav-item span,
+      .user-details,
+      .btn-logout span {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 64px;
+      }
+      
+      .content-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .header-actions {
+        margin-top: var(--space-3);
+        width: 100%;
+      }
+      
+      .search-container {
+        flex: 1;
+      }
+      
+      .search-input {
+        width: 100%;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .kpi-cards {
+        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+      }
+      
+      .grid-layout {
+        grid-template-columns: 1fr;
+      }
+      
+      .content-header {
+        margin-bottom: var(--space-4);
+      }
+      
+      .header-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .search-container {
+        margin-right: 0;
+        margin-bottom: var(--space-3);
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .main-content {
+        padding: var(--space-3);
+      }
+      
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .card-actions {
+        margin-top: var(--space-2);
+      }
+      
+      .pedido-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .pedido-data {
+        margin-top: var(--space-1);
+      }
+    }
   </style>
 </head>
-<body onload="verificaLogin()">
-<div id="loginContainer">
-  <h2>Login</h2>
-  <form onsubmit="realizarLogin(event)">
-    <input type="text" id="user" placeholder="Usuário" required />
-    <input type="password" id="pass" placeholder="Senha" required />
-    <button type="submit">Entrar</button>
-    <p id="loginErro" style="color:red; display:none;">Usuário ou senha incorretos.</p>
-  </form>
+<body>
+<!-- Tela de Login -->
+<div id="loginContainer" class="login-container">
+  <div class="card login-card">
+    <div class="login-header">
+      <div style="width: 64px; height: 64px; background-color: var(--primary-600); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">
+        <i class="fas fa-boxes" style="font-size: 32px; color: white;"></i>
+      </div>
+      <h1 class="login-title">Gestão de Materiais</h1>
+      <p class="login-subtitle">Faça login para acessar o painel administrativo</p>
+    </div>
+    
+    <form class="login-form" onsubmit="realizarLogin(event)">
+      <div class="form-group">
+        <label for="user" class="form-label">Usuário</label>
+        <input type="text" id="user" class="form-control" placeholder="Digite seu usuário" required />
+      </div>
+      
+      <div class="form-group">
+        <label for="pass" class="form-label">Senha</label>
+        <input type="password" id="pass" class="form-control" placeholder="Digite sua senha" required />
+      </div>
+      
+      <p id="loginErro" style="color: var(--error); font-size: 0.875rem; margin-top: var(--space-2); display: none;">
+        Usuário ou senha incorretos.
+      </p>
+      
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--space-4);">
+        <i class="fas fa-sign-in-alt"></i>
+        Entrar
+      </button>
+    </form>
+    
+    <div class="login-footer">
+      <p>&copy; 2025 Gestão de Materiais. Todos os direitos reservados.</p>
+    </div>
+  </div>
 </div>
 
-<div id="conteudo" style="display:none;">
-  <h2>Painel de Pedidos</h2>
-  <input id="buscaTexto" placeholder="Buscar por colaborador, número ou telefone..." />
-  <select id="filtroStatus">
-    <option value="">Todos os Status</option>
-    <option>Solicitação Recebida</option>
-    <option>Reserva Gerada</option>
-    <option>Aguardando Verba</option>
-    <option>Reserva Apropriada</option>
-    <option>Disponível para Retirada</option>
-    <option>Material Entregue</option>
-    <option>Pedido Cancelado</option>
-  </select>
-  <input type="file" id="arquivoStatus" />
-  <button onclick="atualizarStatusEmMassa()">Atualizar em Massa</button>
-  <a href="Modelo_Atualizacao_Status.xlsx" download><button>Baixar Modelo</button></a>
-  <button onclick="exportarExcel()">Exportar Excel</button>
-  <canvas id="graficoStatus"></canvas>
-  <div id="listaPedidos"></div>
+<!-- Painel Principal -->
+<div id="conteudo" class="app-container" style="display: none;">
+  <!-- Barra lateral -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div style="width: 40px; height: 40px; background-color: var(--primary-600); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-boxes" style="font-size: 20px; color: white;"></i>
+      </div>
+      <h1>Gestão de Materiais</h1>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <ul>
+        <li class="nav-item active">
+          <a href="#dashboard" onclick="mostrarSecao('dashboard')">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#pedidos" onclick="mostrarSecao('pedidos')">
+            <i class="fas fa-clipboard-list"></i>
+            <span>Pedidos</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#importacao" onclick="mostrarSecao('importacao')">
+            <i class="fas fa-file-import"></i>
+            <span>Importação</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#relatorios" onclick="mostrarSecao('relatorios')">
+            <i class="fas fa-chart-bar"></i>
+            <span>Relatórios</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div style="width: 36px; height: 36px; background-color: var(--primary-700); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-user" style="font-size: 16px; color: white;"></i>
+        </div>
+        <div class="user-details">
+          <span class="user-name">Admin</span>
+          <span class="user-role">Administrador</span>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="realizarLogout()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Sair</span>
+      </button>
+    </div>
+  </aside>
+  
+  <!-- Conteúdo principal -->
+  <main class="main-content">
+    <!-- Seção Dashboard -->
+    <div id="secao-dashboard">
+      <header class="content-header">
+        <div class="page-title">
+          <h2>Dashboard</h2>
+          <p class="breadcrumb">Home > Dashboard</p>
+        </div>
+        
+        <div class="header-actions">
+          <div class="search-container">
+            <input type="text" id="buscaTexto" placeholder="Buscar pedidos..." class="search-input">
+            <button class="btn-search">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+          <button class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            <span>Novo Pedido</span>
+          </button>
+        </div>
+      </header>
+      
+      <!-- KPIs -->
+      <div class="kpi-cards">
+        <div class="card kpi-card">
+          <div class="kpi-icon">
+            <i class="fas fa-clipboard-list"></i>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-title">Total de Pedidos</h3>
+            <p class="kpi-value" id="kpi-total">0</p>
+            <p class="kpi-change positive">
+              <i class="fas fa-arrow-up"></i> Atualizado
+            </p>
+          </div>
+        </div>
+        
+        <div class="card kpi-card">
+          <div class="kpi-icon" style="background-color: #ffecb3; color: #ff9800;">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-title">Aguardando Verba</h3>
+            <p class="kpi-value" id="kpi-aguardando">0</p>
+            <p class="kpi-change negative">
+              <i class="fas fa-arrow-up"></i> Atualizado
+            </p>
+          </div>
+        </div>
+        
+        <div class="card kpi-card">
+          <div class="kpi-icon" style="background-color: #c8e6c9; color: #2e7d32;">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-title">Disponíveis</h3>
+            <p class="kpi-value" id="kpi-disponiveis">0</p>
+            <p class="kpi-change positive">
+              <i class="fas fa-arrow-up"></i> Atualizado
+            </p>
+          </div>
+        </div>
+        
+        <div class="card kpi-card">
+          <div class="kpi-icon" style="background-color: #e0e0e0; color: #616161;">
+            <i class="fas fa-truck"></i>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-title">Entregues</h3>
+            <p class="kpi-value" id="kpi-entregues">0</p>
+            <p class="kpi-change positive">
+              <i class="fas fa-arrow-up"></i> Atualizado
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Gráficos -->
+      <div class="grid-layout">
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3>Status dos Pedidos</h3>
+            <div class="card-actions">
+              <button class="btn-icon" title="Atualizar">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+              <button class="btn-icon" title="Mais opções">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <canvas id="graficoStatus" height="250"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Pedidos Recentes -->
+      <section>
+        <div class="section-header">
+          <h3>Pedidos Recentes</h3>
+          <a href="#pedidos" class="btn-link" onclick="mostrarSecao('pedidos')">Ver todos</a>
+        </div>
+        
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table" id="tabelaPedidosRecentes">
+              <thead>
+                <tr>
+                  <th>Nº Pedido</th>
+                  <th>Colaborador</th>
+                  <th>Data</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Preenchido via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+          <div class="card-footer">
+            <div class="pagination">
+              <button class="btn-page" disabled>Anterior</button>
+              <button class="btn-page active">1</button>
+              <button class="btn-page">2</button>
+              <button class="btn-page">3</button>
+              <button class="btn-page">Próximo</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    
+    <!-- Seção Pedidos -->
+    <div id="secao-pedidos" style="display: none;">
+      <header class="content-header">
+        <div class="page-title">
+          <h2>Pedidos</h2>
+          <p class="breadcrumb">Home > Pedidos</p>
+        </div>
+        
+        <div class="header-actions">
+          <div class="search-container">
+            <input type="text" id="buscaTextoPedidos" placeholder="Buscar por colaborador, número ou telefone..." class="search-input">
+            <button class="btn-search">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+          <select id="filtroStatus" class="form-select" style="width: auto; margin-right: var(--space-3);">
+            <option value="">Todos os Status</option>
+            <option>Solicitação Recebida</option>
+            <option>Reserva Gerada</option>
+            <option>Aguardando Verba</option>
+            <option>Reserva Apropriada</option>
+            <option>Disponível para Retirada</option>
+            <option>Material Entregue</option>
+            <option>Pedido Cancelado</option>
+          </select>
+          <button class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            <span>Novo Pedido</span>
+          </button>
+        </div>
+      </header>
+      
+      <div id="listaPedidos">
+        <!-- Preenchido via JavaScript -->
+      </div>
+      
+      <div class="card-footer" style="background-color: white; border-radius: 8px; margin-top: var(--space-4);">
+        <div class="pagination">
+          <button class="btn-page" disabled>Anterior</button>
+          <button class="btn-page active">1</button>
+          <button class="btn-page">2</button>
+          <button class="btn-page">3</button>
+          <button class="btn-page">Próximo</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Seção Importação -->
+    <div id="secao-importacao" style="display: none;">
+      <header class="content-header">
+        <div class="page-title">
+          <h2>Importação</h2>
+          <p class="breadcrumb">Home > Importação</p>
+        </div>
+      </header>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3>Atualização em Massa</h3>
+        </div>
+        <div class="card-body">
+          <p style="margin-bottom: var(--space-4);">
+            Utilize esta ferramenta para atualizar o status de múltiplos pedidos de uma só vez através de uma planilha Excel.
+          </p>
+          
+          <div class="form-group">
+            <label for="arquivoStatus" class="form-label">Selecione a planilha</label>
+            <input type="file" id="arquivoStatus" class="form-control" accept=".xlsx, .xls" />
+            <small style="display: block; margin-top: var(--space-2); color: var(--neutral-600);">
+              A planilha deve conter as colunas "Número do Pedido" e "Novo Status".
+            </small>
+          </div>
+          
+          <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4);">
+            <button class="btn btn-primary" onclick="atualizarStatusEmMassa()">
+              <i class="fas fa-upload"></i>
+              Atualizar em Massa
+            </button>
+            <a href="Modelo_Atualizacao_Status.xlsx" download>
+              <button class="btn btn-secondary">
+                <i class="fas fa-download"></i>
+                Baixar Modelo
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card" style="margin-top: var(--space-6);">
+        <div class="card-header">
+          <h3>Exportar Dados</h3>
+        </div>
+        <div class="card-body">
+          <p style="margin-bottom: var(--space-4);">
+            Exporte todos os pedidos para uma planilha Excel para análise ou backup.
+          </p>
+          
+          <button class="btn btn-primary" onclick="exportarExcel()">
+            <i class="fas fa-file-export"></i>
+            Exportar Excel
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Seção Relatórios -->
+    <div id="secao-relatorios" style="display: none;">
+      <header class="content-header">
+        <div class="page-title">
+          <h2>Relatórios</h2>
+          <p class="breadcrumb">Home > Relatórios</p>
+        </div>
+      </header>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3>Relatórios Disponíveis</h3>
+        </div>
+        <div class="card-body">
+          <p style="margin-bottom: var(--space-4);">
+            Esta seção está em desenvolvimento. Em breve, você poderá gerar relatórios personalizados.
+          </p>
+          
+          <div class="grid-layout" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+            <div class="card" style="margin-bottom: 0;">
+              <div class="card-body" style="display: flex; align-items: center;">
+                <div style="width: 48px; height: 48px; background-color: var(--primary-100); color: var(--primary-700); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: var(--space-4);">
+                  <i class="fas fa-chart-pie" style="font-size: 24px;"></i>
+                </div>
+                <div>
+                  <h4 style="margin-bottom: var(--space-1);">Relatório de Status</h4>
+                  <p style="font-size: 0.875rem; color: var(--neutral-600);">Distribuição de pedidos por status</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card" style="margin-bottom: 0;">
+              <div class="card-body" style="display: flex; align-items: center;">
+                <div style="width: 48px; height: 48px; background-color: var(--primary-100); color: var(--primary-700); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: var(--space-4);">
+                  <i class="fas fa-calendar-alt" style="font-size: 24px;"></i>
+                </div>
+                <div>
+                  <h4 style="margin-bottom: var(--space-1);">Relatório Mensal</h4>
+                  <p style="font-size: 0.875rem; color: var(--neutral-600);">Pedidos agrupados por mês</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card" style="margin-bottom: 0;">
+              <div class="card-body" style="display: flex; align-items: center;">
+                <div style="width: 48px; height: 48px; background-color: var(--primary-100); color: var(--primary-700); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: var(--space-4);">
+                  <i class="fas fa-user-friends" style="font-size: 24px;"></i>
+                </div>
+                <div>
+                  <h4 style="margin-bottom: var(--space-1);">Relatório por Colaborador</h4>
+                  <p style="font-size: 0.875rem; color: var(--neutral-600);">Pedidos agrupados por colaborador</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Notificações -->
+<div id="notificationContainer" class="notification-container"></div>
+
+<!-- Modal de Confirmação -->
+<div id="confirmationModal" class="modal">
+  <div class="modal-backdrop"></div>
+  <div class="modal-container">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Confirmar Ação</h4>
+        <button class="btn-close" data-dismiss="modal" onclick="fecharModal('confirmationModal')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Tem certeza que deseja atualizar o status deste pedido?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="fecharModal('confirmationModal')">Cancelar</button>
+        <button class="btn btn-primary" id="confirmAction">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Indicator -->
+<div id="loadingIndicator" class="loading-indicator" style="display: none;">
+  <div class="spinner"></div>
 </div>
 
 <script>
+// Configuração do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCv7vfGMSobE1n0M1CECl46LdMy3pdrxh4",
   authDomain: "pedido-de-material---ilheus.firebaseapp.com",
@@ -89,20 +1491,66 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-let todosPedidos = [];
 
+// Constantes
+const STATUS_OPTIONS = [
+  "Solicitação Recebida",
+  "Reserva Gerada",
+  "Aguardando Verba",
+  "Reserva Apropriada",
+  "Disponível para Retirada",
+  "Material Entregue",
+  "Pedido Cancelado"
+];
+
+const STATUS_COLORS = {
+  "Solicitação Recebida": "var(--status-received)",
+  "Reserva Gerada": "var(--status-generated)",
+  "Aguardando Verba": "var(--status-waiting)",
+  "Reserva Apropriada": "var(--status-appropriated)",
+  "Disponível para Retirada": "var(--status-available)",
+  "Material Entregue": "var(--status-delivered)",
+  "Pedido Cancelado": "var(--status-canceled)"
+};
+
+const STATUS_BADGES = {
+  "Solicitação Recebida": "badge-received",
+  "Reserva Gerada": "badge-generated",
+  "Aguardando Verba": "badge-waiting",
+  "Reserva Apropriada": "badge-appropriated",
+  "Disponível para Retirada": "badge-available",
+  "Material Entregue": "badge-delivered",
+  "Pedido Cancelado": "badge-canceled"
+};
+
+// Variáveis globais
+let todosPedidos = [];
+let pedidosFiltrados = [];
+let confirmCallback = null;
+
+// Autenticação
 function realizarLogin(e) {
   e.preventDefault();
+  showLoadingIndicator();
+  
   const u = document.getElementById("user").value;
   const p = document.getElementById("pass").value;
-  if (u === "CLB354374" && p === "novo") {
-    localStorage.setItem("loginOK", Date.now());
-    document.getElementById("loginContainer").style.display = "none";
-    document.getElementById("conteudo").style.display = "block";
-    carregarPedidos();
-  } else {
-    document.getElementById("loginErro").style.display = "block";
-  }
+  
+  // Simulação de delay para mostrar o loading
+  setTimeout(() => {
+    hideLoadingIndicator();
+    
+    if (u === "CLB354374" && p === "novo") {
+      localStorage.setItem("loginOK", Date.now());
+      document.getElementById("loginContainer").style.display = "none";
+      document.getElementById("conteudo").style.display = "block";
+      carregarPedidos();
+      showNotification("Login realizado com sucesso!", "success");
+    } else {
+      document.getElementById("loginErro").style.display = "block";
+      showNotification("Falha no login. Verifique suas credenciais.", "error");
+    }
+  }, 1000);
 }
 
 function verificaLogin() {
@@ -114,136 +1562,281 @@ function verificaLogin() {
   }
 }
 
+function realizarLogout() {
+  showConfirmationModal(
+    "Deseja realmente sair?",
+    "Você será redirecionado para a tela de login.",
+    () => {
+      localStorage.removeItem("loginOK");
+      document.getElementById("loginContainer").style.display = "flex";
+      document.getElementById("conteudo").style.display = "none";
+      showNotification("Logout realizado com sucesso!", "info");
+    }
+  );
+}
+
+// Navegação
+function mostrarSecao(secao) {
+  // Ocultar todas as seções
+  document.getElementById("secao-dashboard").style.display = "none";
+  document.getElementById("secao-pedidos").style.display = "none";
+  document.getElementById("secao-importacao").style.display = "none";
+  document.getElementById("secao-relatorios").style.display = "none";
+  
+  // Remover classe active de todos os itens de navegação
+  document.querySelectorAll(".nav-item").forEach(item => {
+    item.classList.remove("active");
+  });
+  
+  // Mostrar a seção selecionada
+  document.getElementById(`secao-${secao}`).style.display = "block";
+  
+  // Adicionar classe active ao item de navegação correspondente
+  document.querySelector(`.nav-item a[href="#${secao}"]`).parentElement.classList.add("active");
+}
+
+// Carregamento de dados
 function carregarPedidos() {
+  showLoadingIndicator();
+  
   db.collection("pedidos").orderBy("data", "desc").onSnapshot(snap => {
     todosPedidos = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    pedidosFiltrados = [...todosPedidos];
+    
     renderizarPedidos(todosPedidos);
+    atualizarTabelaPedidosRecentes();
     gerarGraficoStatus(todosPedidos);
+    atualizarKPIs(todosPedidos);
+    
+    hideLoadingIndicator();
+  }, error => {
+    console.error("Erro ao carregar pedidos:", error);
+    showNotification("Erro ao carregar pedidos. Tente novamente mais tarde.", "error");
+    hideLoadingIndicator();
   });
 }
 
+// Renderização de pedidos
 function renderizarPedidos(lista) {
   const div = document.getElementById("listaPedidos");
   div.innerHTML = "";
-  lista.forEach(p => {
-    const historico = (p.historico || []).map(h => `<li>${new Date(h.data).toLocaleString()} - ${h.status}</li>`).join("");
-    const statusClass = p.status.replace(/ /g, "\\ ");
-    const el = document.createElement("div");
-    el.className = "pedido";
-    el.innerHTML = `
-      <div class="numero-pedido">Pedido: ${p.numero}</div>
-      <b>Colaborador:</b> ${p.colaborador}<br>
-      <b>Telefone:</b> ${p.telefone}<br>
-      <b>Data:</b> ${new Date(p.data).toLocaleString()}<br>
-      <b>Observações:</b> ${p.observacoes || ""}<br>
-      <b>Materiais:</b>
-      <table style="width:100%; margin-top:10px; border-collapse:collapse;">
-        <tr style="background-color:#f0f0f0; font-weight:bold;">
-          <td style="padding:8px; border:1px solid #ddd;">Material</td>
-          <td style="padding:8px; border:1px solid #ddd;">Quantidade</td>
-          <td style="padding:8px; border:1px solid #ddd;">Status</td>
-          <td style="padding:8px; border:1px solid #ddd;">Ação</td>
-        </tr>
-        ${p.materiais.map((m, idx) => `
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">${m.material}</td>
-            <td style="padding:8px; border:1px solid #ddd;">${m.quantidade}</td>
-            <td style="padding:8px; border:1px solid #ddd;">
-              <span class="status ${(m.status || p.status).replace(/ /g, "\\ ")}">${m.status || p.status}</span>
-            </td>
-            <td style="padding:8px; border:1px solid #ddd;">
-              <select onchange="atualizarStatusItem('${p.id}', ${idx}, this.value)">
-                ${["Solicitação Recebida", "Reserva Gerada", "Aguardando Verba", "Reserva Apropriada", "Disponível para Retirada", "Material Entregue", "Pedido Cancelado"]
-                  .map(s => `<option value="${s}" ${s === (m.status || p.status) ? "selected" : ""}>${s}</option>`).join("")}
-              </select>
-            </td>
-          </tr>
-        `).join("")}
-      </table>
-      <div style="margin-top:15px;">
-        <b>Status do Pedido:</b>
-        <div class="status ${statusClass}" style="margin-right:10px;">${p.status}</div>
-        <select onchange="atualizarStatusIndividual('${p.id}', this.value)">
-          ${["Solicitação Recebida", "Reserva Gerada", "Aguardando Verba", "Reserva Apropriada", "Disponível para Retirada", "Material Entregue", "Pedido Cancelado"]
-            .map(s => `<option value="${s}" ${s === p.status ? "selected" : ""}>${s}</option>`).join("")}
-        </select>
+  
+  if (lista.length === 0) {
+    div.innerHTML = `
+      <div class="card" style="text-align: center; padding: var(--space-8);">
+        <i class="fas fa-search" style="font-size: 48px; color: var(--neutral-400); margin-bottom: var(--space-4);"></i>
+        <h3 style="margin-bottom: var(--space-2);">Nenhum pedido encontrado</h3>
+        <p style="color: var(--neutral-600);">Tente ajustar os filtros ou criar um novo pedido.</p>
       </div>
-      <b>Histórico:</b>
-      <ul>${historico}</ul>
     `;
-    div.appendChild(el);
+    return;
+  }
+  
+  lista.forEach(p => {
+    const historico = (p.historico || []).map(h => 
+      `<li class="pedido-historico-item">${new Date(h.data).toLocaleString()} - ${h.status}</li>`
+    ).join("");
+    
+    const card = document.createElement("div");
+    card.className = "card pedido-card";
+    card.innerHTML = `
+      <div class="card-body">
+        <div class="pedido-header">
+          <div class="pedido-numero">Pedido: ${p.numero}</div>
+          <div class="pedido-data">${new Date(p.data).toLocaleString()}</div>
+        </div>
+        
+        <div class="pedido-info">
+          <div class="pedido-info-item">
+            <div class="pedido-info-label">Colaborador:</div>
+            <div class="pedido-info-value">${p.colaborador}</div>
+          </div>
+          <div class="pedido-info-item">
+            <div class="pedido-info-label">Telefone:</div>
+            <div class="pedido-info-value">${p.telefone}</div>
+          </div>
+          <div class="pedido-info-item">
+            <div class="pedido-info-label">Observações:</div>
+            <div class="pedido-info-value">${p.observacoes || "Nenhuma observação"}</div>
+          </div>
+        </div>
+        
+        <div class="pedido-materiais">
+          <h4 style="margin-bottom: var(--space-3);">Materiais</h4>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Material</th>
+                  <th>Quantidade</th>
+                  <th>Status</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${p.materiais.map((m, idx) => `
+                  <tr>
+                    <td>${m.material}</td>
+                    <td>${m.quantidade}</td>
+                    <td>
+                      <span style="color: #2e7d32; font-weight: bold;">${m.status || p.status}</span>
+                    </td>
+                    <td>
+                      <select class="form-select" onchange="atualizarStatusItem('${p.id}', ${idx}, this.value)">
+                        ${STATUS_OPTIONS.map(s => 
+                          `<option value="${s}" ${s === (m.status || p.status) ? "selected" : ""}>${s}</option>`
+                        ).join("")}
+                      </select>
+                    </td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="pedido-status">
+          <div class="pedido-status-label">Status do Pedido:</div>
+          <span class="badge ${STATUS_BADGES[p.status] || 'badge-received'}">${p.status}</span>
+          <div class="pedido-status-select">
+            <select class="form-select" onchange="atualizarStatusIndividual('${p.id}', this.value)">
+              ${STATUS_OPTIONS.map(s => 
+                `<option value="${s}" ${s === p.status ? "selected" : ""}>${s}</option>`
+              ).join("")}
+            </select>
+          </div>
+        </div>
+        
+        <div class="pedido-historico">
+          <h4 class="pedido-historico-titulo">Histórico</h4>
+          <ul class="pedido-historico-lista">
+            ${historico || "<li class='pedido-historico-item'>Nenhum histórico disponível</li>"}
+          </ul>
+        </div>
+      </div>
+    `;
+    
+    div.appendChild(card);
   });
 }
 
+// Atualização de status
 function atualizarStatusIndividual(id, valor) {
-  const ref = db.collection("pedidos").doc(id);
-  ref.get().then(doc => {
-    if (doc.exists) {
-      const dados = doc.data();
-      const historico = dados.historico || [];
-      historico.push({ status: valor, data: new Date().toISOString() });
-      ref.update({ status: valor, historico: historico });
+  showConfirmationModal(
+    "Confirmar alteração de status",
+    `Deseja alterar o status do pedido para "${valor}"?`,
+    () => {
+      showLoadingIndicator();
+      
+      const ref = db.collection("pedidos").doc(id);
+      ref.get().then(doc => {
+        if (doc.exists) {
+          const dados = doc.data();
+          const historico = dados.historico || [];
+          historico.push({ status: valor, data: new Date().toISOString() });
+          
+          ref.update({ status: valor, historico: historico })
+            .then(() => {
+              hideLoadingIndicator();
+              showNotification(`Status do pedido atualizado para "${valor}"`, "success");
+            })
+            .catch(error => {
+              console.error("Erro ao atualizar status:", error);
+              hideLoadingIndicator();
+              showNotification("Erro ao atualizar status. Tente novamente.", "error");
+            });
+        }
+      });
     }
-  });
+  );
 }
 
 function atualizarStatusItem(pedidoId, itemIndex, novoStatus) {
-  const ref = db.collection("pedidos").doc(pedidoId);
-  ref.get().then(doc => {
-    if (doc.exists) {
-      const dados = doc.data();
-      const materiais = dados.materiais || [];
+  showConfirmationModal(
+    "Confirmar alteração de status",
+    `Deseja alterar o status do item para "${novoStatus}"?`,
+    () => {
+      showLoadingIndicator();
       
-      // Verificar se o índice é válido
-      if (itemIndex >= 0 && itemIndex < materiais.length) {
-        // Criar ou atualizar o histórico do item
-        if (!materiais[itemIndex].historico) {
-          materiais[itemIndex].historico = [];
+      const ref = db.collection("pedidos").doc(pedidoId);
+      ref.get().then(doc => {
+        if (doc.exists) {
+          const dados = doc.data();
+          const materiais = dados.materiais || [];
+          
+          // Verificar se o índice é válido
+          if (itemIndex >= 0 && itemIndex < materiais.length) {
+            // Criar ou atualizar o histórico do item
+            if (!materiais[itemIndex].historico) {
+              materiais[itemIndex].historico = [];
+            }
+            
+            // Adicionar entrada ao histórico do item
+            materiais[itemIndex].historico.push({
+              status: novoStatus,
+              data: new Date().toISOString()
+            });
+            
+            // Atualizar o status do item
+            materiais[itemIndex].status = novoStatus;
+            
+            // Atualizar o documento no Firestore
+            ref.update({ materiais: materiais })
+              .then(() => {
+                hideLoadingIndicator();
+                showNotification(`Status do item atualizado para "${novoStatus}"`, "success");
+              })
+              .catch(error => {
+                console.error("Erro ao atualizar status do item:", error);
+                hideLoadingIndicator();
+                showNotification("Erro ao atualizar o status do item. Tente novamente.", "error");
+              });
+          }
         }
-        
-        // Adicionar entrada ao histórico do item
-        materiais[itemIndex].historico.push({
-          status: novoStatus,
-          data: new Date().toISOString()
-        });
-        
-        // Atualizar o status do item
-        materiais[itemIndex].status = novoStatus;
-        
-        // Atualizar o documento no Firestore
-        ref.update({ materiais: materiais })
-          .then(() => {
-            console.log(`Status do item ${itemIndex} atualizado para: ${novoStatus}`);
-          })
-          .catch(error => {
-            console.error("Erro ao atualizar status do item:", error);
-            alert("Erro ao atualizar o status do item. Tente novamente.");
-          });
-      }
+      });
     }
-  });
+  );
 }
 
+// Filtros
 function aplicarFiltros() {
   const status = document.getElementById("filtroStatus").value;
-  const texto = document.getElementById("buscaTexto").value.toLowerCase();
-  const filtrado = todosPedidos.filter(p =>
+  const texto = document.getElementById("buscaTextoPedidos").value.toLowerCase() || 
+                document.getElementById("buscaTexto").value.toLowerCase();
+  
+  pedidosFiltrados = todosPedidos.filter(p =>
     (!status || p.status === status) &&
-    (!texto || p.colaborador.toLowerCase().includes(texto) || p.numero.toString().includes(texto) || p.telefone.includes(texto))
+    (!texto || 
+     p.colaborador.toLowerCase().includes(texto) || 
+     p.numero.toString().includes(texto) || 
+     p.telefone.includes(texto))
   );
-  renderizarPedidos(filtrado);
-  gerarGraficoStatus(filtrado);
+  
+  renderizarPedidos(pedidosFiltrados);
+  gerarGraficoStatus(pedidosFiltrados);
 }
 
-document.getElementById("buscaTexto").addEventListener("input", aplicarFiltros);
-document.getElementById("filtroStatus").addEventListener("change", aplicarFiltros);
+// Event Listeners para filtros
+document.addEventListener('DOMContentLoaded', function() {
+  const buscaTexto = document.getElementById("buscaTexto");
+  const buscaTextoPedidos = document.getElementById("buscaTextoPedidos");
+  const filtroStatus = document.getElementById("filtroStatus");
+  
+  if (buscaTexto) buscaTexto.addEventListener("input", aplicarFiltros);
+  if (buscaTextoPedidos) buscaTextoPedidos.addEventListener("input", aplicarFiltros);
+  if (filtroStatus) filtroStatus.addEventListener("change", aplicarFiltros);
+});
 
+// Atualização em massa
 function atualizarStatusEmMassa() {
   const file = document.getElementById("arquivoStatus").files[0];
-  if (!file) return alert("Selecione uma planilha.");
+  if (!file) {
+    showNotification("Selecione uma planilha para continuar.", "warning");
+    return;
+  }
   
-  // Mostrar feedback de processamento
-  alert("Processando planilha. Aguarde...");
+  showLoadingIndicator();
+  showNotification("Processando planilha. Aguarde...", "info");
   
   const reader = new FileReader();
   reader.onload = function(e) {
@@ -253,36 +1846,31 @@ function atualizarStatusEmMassa() {
       
       // Verificar se a planilha tem a Sheet1
       if (!workbook.Sheets.Sheet1) {
-        return alert("Formato de planilha inválido. Use o modelo fornecido.");
+        hideLoadingIndicator();
+        showNotification("Formato de planilha inválido. Use o modelo fornecido.", "error");
+        return;
       }
       
       const dados = XLSX.utils.sheet_to_json(workbook.Sheets.Sheet1);
       
       // Verificar se há dados
       if (dados.length === 0) {
-        return alert("A planilha não contém dados para atualização.");
+        hideLoadingIndicator();
+        showNotification("A planilha não contém dados para atualização.", "warning");
+        return;
       }
       
       // Verificar se as colunas necessárias existem
       if (!dados[0].hasOwnProperty("Número do Pedido") || !dados[0].hasOwnProperty("Novo Status")) {
-        return alert("A planilha não contém as colunas necessárias. Use o modelo fornecido.");
+        hideLoadingIndicator();
+        showNotification("A planilha não contém as colunas necessárias. Use o modelo fornecido.", "error");
+        return;
       }
       
       // Array para armazenar resultados
       let atualizados = 0;
       let naoEncontrados = 0;
       let statusInvalidos = 0;
-      
-      // Lista de status válidos
-      const statusValidos = [
-        "Solicitação Recebida", 
-        "Reserva Gerada", 
-        "Aguardando Verba", 
-        "Reserva Apropriada", 
-        "Disponível para Retirada", 
-        "Material Entregue",
-        "Pedido Cancelado"
-      ];
       
       const promessas = dados.map(row => {
         // Verificar se o número do pedido é válido
@@ -292,7 +1880,7 @@ function atualizarStatusEmMassa() {
         }
         
         // Verificar se o status é válido
-        if (!row["Novo Status"] || !statusValidos.includes(row["Novo Status"])) {
+        if (!row["Novo Status"] || !STATUS_OPTIONS.includes(row["Novo Status"])) {
           statusInvalidos++;
           return Promise.resolve();
         }
@@ -337,91 +1925,279 @@ function atualizarStatusEmMassa() {
       // Processar todas as promessas e mostrar resultado
       Promise.all(promessas)
         .then(() => {
-          let mensagem = `Atualização concluída!\n\n`;
-          mensagem += `- Pedidos atualizados: ${atualizados}\n`;
+          hideLoadingIndicator();
           
-          if (naoEncontrados > 0) {
-            mensagem += `- Pedidos não encontrados: ${naoEncontrados}\n`;
+          let mensagem = `Atualização concluída! ${atualizados} pedidos atualizados.`;
+          let tipo = "success";
+          
+          if (naoEncontrados > 0 || statusInvalidos > 0) {
+            mensagem += ` (${naoEncontrados} não encontrados, ${statusInvalidos} status inválidos)`;
+            tipo = atualizados > 0 ? "warning" : "error";
           }
           
-          if (statusInvalidos > 0) {
-            mensagem += `- Status inválidos: ${statusInvalidos}\n`;
-          }
-          
-          alert(mensagem);
+          showNotification(mensagem, tipo);
           
           // Limpar o input de arquivo
           document.getElementById("arquivoStatus").value = "";
         })
         .catch(error => {
           console.error("Erro na atualização em massa:", error);
-          alert("Ocorreu um erro durante a atualização. Verifique o console para mais detalhes.");
+          hideLoadingIndicator();
+          showNotification("Ocorreu um erro durante a atualização. Tente novamente.", "error");
         });
     } catch (error) {
       console.error("Erro ao processar planilha:", error);
-      alert("Erro ao processar a planilha. Verifique se o formato está correto.");
+      hideLoadingIndicator();
+      showNotification("Erro ao processar a planilha. Verifique se o formato está correto.", "error");
     }
   };
   
   reader.onerror = function() {
-    alert("Erro ao ler o arquivo. Tente novamente.");
+    hideLoadingIndicator();
+    showNotification("Erro ao ler o arquivo. Tente novamente.", "error");
   };
   
   reader.readAsArrayBuffer(file);
 }
 
+// Exportação para Excel
 function exportarExcel() {
-  const wb = XLSX.utils.book_new();
-  const linhas = [];
-  todosPedidos.forEach(p =>
-    p.materiais.forEach(m => linhas.push({
-      "Número do Pedido": p.numero,
-      "Colaborador": p.colaborador,
-      "Status do Pedido": p.status,
-      "Material": m.material,
-      "Quantidade": m.quantidade,
-      "Status do Item": m.status || p.status,
-      "Observações": p.observacoes || "",
-      "Data": new Date(p.data).toLocaleString()
-    }))
-  );
-  const ws = XLSX.utils.json_to_sheet(linhas);
-  XLSX.utils.book_append_sheet(wb, ws, "Pedidos");
-  XLSX.writeFile(wb, "Pedidos_Materiais.xlsx");
+  showLoadingIndicator();
+  
+  try {
+    const wb = XLSX.utils.book_new();
+    const linhas = [];
+    
+    todosPedidos.forEach(p =>
+      p.materiais.forEach(m => linhas.push({
+        "Número do Pedido": p.numero,
+        "Colaborador": p.colaborador,
+        "Status do Pedido": p.status,
+        "Material": m.material,
+        "Quantidade": m.quantidade,
+        "Status do Item": m.status || p.status,
+        "Observações": p.observacoes || "",
+        "Data": new Date(p.data).toLocaleString()
+      }))
+    );
+    
+    const ws = XLSX.utils.json_to_sheet(linhas);
+    XLSX.utils.book_append_sheet(wb, ws, "Pedidos");
+    
+    // Timeout para simular processamento
+    setTimeout(() => {
+      XLSX.writeFile(wb, "Pedidos_Materiais.xlsx");
+      hideLoadingIndicator();
+      showNotification("Exportação concluída com sucesso!", "success");
+    }, 1000);
+  } catch (error) {
+    console.error("Erro ao exportar para Excel:", error);
+    hideLoadingIndicator();
+    showNotification("Erro ao exportar dados. Tente novamente.", "error");
+  }
 }
 
+// Gráfico de Status
 function gerarGraficoStatus(pedidos) {
-  const contagem = {
-    "Solicitação Recebida": 0,
-    "Reserva Gerada": 0,
-    "Aguardando Verba": 0,
-    "Reserva Apropriada": 0,
-    "Disponível para Retirada": 0,
-    "Material Entregue": 0,
-    "Pedido Cancelado": 0
-  };
-  pedidos.forEach(p => contagem[p.status] = (contagem[p.status] || 0) + 1);
-  new Chart(document.getElementById("graficoStatus"), {
+  const contagem = {};
+  
+  // Inicializar contagem para todos os status
+  STATUS_OPTIONS.forEach(status => {
+    contagem[status] = 0;
+  });
+  
+  // Contar pedidos por status
+  pedidos.forEach(p => {
+    contagem[p.status] = (contagem[p.status] || 0) + 1;
+  });
+  
+  // Filtrar apenas status com contagem > 0
+  const labels = [];
+  const data = [];
+  const backgroundColor = [];
+  
+  Object.keys(contagem).forEach(status => {
+    if (contagem[status] > 0) {
+      labels.push(status);
+      data.push(contagem[status]);
+      backgroundColor.push(STATUS_COLORS[status]);
+    }
+  });
+  
+  // Verificar se já existe um gráfico e destruí-lo
+  const chartElement = document.getElementById("graficoStatus");
+  const chartInstance = Chart.getChart(chartElement);
+  if (chartInstance) {
+    chartInstance.destroy();
+  }
+  
+  // Criar novo gráfico
+  new Chart(chartElement, {
     type: "pie",
     data: {
-      labels: Object.keys(contagem),
+      labels: labels,
       datasets: [{
-        data: Object.values(contagem),
-        backgroundColor: ["#9c27b0", "#007bff", "#e53935", "#ec407a", "#2e7d32", "#757575", "#f44336"]
+        data: data,
+        backgroundColor: backgroundColor
       }]
     },
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
       plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            padding: 20,
+            boxWidth: 12,
+            font: {
+              size: 12
+            }
+          }
+        },
         datalabels: {
           color: "#fff",
           font: { weight: "bold" },
-          formatter: v => v
+          formatter: (value, ctx) => {
+            const total = ctx.dataset.data.reduce((acc, val) => acc + val, 0);
+            const percentage = (value * 100 / total).toFixed(1) + '%';
+            return value > 0 ? percentage : '';
+          }
         }
       }
     },
     plugins: [ChartDataLabels]
   });
 }
+
+// Tabela de Pedidos Recentes
+function atualizarTabelaPedidosRecentes() {
+  const tbody = document.querySelector("#tabelaPedidosRecentes tbody");
+  tbody.innerHTML = "";
+  
+  // Pegar os 5 pedidos mais recentes
+  const pedidosRecentes = todosPedidos.slice(0, 5);
+  
+  pedidosRecentes.forEach(p => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${p.numero}</td>
+      <td>${p.colaborador}</td>
+      <td>${new Date(p.data).toLocaleDateString()}</td>
+      <td>
+        <span class="badge ${STATUS_BADGES[p.status] || 'badge-received'}">${p.status}</span>
+      </td>
+      <td>
+        <div style="display: flex; gap: var(--space-2);">
+          <button class="btn-icon" title="Ver detalhes" onclick="mostrarSecao('pedidos')">
+            <i class="fas fa-eye"></i>
+          </button>
+          <button class="btn-icon" title="Editar" onclick="mostrarSecao('pedidos')">
+            <i class="fas fa-edit"></i>
+          </button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// KPIs
+function atualizarKPIs(pedidos) {
+  // Total de pedidos
+  document.getElementById("kpi-total").textContent = pedidos.length;
+  
+  // Aguardando Verba
+  const aguardandoVerba = pedidos.filter(p => p.status === "Aguardando Verba").length;
+  document.getElementById("kpi-aguardando").textContent = aguardandoVerba;
+  
+  // Disponíveis para Retirada
+  const disponiveis = pedidos.filter(p => p.status === "Disponível para Retirada").length;
+  document.getElementById("kpi-disponiveis").textContent = disponiveis;
+  
+  // Entregues
+  const entregues = pedidos.filter(p => p.status === "Material Entregue").length;
+  document.getElementById("kpi-entregues").textContent = entregues;
+}
+
+// UI Helpers
+function showLoadingIndicator() {
+  document.getElementById("loadingIndicator").style.display = "flex";
+}
+
+function hideLoadingIndicator() {
+  document.getElementById("loadingIndicator").style.display = "none";
+}
+
+function showNotification(message, type = 'info') {
+  const container = document.getElementById('notificationContainer');
+  
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  
+  let icon = 'info-circle';
+  if (type === 'success') icon = 'check-circle';
+  if (type === 'error') icon = 'exclamation-circle';
+  if (type === 'warning') icon = 'exclamation-triangle';
+  
+  notification.innerHTML = `
+    <div class="notification-icon">
+      <i class="fas fa-${icon}"></i>
+    </div>
+    <div class="notification-content">
+      <h4 class="notification-title">${type.charAt(0).toUpperCase() + type.slice(1)}</h4>
+      <p class="notification-message">${message}</p>
+    </div>
+    <button class="notification-close">
+      <i class="fas fa-times"></i>
+    </button>
+  `;
+  
+  notification.querySelector('.notification-close').addEventListener('click', () => {
+    notification.classList.add('notification-hiding');
+    setTimeout(() => notification.remove(), 300);
+  });
+  
+  container.appendChild(notification);
+  
+  // Auto-remover após 5 segundos
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.classList.add('notification-hiding');
+      setTimeout(() => notification.remove(), 300);
+    }
+  }, 5000);
+}
+
+function showConfirmationModal(title, message, callback) {
+  const modal = document.getElementById('confirmationModal');
+  modal.querySelector('.modal-title').textContent = title;
+  modal.querySelector('.modal-body p').textContent = message;
+  
+  // Armazenar callback
+  confirmCallback = callback;
+  
+  // Configurar botão de confirmação
+  const confirmButton = document.getElementById('confirmAction');
+  confirmButton.onclick = function() {
+    if (confirmCallback) confirmCallback();
+    fecharModal('confirmationModal');
+  };
+  
+  // Mostrar modal
+  modal.classList.add('show');
+}
+
+function fecharModal(modalId) {
+  const modal = document.getElementById(modalId);
+  modal.classList.remove('show');
+  confirmCallback = null;
+}
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+  verificaLogin();
+});
 </script>
 </body>
 </html>
