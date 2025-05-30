@@ -1396,52 +1396,56 @@
           <p class="breadcrumb">Home > Relatórios</p>
         </div>
       </header>
-      
+
       <div class="card">
         <div class="card-header">
-          <h3>Relatórios Disponíveis</h3>
+          <h3>Gerar Relatórios</h3>
         </div>
         <div class="card-body">
-          <p style="margin-bottom: var(--space-4);">
-            Esta seção está em desenvolvimento. Em breve, você poderá gerar relatórios personalizados.
-          </p>
-          
-          <div class="grid-layout" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
-            <div class="card" style="margin-bottom: 0;">
-              <div class="card-body" style="display: flex; align-items: center;">
-                <div style="width: 48px; height: 48px; background-color: var(--primary-100); color: var(--primary-700); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: var(--space-4);">
-                  <i class="fas fa-chart-pie" style="font-size: 24px;"></i>
-                </div>
-                <div>
-                  <h4 style="margin-bottom: var(--space-1);">Relatório de Status</h4>
-                  <p style="font-size: 0.875rem; color: var(--neutral-600);">Distribuição de pedidos por status</p>
-                </div>
-              </div>
-            </div>
-            
-            <div class="card" style="margin-bottom: 0;">
-              <div class="card-body" style="display: flex; align-items: center;">
-                <div style="width: 48px; height: 48px; background-color: var(--primary-100); color: var(--primary-700); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: var(--space-4);">
-                  <i class="fas fa-calendar-alt" style="font-size: 24px;"></i>
-                </div>
-                <div>
-                  <h4 style="margin-bottom: var(--space-1);">Relatório Mensal</h4>
-                  <p style="font-size: 0.875rem; color: var(--neutral-600);">Pedidos agrupados por mês</p>
-                </div>
-              </div>
-            </div>
-            
-            <div class="card" style="margin-bottom: 0;">
-              <div class="card-body" style="display: flex; align-items: center;">
-                <div style="width: 48px; height: 48px; background-color: var(--primary-100); color: var(--primary-700); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: var(--space-4);">
-                  <i class="fas fa-user-friends" style="font-size: 24px;"></i>
-                </div>
-                <div>
-                  <h4 style="margin-bottom: var(--space-1);">Relatório por Colaborador</h4>
-                  <p style="font-size: 0.875rem; color: var(--neutral-600);">Pedidos agrupados por colaborador</p>
-                </div>
-              </div>
-            </div>
+          <div class="form-group">
+            <label for="tipoRelatorio" class="form-label">Tipo de Relatório:</label>
+            <select id="tipoRelatorio" class="form-select">
+              <option value="status">Distribuição por Status</option>
+              <option value="mensal">Pedidos por Mês</option>
+              <option value="colaborador">Pedidos por Colaborador</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="dataInicioRelatorio" class="form-label">Data Início:</label>
+            <input type="date" id="dataInicioRelatorio" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="dataFimRelatorio" class="form-label">Data Fim:</label>
+            <input type="date" id="dataFimRelatorio" class="form-control">
+          </div>
+
+          <button class="btn btn-primary" onclick="gerarRelatorio()">
+            <i class="fas fa-cogs"></i>
+            Gerar Relatório
+          </button>
+        </div>
+      </div>
+
+      <div id="resultadoRelatorio" class="card" style="margin-top: var(--space-6); display: none;">
+        <div class="card-header">
+          <h3 id="tituloResultadoRelatorio">Resultado do Relatório</h3>
+          <button class="btn btn-secondary" onclick="exportarRelatorioExcel()">
+            <i class="fas fa-file-export"></i>
+            Exportar para Excel
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table" id="tabelaRelatorio">
+              <thead>
+                <!-- Cabeçalho preenchido via JavaScript -->
+              </thead>
+              <tbody>
+                <!-- Dados preenchidos via JavaScript -->
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -1452,7 +1456,7 @@
 <!-- Notificações -->
 <div id="notificationContainer" class="notification-container"></div>
 
-<!-- Modal de Confirmação -->
+<!<!-- Modal de Confirmação -->
 <div id="confirmationModal" class="modal">
   <div class="modal-backdrop"></div>
   <div class="modal-container">
@@ -1469,6 +1473,33 @@
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="fecharModal('confirmationModal')">Cancelar</button>
         <button class="btn btn-primary" id="confirmAction">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Troca de Senha -->
+<div id="trocaSenhaModal" class="modal">
+  <div class="modal-backdrop"></div>
+  <div class="modal-container">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Alterar Senha</h4>
+      </div>
+      <div class="modal-body">
+        <p>Este é seu primeiro login. Por favor, altere sua senha.</p>
+        <div class="form-group">
+          <label for="novaSenha" class="form-label">Nova Senha:</label>
+          <input type="password" id="novaSenha" class="form-control" placeholder="Digite sua nova senha">
+        </div>
+        <div class="form-group">
+          <label for="confirmaSenha" class="form-label">Confirmar Senha:</label>
+          <input type="password" id="confirmaSenha" class="form-control" placeholder="Confirme sua nova senha">
+        </div>
+        <div id="trocaSenhaErro" class="alert alert-danger" style="display: none;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="trocarSenha()">Alterar Senha</button>
       </div>
     </div>
   </div>
@@ -1528,6 +1559,15 @@ let todosPedidos = [];
 let pedidosFiltrados = [];
 let confirmCallback = null;
 
+// Usuários do sistema
+const USUARIOS = {
+  "CLB354374": { senha: "novo", nome: "Administrador", cargo: "Administrador", primeiroLogin: false },
+  "CLB149233": { senha: "12345", nome: "Michael", cargo: "Designer Gráfico", primeiroLogin: true },
+  "CLB123633": { senha: "12345", nome: "Rafael", cargo: "Programador", primeiroLogin: true },
+  "CLB961017": { senha: "12345", nome: "Suporte", cargo: "Suporte Técnico", primeiroLogin: true },
+  "CLB620245": { senha: "12345", nome: "Gerente", cargo: "Gerente de Operações", primeiroLogin: true }
+};
+
 // Autenticação
 function realizarLogin(e) {
   e.preventDefault();
@@ -1540,12 +1580,34 @@ function realizarLogin(e) {
   setTimeout(() => {
     hideLoadingIndicator();
     
-    if (u === "CLB354374" && p === "novo") {
-      localStorage.setItem("loginOK", Date.now());
-      document.getElementById("loginContainer").style.display = "none";
-      document.getElementById("conteudo").style.display = "block";
-      carregarPedidos();
-      showNotification("Login realizado com sucesso!", "success");
+    if (USUARIOS[u] && USUARIOS[u].senha === p) {
+      // Armazenar informações do usuário logado
+      const usuarioLogado = {
+        usuario: u,
+        nome: USUARIOS[u].nome,
+        cargo: USUARIOS[u].cargo,
+        primeiroLogin: USUARIOS[u].primeiroLogin,
+        timestamp: Date.now()
+      };
+      
+      localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
+      
+      // Verificar se é primeiro login
+      if (USUARIOS[u].primeiroLogin) {
+        // Mostrar modal para troca de senha
+        showTrocaSenhaModal();
+      } else {
+        // Login normal
+        document.getElementById("loginContainer").style.display = "none";
+        document.getElementById("conteudo").style.display = "block";
+        
+        // Atualizar informações do usuário na interface
+        document.querySelector(".user-name").textContent = USUARIOS[u].nome;
+        document.querySelector(".user-role").textContent = USUARIOS[u].cargo;
+        
+        carregarPedidos();
+        showNotification("Login realizado com sucesso!", "success");
+      }
     } else {
       document.getElementById("loginErro").style.display = "block";
       showNotification("Falha no login. Verifique suas credenciais.", "error");
@@ -1553,11 +1615,102 @@ function realizarLogin(e) {
   }, 1000);
 }
 
+// Modal para troca de senha no primeiro login
+function showTrocaSenhaModal() {
+  const modal = document.getElementById('trocaSenhaModal');
+  modal.classList.add('show');
+}
+
+// Função para trocar senha no primeiro login
+function trocarSenha() {
+  const novaSenha = document.getElementById("novaSenha").value;
+  const confirmaSenha = document.getElementById("confirmaSenha").value;
+  
+  // Validar senha
+  if (novaSenha.length < 6) {
+    document.getElementById("trocaSenhaErro").textContent = "A senha deve ter pelo menos 6 caracteres";
+    document.getElementById("trocaSenhaErro").style.display = "block";
+    return;
+  }
+  
+  if (novaSenha !== confirmaSenha) {
+    document.getElementById("trocaSenhaErro").textContent = "As senhas não coincidem";
+    document.getElementById("trocaSenhaErro").style.display = "block";
+    return;
+  }
+  
+  // Obter usuário logado
+  const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+  
+  // Atualizar senha
+  USUARIOS[usuarioLogado.usuario].senha = novaSenha;
+  USUARIOS[usuarioLogado.usuario].primeiroLogin = false;
+  
+  // Atualizar informações do usuário logado
+  usuarioLogado.primeiroLogin = false;
+  localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
+  
+  // Registrar alteração de senha
+  registrarAcao("Alteração de senha", "Senha alterada no primeiro login");
+  
+  // Fechar modal
+  fecharModal('trocaSenhaModal');
+  
+  // Mostrar conteúdo
+  document.getElementById("loginContainer").style.display = "none";
+  document.getElementById("conteudo").style.display = "block";
+  
+  // Atualizar informações do usuário na interface
+  document.querySelector(".user-name").textContent = usuarioLogado.nome;
+  document.querySelector(".user-role").textContent = usuarioLogado.cargo;
+  
+  carregarPedidos();
+  showNotification("Senha alterada com sucesso!", "success");
+}
+
+// Registro de ações do usuário
+function registrarAcao(tipo, descricao, detalhes = {}) {
+  // Obter usuário logado
+  const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+  if (!usuarioLogado) return;
+  
+  // Criar registro de ação
+  const acao = {
+    tipo: tipo,
+    descricao: descricao,
+    usuario: usuarioLogado.usuario,
+    nome: usuarioLogado.nome,
+    cargo: usuarioLogado.cargo,
+    data: new Date().toISOString(),
+    detalhes: detalhes
+  };
+  
+  // Obter registros existentes
+  let registros = JSON.parse(localStorage.getItem("registroAcoes")) || [];
+  
+  // Adicionar novo registro
+  registros.push(acao);
+  
+  // Salvar registros
+  localStorage.setItem("registroAcoes", JSON.stringify(registros));
+  
+  // Se estiver conectado ao Firebase, salvar também no banco de dados
+  if (db) {
+    db.collection("registroAcoes").add(acao)
+      .catch(error => console.error("Erro ao salvar registro de ação:", error));
+  }
+}
+
 function verificaLogin() {
-  const l = localStorage.getItem("loginOK");
-  if (l && Date.now() - l < 1800000) {
+  const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+  if (usuarioLogado && Date.now() - usuarioLogado.timestamp < 1800000) {
     document.getElementById("loginContainer").style.display = "none";
     document.getElementById("conteudo").style.display = "block";
+    
+    // Atualizar informações do usuário na interface
+    document.querySelector(".user-name").textContent = usuarioLogado.nome;
+    document.querySelector(".user-role").textContent = usuarioLogado.cargo;
+    
     carregarPedidos();
   }
 }
@@ -1567,7 +1720,13 @@ function realizarLogout() {
     "Deseja realmente sair?",
     "Você será redirecionado para a tela de login.",
     () => {
-      localStorage.removeItem("loginOK");
+      // Registrar ação de logout
+      registrarAcao("Logout", "Usuário realizou logout do sistema");
+      
+      // Remover dados de login
+      localStorage.removeItem("usuarioLogado");
+      
+      // Redirecionar para tela de login
       document.getElementById("loginContainer").style.display = "flex";
       document.getElementById("conteudo").style.display = "none";
       showNotification("Logout realizado com sucesso!", "info");
@@ -1733,12 +1892,32 @@ function atualizarStatusIndividual(id, valor) {
         if (doc.exists) {
           const dados = doc.data();
           const historico = dados.historico || [];
-          historico.push({ status: valor, data: new Date().toISOString() });
+          
+          // Obter usuário logado
+          const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+          
+          // Criar entrada de histórico com informações do usuário
+          const novaEntrada = { 
+            status: valor, 
+            data: new Date().toISOString(),
+            usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
+            nome: usuarioLogado ? usuarioLogado.nome : "Sistema"
+          };
+          
+          historico.push(novaEntrada);
           
           ref.update({ status: valor, historico: historico })
             .then(() => {
               hideLoadingIndicator();
               showNotification(`Status do pedido atualizado para "${valor}"`, "success");
+              
+              // Registrar ação
+              registrarAcao("Alteração de Status", `Status do pedido ${dados.numero} alterado para "${valor}"`, {
+                pedidoId: id,
+                numeroPedido: dados.numero,
+                statusAntigo: dados.status,
+                statusNovo: valor
+              });
             })
             .catch(error => {
               console.error("Erro ao atualizar status:", error);
@@ -1771,10 +1950,15 @@ function atualizarStatusItem(pedidoId, itemIndex, novoStatus) {
               materiais[itemIndex].historico = [];
             }
             
-            // Adicionar entrada ao histórico do item
+            // Obter usuário logado
+            const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+            
+            // Adicionar entrada ao histórico do item com informações do usuário
             materiais[itemIndex].historico.push({
               status: novoStatus,
-              data: new Date().toISOString()
+              data: new Date().toISOString(),
+              usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
+              nome: usuarioLogado ? usuarioLogado.nome : "Sistema"
             });
             
             // Atualizar o status do item
@@ -1785,6 +1969,15 @@ function atualizarStatusItem(pedidoId, itemIndex, novoStatus) {
               .then(() => {
                 hideLoadingIndicator();
                 showNotification(`Status do item atualizado para "${novoStatus}"`, "success");
+                
+                // Registrar ação
+                registrarAcao("Alteração de Status de Item", `Status do item ${materiais[itemIndex].material} alterado para "${novoStatus}"`, {
+                  pedidoId: pedidoId,
+                  numeroPedido: dados.numero,
+                  material: materiais[itemIndex].material,
+                  statusAntigo: materiais[itemIndex].status || dados.status,
+                  statusNovo: novoStatus
+                });
               })
               .catch(error => {
                 console.error("Erro ao atualizar status do item:", error);
@@ -2192,6 +2385,337 @@ function fecharModal(modalId) {
   const modal = document.getElementById(modalId);
   modal.classList.remove('show');
   confirmCallback = null;
+}
+
+// Funções para a aba de relatórios
+function gerarRelatorio() {
+  const tipoRelatorio = document.getElementById("tipoRelatorio").value;
+  const dataInicio = document.getElementById("dataInicioRelatorio").value;
+  const dataFim = document.getElementById("dataFimRelatorio").value;
+  
+  // Validar datas
+  if (dataInicio && dataFim && new Date(dataInicio) > new Date(dataFim)) {
+    showNotification("A data de início deve ser anterior à data de fim", "error");
+    return;
+  }
+  
+  // Filtrar pedidos por data se especificado
+  let pedidosFiltrados = [...todosPedidos];
+  
+  if (dataInicio) {
+    const dataInicioObj = new Date(dataInicio);
+    dataInicioObj.setHours(0, 0, 0, 0);
+    pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.data) >= dataInicioObj);
+  }
+  
+  if (dataFim) {
+    const dataFimObj = new Date(dataFim);
+    dataFimObj.setHours(23, 59, 59, 999);
+    pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.data) <= dataFimObj);
+  }
+  
+  // Verificar se há dados
+  if (pedidosFiltrados.length === 0) {
+    showNotification("Não há dados para o período selecionado", "warning");
+    return;
+  }
+  
+  // Gerar relatório conforme o tipo selecionado
+  switch (tipoRelatorio) {
+    case "status":
+      gerarRelatorioStatus(pedidosFiltrados);
+      break;
+    case "mensal":
+      gerarRelatorioMensal(pedidosFiltrados);
+      break;
+    case "colaborador":
+      gerarRelatorioColaborador(pedidosFiltrados);
+      break;
+  }
+  
+  // Mostrar a seção de resultado
+  document.getElementById("resultadoRelatorio").style.display = "block";
+}
+
+function gerarRelatorioStatus(pedidos) {
+  // Configurar título
+  document.getElementById("tituloResultadoRelatorio").textContent = "Relatório de Distribuição por Status";
+  
+  // Contagem por status
+  const contagemStatus = {};
+  STATUS_OPTIONS.forEach(status => {
+    contagemStatus[status] = 0;
+  });
+  
+  // Contar pedidos por status
+  pedidos.forEach(p => {
+    contagemStatus[p.status] = (contagemStatus[p.status] || 0) + 1;
+  });
+  
+  // Contar itens por status
+  const contagemItens = {};
+  STATUS_OPTIONS.forEach(status => {
+    contagemItens[status] = 0;
+  });
+  
+  pedidos.forEach(p => {
+    p.materiais.forEach(m => {
+      const itemStatus = m.status || p.status;
+      contagemItens[itemStatus] = (contagemItens[itemStatus] || 0) + 1;
+    });
+  });
+  
+  // Preparar dados para a tabela
+  const dados = [];
+  STATUS_OPTIONS.forEach(status => {
+    if (contagemStatus[status] > 0 || contagemItens[status] > 0) {
+      dados.push({
+        status: status,
+        pedidos: contagemStatus[status],
+        itens: contagemItens[status],
+        percentualPedidos: ((contagemStatus[status] / pedidos.length) * 100).toFixed(2) + "%"
+      });
+    }
+  });
+  
+  // Renderizar tabela
+  const thead = document.querySelector("#tabelaRelatorio thead");
+  const tbody = document.querySelector("#tabelaRelatorio tbody");
+  
+  thead.innerHTML = `
+    <tr>
+      <th>Status</th>
+      <th>Quantidade de Pedidos</th>
+      <th>Quantidade de Itens</th>
+      <th>% do Total</th>
+    </tr>
+  `;
+  
+  tbody.innerHTML = "";
+  dados.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>
+        <span class="badge ${STATUS_BADGES[row.status]}">${row.status}</span>
+      </td>
+      <td>${row.pedidos}</td>
+      <td>${row.itens}</td>
+      <td>${row.percentualPedidos}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  
+  // Adicionar linha de total
+  const trTotal = document.createElement("tr");
+  trTotal.style.fontWeight = "bold";
+  trTotal.innerHTML = `
+    <td>Total</td>
+    <td>${pedidos.length}</td>
+    <td>${pedidos.reduce((total, p) => total + p.materiais.length, 0)}</td>
+    <td>100%</td>
+  `;
+  tbody.appendChild(trTotal);
+}
+
+function gerarRelatorioMensal(pedidos) {
+  // Configurar título
+  document.getElementById("tituloResultadoRelatorio").textContent = "Relatório Mensal de Pedidos";
+  
+  // Agrupar por mês
+  const pedidosPorMes = {};
+  
+  pedidos.forEach(p => {
+    const data = new Date(p.data);
+    const mesAno = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}`;
+    
+    if (!pedidosPorMes[mesAno]) {
+      pedidosPorMes[mesAno] = {
+        pedidos: 0,
+        itens: 0,
+        statusCounts: {}
+      };
+      
+      STATUS_OPTIONS.forEach(status => {
+        pedidosPorMes[mesAno].statusCounts[status] = 0;
+      });
+    }
+    
+    pedidosPorMes[mesAno].pedidos++;
+    pedidosPorMes[mesAno].itens += p.materiais.length;
+    pedidosPorMes[mesAno].statusCounts[p.status]++;
+  });
+  
+  // Ordenar meses
+  const mesesOrdenados = Object.keys(pedidosPorMes).sort();
+  
+  // Renderizar tabela
+  const thead = document.querySelector("#tabelaRelatorio thead");
+  const tbody = document.querySelector("#tabelaRelatorio tbody");
+  
+  thead.innerHTML = `
+    <tr>
+      <th>Mês/Ano</th>
+      <th>Total de Pedidos</th>
+      <th>Total de Itens</th>
+      <th>Status Predominante</th>
+    </tr>
+  `;
+  
+  tbody.innerHTML = "";
+  mesesOrdenados.forEach(mesAno => {
+    const dados = pedidosPorMes[mesAno];
+    
+    // Encontrar status predominante
+    let statusPredominante = "";
+    let maxCount = 0;
+    
+    Object.keys(dados.statusCounts).forEach(status => {
+      if (dados.statusCounts[status] > maxCount) {
+        maxCount = dados.statusCounts[status];
+        statusPredominante = status;
+      }
+    });
+    
+    // Formatar mês/ano para exibição
+    const [ano, mes] = mesAno.split('-');
+    const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const mesFormatado = `${meses[parseInt(mes) - 1]} de ${ano}`;
+    
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${mesFormatado}</td>
+      <td>${dados.pedidos}</td>
+      <td>${dados.itens}</td>
+      <td>
+        <span class="badge ${STATUS_BADGES[statusPredominante]}">${statusPredominante}</span>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  
+  // Adicionar linha de total
+  const trTotal = document.createElement("tr");
+  trTotal.style.fontWeight = "bold";
+  trTotal.innerHTML = `
+    <td>Total</td>
+    <td>${pedidos.length}</td>
+    <td>${pedidos.reduce((total, p) => total + p.materiais.length, 0)}</td>
+    <td></td>
+  `;
+  tbody.appendChild(trTotal);
+}
+
+function gerarRelatorioColaborador(pedidos) {
+  // Configurar título
+  document.getElementById("tituloResultadoRelatorio").textContent = "Relatório de Pedidos por Colaborador";
+  
+  // Agrupar por colaborador
+  const pedidosPorColaborador = {};
+  
+  pedidos.forEach(p => {
+    if (!pedidosPorColaborador[p.colaborador]) {
+      pedidosPorColaborador[p.colaborador] = {
+        pedidos: 0,
+        itens: 0,
+        statusCounts: {}
+      };
+      
+      STATUS_OPTIONS.forEach(status => {
+        pedidosPorColaborador[p.colaborador].statusCounts[status] = 0;
+      });
+    }
+    
+    pedidosPorColaborador[p.colaborador].pedidos++;
+    pedidosPorColaborador[p.colaborador].itens += p.materiais.length;
+    pedidosPorColaborador[p.colaborador].statusCounts[p.status]++;
+  });
+  
+  // Ordenar colaboradores por número de pedidos (decrescente)
+  const colaboradoresOrdenados = Object.keys(pedidosPorColaborador).sort((a, b) => 
+    pedidosPorColaborador[b].pedidos - pedidosPorColaborador[a].pedidos
+  );
+  
+  // Renderizar tabela
+  const thead = document.querySelector("#tabelaRelatorio thead");
+  const tbody = document.querySelector("#tabelaRelatorio tbody");
+  
+  thead.innerHTML = `
+    <tr>
+      <th>Colaborador</th>
+      <th>Total de Pedidos</th>
+      <th>Total de Itens</th>
+      <th>Status Predominante</th>
+    </tr>
+  `;
+  
+  tbody.innerHTML = "";
+  colaboradoresOrdenados.forEach(colaborador => {
+    const dados = pedidosPorColaborador[colaborador];
+    
+    // Encontrar status predominante
+    let statusPredominante = "";
+    let maxCount = 0;
+    
+    Object.keys(dados.statusCounts).forEach(status => {
+      if (dados.statusCounts[status] > maxCount) {
+        maxCount = dados.statusCounts[status];
+        statusPredominante = status;
+      }
+    });
+    
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${colaborador}</td>
+      <td>${dados.pedidos}</td>
+      <td>${dados.itens}</td>
+      <td>
+        <span class="badge ${STATUS_BADGES[statusPredominante]}">${statusPredominante}</span>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  
+  // Adicionar linha de total
+  const trTotal = document.createElement("tr");
+  trTotal.style.fontWeight = "bold";
+  trTotal.innerHTML = `
+    <td>Total</td>
+    <td>${pedidos.length}</td>
+    <td>${pedidos.reduce((total, p) => total + p.materiais.length, 0)}</td>
+    <td></td>
+  `;
+  tbody.appendChild(trTotal);
+}
+
+function exportarRelatorioExcel() {
+  const tipoRelatorio = document.getElementById("tipoRelatorio").value;
+  const tituloRelatorio = document.getElementById("tituloResultadoRelatorio").textContent;
+  
+  // Obter dados da tabela
+  const tabela = document.getElementById("tabelaRelatorio");
+  const workbook = XLSX.utils.book_new();
+  
+  // Converter tabela HTML para planilha
+  const worksheet = XLSX.utils.table_to_sheet(tabela);
+  
+  // Adicionar planilha ao workbook
+  XLSX.utils.book_append_sheet(workbook, worksheet, tipoRelatorio);
+  
+  // Gerar o arquivo Excel
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  
+  // Criar link para download
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${tituloRelatorio.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  showNotification("Relatório exportado com sucesso!", "success");
 }
 
 // Inicialização
