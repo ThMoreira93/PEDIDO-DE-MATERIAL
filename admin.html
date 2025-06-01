@@ -2209,11 +2209,31 @@ function gerarGraficoStatus(pedidos) {
   const data = [];
   const backgroundColor = [];
   
+  // Função para converter variáveis CSS em valores reais de cor
+  function getCSSColorValue(cssVar) {
+    // Extrair o nome da variável CSS da string var(--nome)
+    const varName = cssVar.match(/var\(([^)]+)\)/)[1];
+    // Obter o valor real da variável CSS
+    return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  }
+  
+  // Cores reais para cada status
+  const coresReais = {
+    "Solicitação Recebida": "#9c27b0",     // roxo
+    "Reserva Gerada": "#1976d2",           // azul
+    "Aguardando Verba": "#e53935",         // vermelho
+    "Reserva Apropriada": "#ec407a",       // rosa
+    "Disponível para Retirada": "#2e7d32", // verde
+    "Material Entregue": "#757575",        // cinza
+    "Pedido Cancelado": "#ff0000"          // vermelho
+  };
+  
   Object.keys(contagem).forEach(status => {
     if (contagem[status] > 0) {
       labels.push(status);
       data.push(contagem[status]);
-      backgroundColor.push(STATUS_COLORS[status]);
+      // Usar cores reais em vez de variáveis CSS
+      backgroundColor.push(coresReais[status]);
     }
   });
   
@@ -2389,52 +2409,81 @@ function fecharModal(modalId) {
 
 // Funções para a aba de relatórios
 function gerarRelatorio() {
-  const tipoRelatorio = document.getElementById("tipoRelatorio").value;
-  const dataInicio = document.getElementById("dataInicioRelatorio").value;
-  const dataFim = document.getElementById("dataFimRelatorio").value;
+  showLoadingIndicator();
   
-  // Validar datas
-  if (dataInicio && dataFim && new Date(dataInicio) > new Date(dataFim)) {
-    showNotification("A data de início deve ser anterior à data de fim", "error");
-    return;
+  try {
+    const tipoRelatorio = document.getElementById("tipoRelatorio").value;
+    const dataInicio = document.getElementById("dataInicioRelatorio").value;
+    const dataFim = document.getElementById("dataFimRelatorio").value;
+    
+    // Validar datas
+    if (dataInicio && dataFim && new Date(dataInicio) > new Date(dataFim)) {
+      hideLoadingIndicator();
+      showNotification("A data de início deve ser anterior à data de fim", "error");
+      return;
+    }
+    
+    // Filtrar pedidos por data se especificado
+    let pedidosFiltrados = [...todosPedidos];
+    
+    if (dataInicio) {
+      const dataInicioObj = new Date(dataInicio);
+      dataInicioObj.setHours(0, 0, 0, 0);
+      pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.data) >= dataInicioObj);
+    }
+    
+    if (dataFim) {
+      const dataFimObj = new Date(dataFim);
+      dataFimObj.setHours(23, 59, 59, 999);
+      pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.data) <= dataFimObj);
+    }
+    
+    // Verificar se há dados
+    if (pedidosFiltrados.length === 0) {
+      hideLoadingIndicator();
+      showNotification("Não há dados para o período selecionado", "warning");
+      return;
+    }
+    
+    // Gerar relatório conforme o tipo selecionado
+    switch (tipoRelatorio) {
+      case "status":
+        gerarRelatorioStatus(pedidosFiltrados);
+        break;
+      case "mensal":
+        gerarRelatorioMensal(pedidosFiltrados);
+        break;
+      case "colaborador":
+        gerarRelatorioColaborador(pedidosFiltrados);
+        break;
+    }
+    
+    // Registrar ação
+    const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+    if (usuarioLogado) {
+      let descricaoRelatorio = "Relatório de ";
+      if (tipoRelatorio === "status") descricaoRelatorio += "Distribuição por Status";
+      else if (tipoRelatorio === "mensal") descricaoRelatorio += "Pedidos Mensais";
+      else if (tipoRelatorio === "colaborador") descricaoRelatorio += "Pedidos por Colaborador";
+      
+      registrarAcao("Geração de Relatório", descricaoRelatorio, {
+        tipoRelatorio: tipoRelatorio,
+        dataInicio: dataInicio || "Não especificada",
+        dataFim: dataFim || "Não especificada",
+        quantidadePedidos: pedidosFiltrados.length
+      });
+    }
+    
+    // Mostrar a seção de resultado
+    document.getElementById("resultadoRelatorio").style.display = "block";
+    
+    hideLoadingIndicator();
+    showNotification("Relatório gerado com sucesso!", "success");
+  } catch (error) {
+    console.error("Erro ao gerar relatório:", error);
+    hideLoadingIndicator();
+    showNotification("Erro ao gerar relatório. Tente novamente.", "error");
   }
-  
-  // Filtrar pedidos por data se especificado
-  let pedidosFiltrados = [...todosPedidos];
-  
-  if (dataInicio) {
-    const dataInicioObj = new Date(dataInicio);
-    dataInicioObj.setHours(0, 0, 0, 0);
-    pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.data) >= dataInicioObj);
-  }
-  
-  if (dataFim) {
-    const dataFimObj = new Date(dataFim);
-    dataFimObj.setHours(23, 59, 59, 999);
-    pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.data) <= dataFimObj);
-  }
-  
-  // Verificar se há dados
-  if (pedidosFiltrados.length === 0) {
-    showNotification("Não há dados para o período selecionado", "warning");
-    return;
-  }
-  
-  // Gerar relatório conforme o tipo selecionado
-  switch (tipoRelatorio) {
-    case "status":
-      gerarRelatorioStatus(pedidosFiltrados);
-      break;
-    case "mensal":
-      gerarRelatorioMensal(pedidosFiltrados);
-      break;
-    case "colaborador":
-      gerarRelatorioColaborador(pedidosFiltrados);
-      break;
-  }
-  
-  // Mostrar a seção de resultado
-  document.getElementById("resultadoRelatorio").style.display = "block";
 }
 
 function gerarRelatorioStatus(pedidos) {
@@ -2688,34 +2737,62 @@ function gerarRelatorioColaborador(pedidos) {
 }
 
 function exportarRelatorioExcel() {
-  const tipoRelatorio = document.getElementById("tipoRelatorio").value;
-  const tituloRelatorio = document.getElementById("tituloResultadoRelatorio").textContent;
+  showLoadingIndicator();
   
-  // Obter dados da tabela
-  const tabela = document.getElementById("tabelaRelatorio");
-  const workbook = XLSX.utils.book_new();
-  
-  // Converter tabela HTML para planilha
-  const worksheet = XLSX.utils.table_to_sheet(tabela);
-  
-  // Adicionar planilha ao workbook
-  XLSX.utils.book_append_sheet(workbook, worksheet, tipoRelatorio);
-  
-  // Gerar o arquivo Excel
-  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-  const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  
-  // Criar link para download
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${tituloRelatorio.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  
-  showNotification("Relatório exportado com sucesso!", "success");
+  try {
+    const tipoRelatorio = document.getElementById("tipoRelatorio").value;
+    const tituloRelatorio = document.getElementById("tituloResultadoRelatorio").textContent;
+    
+    // Obter dados da tabela
+    const tabela = document.getElementById("tabelaRelatorio");
+    
+    if (!tabela || !tabela.rows || tabela.rows.length <= 1) {
+      hideLoadingIndicator();
+      showNotification("Não há dados para exportar. Gere um relatório primeiro.", "warning");
+      return;
+    }
+    
+    const workbook = XLSX.utils.book_new();
+    
+    // Converter tabela HTML para planilha
+    const worksheet = XLSX.utils.table_to_sheet(tabela);
+    
+    // Adicionar planilha ao workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, tipoRelatorio);
+    
+    // Gerar o arquivo Excel
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    
+    // Criar link para download
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${tituloRelatorio.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
+    document.body.appendChild(a);
+    
+    // Registrar ação
+    const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+    if (usuarioLogado) {
+      registrarAcao("Exportação de Relatório", `Relatório "${tituloRelatorio}" exportado para Excel`, {
+        tipoRelatorio: tipoRelatorio,
+        dataExportacao: new Date().toISOString()
+      });
+    }
+    
+    // Pequeno delay para garantir que o indicador de carregamento seja exibido
+    setTimeout(() => {
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      hideLoadingIndicator();
+      showNotification("Relatório exportado com sucesso!", "success");
+    }, 500);
+  } catch (error) {
+    console.error("Erro ao exportar relatório:", error);
+    hideLoadingIndicator();
+    showNotification("Erro ao exportar relatório. Tente novamente.", "error");
+  }
 }
 
 // Inicialização
