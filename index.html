@@ -71,6 +71,16 @@
       border-radius: 5px;
       cursor: pointer;
     }
+  
+    .status-verde {
+      color: green;
+      font-weight: bold;
+    }
+    .status-vermelho {
+      color: red;
+      font-weight: bold;
+    }
+
   </style>
 </head>
 <body>
@@ -321,11 +331,18 @@
 
           snapshot.forEach(doc => {
             const p = doc.data();
+            let listaMateriais = '';
+            p.materiais.forEach(m => {
+              const status = m.status === 'Material Entregue' ?
+                `<span class='status-verde'>${m.status}</span>` :
+                `<span class='status-vermelho'>${m.status || 'Pendente'}</span>`;
+              listaMateriais += `- ${m.material} (Qtd: ${m.quantidade}) - ${status}<br>`;
+            });
             resultado.innerHTML = `
               <p><strong>Colaborador:</strong> ${p.colaborador}</p>
               <p><strong>Telefone:</strong> ${p.telefone}</p>
-              <p><strong>Status:</strong> <span style="color:#28a745; font-weight:bold;">${p.status}</span></p>
-              <p><strong>Materiais:</strong><br>${p.materiais.map(m => '- ' + m.material + ' (Qtd: ' + m.quantidade + ')').join('<br>')}</p>
+              <p><strong>Status geral:</strong> <span style="color:#28a745; font-weight:bold;">${p.status}</span></p>
+              <p><strong>Materiais:</strong><br>${listaMateriais}</p>
               <p><strong>Observações:</strong> ${p.observacoes}</p>
               <p><strong>Data do Pedido:</strong> ${new Date(p.data).toLocaleString()}</p>
             `;
@@ -341,4 +358,3 @@
   </script>
 </body>
 </html>
-
