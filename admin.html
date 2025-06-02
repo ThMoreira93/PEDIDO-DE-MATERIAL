@@ -2802,5 +2802,24 @@ document.addEventListener('DOMContentLoaded', function() {
   verificaLogin();
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.status-geral').forEach(select => {
+    select.addEventListener('change', function () {
+      const pedidoId = this.dataset.pedidoId;
+      const reservaDiv = document.getElementById(`reserva-${pedidoId}`);
+      const inputReserva = document.getElementById(`numero-reserva-${pedidoId}`);
+      
+      if (this.value === 'Reserva Gerada') {
+        reservaDiv.style.display = 'block';
+        inputReserva.required = true;
+      } else {
+        reservaDiv.style.display = 'none';
+        inputReserva.required = false;
+      }
+    });
+  });
+});
+</script>
 </body>
 </html>
