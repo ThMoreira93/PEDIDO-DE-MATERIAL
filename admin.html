@@ -1,17 +1,18 @@
 <!DOCTYPE html>
+
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gestão de Materiais - Painel Administrativo</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gestão de Materiais - Painel Administrativo</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&amp;family=Open+Sans:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
     :root {
       /* Cores primárias */
       --primary-50: #e3f2fd;
@@ -1053,463 +1054,497 @@
 </head>
 <body>
 <!-- Tela de Login -->
-<div id="loginContainer" class="login-container">
-  <div class="card login-card">
-    <div class="login-header">
-      <div style="width: 64px; height: 64px; background-color: var(--primary-600); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">
-        <i class="fas fa-boxes" style="font-size: 32px; color: white;"></i>
-      </div>
-      <h1 class="login-title">Gestão de Materiais</h1>
-      <p class="login-subtitle">Faça login para acessar o painel administrativo</p>
-    </div>
-    
-    <form class="login-form" onsubmit="realizarLogin(event)">
-      <div class="form-group">
-        <label for="user" class="form-label">Usuário</label>
-        <input type="text" id="user" class="form-control" placeholder="Digite seu usuário" required />
-      </div>
-      
-      <div class="form-group">
-        <label for="pass" class="form-label">Senha</label>
-        <input type="password" id="pass" class="form-control" placeholder="Digite sua senha" required />
-      </div>
-      
-      <p id="loginErro" style="color: var(--error); font-size: 0.875rem; margin-top: var(--space-2); display: none;">
+<div class="login-container" id="loginContainer">
+<div class="card login-card">
+<div class="login-header">
+<div style="width: 64px; height: 64px; background-color: var(--primary-600); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">
+<i class="fas fa-boxes" style="font-size: 32px; color: white;"></i>
+</div>
+<h1 class="login-title">Gestão de Materiais</h1>
+<p class="login-subtitle">Faça login para acessar o painel administrativo</p>
+</div>
+<form class="login-form" onsubmit="realizarLogin(event)">
+<div class="form-group">
+<label class="form-label" for="user">Usuário</label>
+<input class="form-control" id="user" placeholder="Digite seu usuário" required="" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="pass">Senha</label>
+<input class="form-control" id="pass" placeholder="Digite sua senha" required="" type="password"/>
+</div>
+<p id="loginErro" style="color: var(--error); font-size: 0.875rem; margin-top: var(--space-2); display: none;">
         Usuário ou senha incorretos.
       </p>
-      
-      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--space-4);">
-        <i class="fas fa-sign-in-alt"></i>
+<button class="btn btn-primary" style="width: 100%; margin-top: var(--space-4);" type="submit">
+<i class="fas fa-sign-in-alt"></i>
         Entrar
       </button>
-    </form>
-    
-    <div class="login-footer">
-      <p>&copy; 2025 Gestão de Materiais. Todos os direitos reservados.</p>
-    </div>
-  </div>
+</form>
+<div class="login-footer">
+<p>© 2025 Gestão de Materiais. Todos os direitos reservados.</p>
 </div>
-
+</div>
+</div>
 <!-- Painel Principal -->
-<div id="conteudo" class="app-container" style="display: none;">
-  <!-- Barra lateral -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div style="width: 40px; height: 40px; background-color: var(--primary-600); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-        <i class="fas fa-boxes" style="font-size: 20px; color: white;"></i>
-      </div>
-      <h1>Gestão de Materiais</h1>
-    </div>
-    
-    <nav class="sidebar-nav">
-      <ul>
-        <li class="nav-item active">
-          <a href="#dashboard" onclick="mostrarSecao('dashboard')">
-            <i class="fas fa-tachometer-alt"></i>
-            <span>Dashboard</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#pedidos" onclick="mostrarSecao('pedidos')">
-            <i class="fas fa-clipboard-list"></i>
-            <span>Pedidos</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#importacao" onclick="mostrarSecao('importacao')">
-            <i class="fas fa-file-import"></i>
-            <span>Importação</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#relatorios" onclick="mostrarSecao('relatorios')">
-            <i class="fas fa-chart-bar"></i>
-            <span>Relatórios</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-    
-    <div class="sidebar-footer">
-      <div class="user-info">
-        <div style="width: 36px; height: 36px; background-color: var(--primary-700); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-          <i class="fas fa-user" style="font-size: 16px; color: white;"></i>
-        </div>
-        <div class="user-details">
-          <span class="user-name">Admin</span>
-          <span class="user-role">Administrador</span>
-        </div>
-      </div>
-      <button class="btn-logout" onclick="realizarLogout()">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Sair</span>
-      </button>
-    </div>
-  </aside>
-  
-  <!-- Conteúdo principal -->
-  <main class="main-content">
-    <!-- Seção Dashboard -->
-    <div id="secao-dashboard">
-      <header class="content-header">
-        <div class="page-title">
-          <h2>Dashboard</h2>
-          <p class="breadcrumb">Home > Dashboard</p>
-        </div>
-        
-        <div class="header-actions">
-          <div class="search-container">
-            <input type="text" id="buscaTexto" placeholder="Buscar pedidos..." class="search-input">
-            <button class="btn-search">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
-          <button class="btn btn-primary">
-            <i class="fas fa-plus"></i>
-            <span>Novo Pedido</span>
-          </button>
-        </div>
-      </header>
-      
-      <!-- KPIs -->
-      <div class="kpi-cards">
-        <div class="card kpi-card">
-          <div class="kpi-icon">
-            <i class="fas fa-clipboard-list"></i>
-          </div>
-          <div class="kpi-content">
-            <h3 class="kpi-title">Total de Pedidos</h3>
-            <p class="kpi-value" id="kpi-total">0</p>
-            <p class="kpi-change positive">
-              <i class="fas fa-arrow-up"></i> Atualizado
+<div class="app-container" id="conteudo" style="display: none;">
+<!-- Barra lateral -->
+<aside class="sidebar">
+<div class="sidebar-header">
+<div style="width: 40px; height: 40px; background-color: var(--primary-600); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+<i class="fas fa-boxes" style="font-size: 20px; color: white;"></i>
+</div>
+<h1>Gestão de Materiais</h1>
+</div>
+<nav class="sidebar-nav">
+<ul>
+<li class="nav-item active">
+<a href="#dashboard" onclick="mostrarSecao('dashboard')">
+<i class="fas fa-tachometer-alt"></i>
+<span>Dashboard</span>
+</a>
+</li>
+<li class="nav-item">
+<a href="#pedidos" onclick="mostrarSecao('pedidos')">
+<i class="fas fa-clipboard-list"></i>
+<span>Pedidos</span>
+</a>
+</li>
+<li class="nav-item">
+<a href="#importacao" onclick="mostrarSecao('importacao')">
+<i class="fas fa-file-import"></i>
+<span>Importação</span>
+</a>
+</li>
+<li class="nav-item">
+<a href="#relatorios" onclick="mostrarSecao('relatorios')">
+<i class="fas fa-chart-bar"></i>
+<span>Relatórios</span>
+</a>
+</li>
+</ul>
+</nav>
+<div class="sidebar-footer">
+<div class="user-info">
+<div style="width: 36px; height: 36px; background-color: var(--primary-700); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+<i class="fas fa-user" style="font-size: 16px; color: white;"></i>
+</div>
+<div class="user-details">
+<span class="user-name">Admin</span>
+<span class="user-role">Administrador</span>
+</div>
+</div>
+<button class="btn-logout" onclick="realizarLogout()">
+<i class="fas fa-sign-out-alt"></i>
+<span>Sair</span>
+</button>
+</div>
+</aside>
+<!-- Conteúdo principal -->
+<main class="main-content">
+<!-- Seção Dashboard -->
+<div id="secao-dashboard">
+<header class="content-header">
+<div class="page-title">
+<h2>Dashboard</h2>
+<p class="breadcrumb">Home &gt; Dashboard</p>
+</div>
+<div class="header-actions">
+<div class="search-container">
+<input class="search-input" id="buscaTexto" placeholder="Buscar pedidos..." type="text"/>
+<button class="btn-search">
+<i class="fas fa-search"></i>
+</button>
+</div>
+<button class="btn btn-primary">
+<i class="fas fa-plus"></i>
+<span>Novo Pedido</span>
+</button>
+</div>
+</header>
+<!-- KPIs -->
+<div class="kpi-cards">
+<div class="card kpi-card">
+<div class="kpi-icon">
+<i class="fas fa-clipboard-list"></i>
+</div>
+<div class="kpi-content">
+<h3 class="kpi-title">Total de Pedidos</h3>
+<p class="kpi-value" id="kpi-total">0</p>
+<p class="kpi-change positive">
+<i class="fas fa-arrow-up"></i> Atualizado
             </p>
-          </div>
-        </div>
-        
-        <div class="card kpi-card">
-          <div class="kpi-icon" style="background-color: #ffecb3; color: #ff9800;">
-            <i class="fas fa-clock"></i>
-          </div>
-          <div class="kpi-content">
-            <h3 class="kpi-title">Aguardando Verba</h3>
-            <p class="kpi-value" id="kpi-aguardando">0</p>
-            <p class="kpi-change negative">
-              <i class="fas fa-arrow-up"></i> Atualizado
+</div>
+</div>
+<div class="card kpi-card">
+<div class="kpi-icon" style="background-color: #ffecb3; color: #ff9800;">
+<i class="fas fa-clock"></i>
+</div>
+<div class="kpi-content">
+<h3 class="kpi-title">Aguardando Verba</h3>
+<p class="kpi-value" id="kpi-aguardando">0</p>
+<p class="kpi-change negative">
+<i class="fas fa-arrow-up"></i> Atualizado
             </p>
-          </div>
-        </div>
-        
-        <div class="card kpi-card">
-          <div class="kpi-icon" style="background-color: #c8e6c9; color: #2e7d32;">
-            <i class="fas fa-check-circle"></i>
-          </div>
-          <div class="kpi-content">
-            <h3 class="kpi-title">Disponíveis</h3>
-            <p class="kpi-value" id="kpi-disponiveis">0</p>
-            <p class="kpi-change positive">
-              <i class="fas fa-arrow-up"></i> Atualizado
+</div>
+</div>
+<div class="card kpi-card">
+<div class="kpi-icon" style="background-color: #c8e6c9; color: #2e7d32;">
+<i class="fas fa-check-circle"></i>
+</div>
+<div class="kpi-content">
+<h3 class="kpi-title">Disponíveis</h3>
+<p class="kpi-value" id="kpi-disponiveis">0</p>
+<p class="kpi-change positive">
+<i class="fas fa-arrow-up"></i> Atualizado
             </p>
-          </div>
-        </div>
-        
-        <div class="card kpi-card">
-          <div class="kpi-icon" style="background-color: #e0e0e0; color: #616161;">
-            <i class="fas fa-truck"></i>
-          </div>
-          <div class="kpi-content">
-            <h3 class="kpi-title">Entregues</h3>
-            <p class="kpi-value" id="kpi-entregues">0</p>
-            <p class="kpi-change positive">
-              <i class="fas fa-arrow-up"></i> Atualizado
+</div>
+</div>
+<div class="card kpi-card">
+<div class="kpi-icon" style="background-color: #e0e0e0; color: #616161;">
+<i class="fas fa-truck"></i>
+</div>
+<div class="kpi-content">
+<h3 class="kpi-title">Entregues</h3>
+<p class="kpi-value" id="kpi-entregues">0</p>
+<p class="kpi-change positive">
+<i class="fas fa-arrow-up"></i> Atualizado
             </p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Gráficos -->
-      <div class="grid-layout">
-        <div class="card chart-card">
-          <div class="card-header">
-            <h3>Status dos Pedidos</h3>
-            <div class="card-actions">
-              <button class="btn-icon" title="Atualizar">
-                <i class="fas fa-sync-alt"></i>
-              </button>
-              <button class="btn-icon" title="Mais opções">
-                <i class="fas fa-ellipsis-v"></i>
-              </button>
-            </div>
-          </div>
-          <div class="card-body">
-            <canvas id="graficoStatus" height="250"></canvas>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Pedidos Recentes -->
-      <section>
-        <div class="section-header">
-          <h3>Pedidos Recentes</h3>
-          <a href="#pedidos" class="btn-link" onclick="mostrarSecao('pedidos')">Ver todos</a>
-        </div>
-        
-        <div class="card">
-          <div class="table-responsive">
-            <table class="table" id="tabelaPedidosRecentes">
-              <thead>
-                <tr>
-                  <th>Nº Pedido</th>
-                  <th>Colaborador</th>
-                  <th>Data</th>
-                  <th>Status</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Preenchido via JavaScript -->
-              </tbody>
-            </table>
-          </div>
-          <div class="card-footer">
-            <div class="pagination">
-              <button class="btn-page" disabled>Anterior</button>
-              <button class="btn-page active">1</button>
-              <button class="btn-page">2</button>
-              <button class="btn-page">3</button>
-              <button class="btn-page">Próximo</button>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-    
-    <!-- Seção Pedidos -->
-    <div id="secao-pedidos" style="display: none;">
-      <header class="content-header">
-        <div class="page-title">
-          <h2>Pedidos</h2>
-          <p class="breadcrumb">Home > Pedidos</p>
-        </div>
-        
-        <div class="header-actions">
-          <div class="search-container">
-            <input type="text" id="buscaTextoPedidos" placeholder="Buscar por colaborador, número ou telefone..." class="search-input">
-            <button class="btn-search">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
-          <select id="filtroStatus" class="form-select" style="width: auto; margin-right: var(--space-3);">
-            <option value="">Todos os Status</option>
-            <option>Solicitação Recebida</option>
-            <option>Reserva Gerada</option>
-            <option>Aguardando Verba</option>
-            <option>Reserva Apropriada</option>
-            <option>Disponível para Retirada</option>
-            <option>Material Entregue</option>
-            <option>Pedido Cancelado</option>
-          </select>
-          <button class="btn btn-primary">
-            <i class="fas fa-plus"></i>
-            <span>Novo Pedido</span>
-          </button>
-        </div>
-      </header>
-      
-      <div id="listaPedidos">
-        <!-- Preenchido via JavaScript -->
-      </div>
-      
-      <div class="card-footer" style="background-color: white; border-radius: 8px; margin-top: var(--space-4);">
-        <div class="pagination">
-          <button class="btn-page" disabled>Anterior</button>
-          <button class="btn-page active">1</button>
-          <button class="btn-page">2</button>
-          <button class="btn-page">3</button>
-          <button class="btn-page">Próximo</button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Seção Importação -->
-    <div id="secao-importacao" style="display: none;">
-      <header class="content-header">
-        <div class="page-title">
-          <h2>Importação</h2>
-          <p class="breadcrumb">Home > Importação</p>
-        </div>
-      </header>
-      
-      <div class="card">
-        <div class="card-header">
-          <h3>Atualização em Massa</h3>
-        </div>
-        <div class="card-body">
-          <p style="margin-bottom: var(--space-4);">
+
+
+
+
+
+
+</div>
+</div>
+<div class="card kpi-card">
+<div class="kpi-icon" style="background-color: #e1bee7; color: #9c27b0;">
+<i class="fas fa-inbox"></i>
+</div>
+<div class="kpi-content">
+<h3 class="kpi-title">Recebidos</h3>
+<p class="kpi-value" id="kpi-recebidos">0</p>
+<p class="kpi-change positive">
+<i class="fas fa-arrow-up"></i> Atualizado
+    </p>
+</div>
+</div><div class="card kpi-card">
+<div class="kpi-icon" style="background-color: #bbdefb; color: #1976d2;">
+<i class="fas fa-dolly-flatbed"></i>
+</div>
+<div class="kpi-content">
+<h3 class="kpi-title">Gerados</h3>
+<p class="kpi-value" id="kpi-gerados">0</p>
+<p class="kpi-change positive">
+<i class="fas fa-arrow-up"></i> Atualizado
+    </p>
+</div>
+</div><div class="card kpi-card">
+<div class="kpi-icon" style="background-color: #f8bbd0; color: #ec407a;">
+<i class="fas fa-file-signature"></i>
+</div>
+<div class="kpi-content">
+<h3 class="kpi-title">Apropriados</h3>
+<p class="kpi-value" id="kpi-apropriados">0</p>
+<p class="kpi-change positive">
+<i class="fas fa-arrow-up"></i> Atualizado
+    </p>
+</div>
+</div><div class="card kpi-card">
+<div class="kpi-icon" style="background-color: #ffcdd2; color: #f44336;">
+<i class="fas fa-ban"></i>
+</div>
+<div class="kpi-content">
+<h3 class="kpi-title">Cancelados</h3>
+<p class="kpi-value" id="kpi-cancelados">0</p>
+<p class="kpi-change negative">
+<i class="fas fa-arrow-up"></i> Atualizado
+    </p>
+</div>
+</div><div class="card kpi-card">
+<div class="kpi-icon" style="background-color: #dcedc8; color: #7cb342;">
+<i class="fas fa-warehouse"></i>
+</div>
+<div class="kpi-content">
+<h3 class="kpi-title">Almoxarifado</h3>
+<p class="kpi-value" id="kpi-almoxarifado">0</p>
+<p class="kpi-change positive">
+<i class="fas fa-arrow-up"></i> Atualizado
+    </p>
+</div>
+</div><div class="card kpi-card">
+<div class="kpi-icon" style="background-color: #ffe0b2; color: #fb8c00;">
+<i class="fas fa-box-open"></i>
+</div>
+<div class="kpi-content">
+<h3 class="kpi-title">Aguardando Material</h3>
+<p class="kpi-value" id="kpi-aguardando-material">0</p>
+<p class="kpi-change positive">
+<i class="fas fa-arrow-up"></i> Atualizado
+    </p>
+</div>
+</div></div>
+<!-- Gráficos -->
+<div class="grid-layout">
+<div class="card chart-card">
+<div class="card-header">
+<h3>Status dos Pedidos</h3>
+<div class="card-actions">
+<button class="btn-icon" title="Atualizar">
+<i class="fas fa-sync-alt"></i>
+</button>
+<button class="btn-icon" title="Mais opções">
+<i class="fas fa-ellipsis-v"></i>
+</button>
+</div>
+</div>
+<div class="card-body">
+<canvas height="250" id="graficoStatus"></canvas>
+</div>
+</div>
+</div>
+<!-- Pedidos Recentes -->
+<section>
+<div class="section-header">
+<h3>Pedidos Recentes</h3>
+<a class="btn-link" href="#pedidos" onclick="mostrarSecao('pedidos')">Ver todos</a>
+</div>
+<div class="card">
+<div class="table-responsive">
+<table class="table" id="tabelaPedidosRecentes">
+<thead>
+<tr>
+<th>Nº Pedido</th>
+<th>Colaborador</th>
+<th>Data</th>
+<th>Status</th>
+<th>Ações</th>
+</tr>
+</thead>
+<tbody>
+<!-- Preenchido via JavaScript -->
+</tbody>
+</table>
+</div>
+<div class="card-footer">
+<div class="pagination">
+<button class="btn-page" disabled="">Anterior</button>
+<button class="btn-page active">1</button>
+<button class="btn-page">2</button>
+<button class="btn-page">3</button>
+<button class="btn-page">Próximo</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Seção Pedidos -->
+<div id="secao-pedidos" style="display: none;">
+<header class="content-header">
+<div class="page-title">
+<h2>Pedidos</h2>
+<p class="breadcrumb">Home &gt; Pedidos</p>
+</div>
+<div class="header-actions">
+<div class="search-container">
+<input class="search-input" id="buscaTextoPedidos" placeholder="Buscar por colaborador, número ou telefone..." type="text"/>
+<button class="btn-search">
+<i class="fas fa-search"></i>
+</button>
+</div>
+<select class="form-select" id="filtroStatus" style="width: auto; margin-right: var(--space-3);">
+<option value="">Todos os Status</option>
+<option>Solicitação Recebida</option>
+<option>Reserva Gerada</option>
+<option>Aguardando Verba</option>
+<option>Reserva Apropriada</option>
+<option>Disponível para Retirada</option>
+<option>Material Entregue</option>
+<option>Pedido Cancelado</option>
+</select>
+<button class="btn btn-primary">
+<i class="fas fa-plus"></i>
+<span>Novo Pedido</span>
+</button>
+</div>
+</header>
+<div id="listaPedidos">
+<!-- Preenchido via JavaScript -->
+</div>
+<div class="card-footer" style="background-color: white; border-radius: 8px; margin-top: var(--space-4);">
+<div class="pagination">
+<button class="btn-page" disabled="">Anterior</button>
+<button class="btn-page active">1</button>
+<button class="btn-page">2</button>
+<button class="btn-page">3</button>
+<button class="btn-page">Próximo</button>
+</div>
+</div>
+</div>
+<!-- Seção Importação -->
+<div id="secao-importacao" style="display: none;">
+<header class="content-header">
+<div class="page-title">
+<h2>Importação</h2>
+<p class="breadcrumb">Home &gt; Importação</p>
+</div>
+</header>
+<div class="card">
+<div class="card-header">
+<h3>Atualização em Massa</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: var(--space-4);">
             Utilize esta ferramenta para atualizar o status de múltiplos pedidos de uma só vez através de uma planilha Excel.
           </p>
-          
-          <div class="form-group">
-            <label for="arquivoStatus" class="form-label">Selecione a planilha</label>
-            <input type="file" id="arquivoStatus" class="form-control" accept=".xlsx, .xls" />
-            <small style="display: block; margin-top: var(--space-2); color: var(--neutral-600);">
+<div class="form-group">
+<label class="form-label" for="arquivoStatus">Selecione a planilha</label>
+<input accept=".xlsx, .xls" class="form-control" id="arquivoStatus" type="file">
+<small style="display: block; margin-top: var(--space-2); color: var(--neutral-600);">
               A planilha deve conter as colunas "Número do Pedido" e "Novo Status".
             </small>
-          </div>
-          
-          <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4);">
-            <button class="btn btn-primary" onclick="atualizarStatusEmMassa()">
-              <i class="fas fa-upload"></i>
+</input></div>
+<div style="display: flex; gap: var(--space-3); margin-top: var(--space-4);">
+<button class="btn btn-primary" onclick="atualizarStatusEmMassa()">
+<i class="fas fa-upload"></i>
               Atualizar em Massa
             </button>
-            <a href="Modelo_Atualizacao_Status.xlsx" download>
-              <button class="btn btn-secondary">
-                <i class="fas fa-download"></i>
+<a download="" href="Modelo_Atualizacao_Status.xlsx">
+<button class="btn btn-secondary">
+<i class="fas fa-download"></i>
                 Baixar Modelo
               </button>
-            </a>
-          </div>
-        </div>
-      </div>
-      
-      <div class="card" style="margin-top: var(--space-6);">
-        <div class="card-header">
-          <h3>Exportar Dados</h3>
-        </div>
-        <div class="card-body">
-          <p style="margin-bottom: var(--space-4);">
+</a>
+</div>
+</div>
+</div>
+<div class="card" style="margin-top: var(--space-6);">
+<div class="card-header">
+<h3>Exportar Dados</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: var(--space-4);">
             Exporte todos os pedidos para uma planilha Excel para análise ou backup.
           </p>
-          
-          <button class="btn btn-primary" onclick="exportarExcel()">
-            <i class="fas fa-file-export"></i>
+<button class="btn btn-primary" onclick="exportarExcel()">
+<i class="fas fa-file-export"></i>
             Exportar Excel
           </button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Seção Relatórios -->
-    <div id="secao-relatorios" style="display: none;">
-      <header class="content-header">
-        <div class="page-title">
-          <h2>Relatórios</h2>
-          <p class="breadcrumb">Home > Relatórios</p>
-        </div>
-      </header>
-
-      <div class="card">
-        <div class="card-header">
-          <h3>Gerar Relatórios</h3>
-        </div>
-        <div class="card-body">
-          <div class="form-group">
-            <label for="tipoRelatorio" class="form-label">Tipo de Relatório:</label>
-            <select id="tipoRelatorio" class="form-select">
-              <option value="status">Distribuição por Status</option>
-              <option value="mensal">Pedidos por Mês</option>
-              <option value="colaborador">Pedidos por Colaborador</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="dataInicioRelatorio" class="form-label">Data Início:</label>
-            <input type="date" id="dataInicioRelatorio" class="form-control">
-          </div>
-
-          <div class="form-group">
-            <label for="dataFimRelatorio" class="form-label">Data Fim:</label>
-            <input type="date" id="dataFimRelatorio" class="form-control">
-          </div>
-
-          <button class="btn btn-primary" onclick="gerarRelatorio()">
-            <i class="fas fa-cogs"></i>
+</div>
+</div>
+</div>
+<!-- Seção Relatórios -->
+<div id="secao-relatorios" style="display: none;">
+<header class="content-header">
+<div class="page-title">
+<h2>Relatórios</h2>
+<p class="breadcrumb">Home &gt; Relatórios</p>
+</div>
+</header>
+<div class="card">
+<div class="card-header">
+<h3>Gerar Relatórios</h3>
+</div>
+<div class="card-body">
+<div class="form-group">
+<label class="form-label" for="tipoRelatorio">Tipo de Relatório:</label>
+<select class="form-select" id="tipoRelatorio">
+<option value="status">Distribuição por Status</option>
+<option value="mensal">Pedidos por Mês</option>
+<option value="colaborador">Pedidos por Colaborador</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label" for="dataInicioRelatorio">Data Início:</label>
+<input class="form-control" id="dataInicioRelatorio" type="date"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="dataFimRelatorio">Data Fim:</label>
+<input class="form-control" id="dataFimRelatorio" type="date"/>
+</div>
+<button class="btn btn-primary" onclick="gerarRelatorio()">
+<i class="fas fa-cogs"></i>
             Gerar Relatório
           </button>
-        </div>
-      </div>
-
-      <div id="resultadoRelatorio" class="card" style="margin-top: var(--space-6); display: none;">
-        <div class="card-header">
-          <h3 id="tituloResultadoRelatorio">Resultado do Relatório</h3>
-          <button class="btn btn-secondary" onclick="exportarRelatorioExcel()">
-            <i class="fas fa-file-export"></i>
+</div>
+</div>
+<div class="card" id="resultadoRelatorio" style="margin-top: var(--space-6); display: none;">
+<div class="card-header">
+<h3 id="tituloResultadoRelatorio">Resultado do Relatório</h3>
+<button class="btn btn-secondary" onclick="exportarRelatorioExcel()">
+<i class="fas fa-file-export"></i>
             Exportar para Excel
           </button>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table" id="tabelaRelatorio">
-              <thead>
-                <!-- Cabeçalho preenchido via JavaScript -->
-              </thead>
-              <tbody>
-                <!-- Dados preenchidos via JavaScript -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
 </div>
-
+<div class="card-body">
+<div class="table-responsive">
+<table class="table" id="tabelaRelatorio">
+<thead>
+<!-- Cabeçalho preenchido via JavaScript -->
+</thead>
+<tbody>
+<!-- Dados preenchidos via JavaScript -->
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
 <!-- Notificações -->
-<div id="notificationContainer" class="notification-container"></div>
-
-<!<!-- Modal de Confirmação -->
-<div id="confirmationModal" class="modal">
-  <div class="modal-backdrop"></div>
-  <div class="modal-container">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">Confirmar Ação</h4>
-        <button class="btn-close" data-dismiss="modal" onclick="fecharModal('confirmationModal')">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Tem certeza que deseja atualizar o status deste pedido?</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="fecharModal('confirmationModal')">Cancelar</button>
-        <button class="btn btn-primary" id="confirmAction">Confirmar</button>
-      </div>
-    </div>
-  </div>
+<div class="notification-container" id="notificationContainer"></div>
+<!--<!-- Modal de Confirmação ---->
+<div class="modal" id="confirmationModal">
+<div class="modal-backdrop"></div>
+<div class="modal-container">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title">Confirmar Ação</h4>
+<button class="btn-close" data-dismiss="modal" onclick="fecharModal('confirmationModal')">
+<i class="fas fa-times"></i>
+</button>
 </div>
-
+<div class="modal-body">
+<p>Tem certeza que deseja atualizar o status deste pedido?</p>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" onclick="fecharModal('confirmationModal')">Cancelar</button>
+<button class="btn btn-primary" id="confirmAction">Confirmar</button>
+</div>
+</div>
+</div>
+</div>
 <!-- Modal de Troca de Senha -->
-<div id="trocaSenhaModal" class="modal">
-  <div class="modal-backdrop"></div>
-  <div class="modal-container">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">Alterar Senha</h4>
-      </div>
-      <div class="modal-body">
-        <p>Este é seu primeiro login. Por favor, altere sua senha.</p>
-        <div class="form-group">
-          <label for="novaSenha" class="form-label">Nova Senha:</label>
-          <input type="password" id="novaSenha" class="form-control" placeholder="Digite sua nova senha">
-        </div>
-        <div class="form-group">
-          <label for="confirmaSenha" class="form-label">Confirmar Senha:</label>
-          <input type="password" id="confirmaSenha" class="form-control" placeholder="Confirme sua nova senha">
-        </div>
-        <div id="trocaSenhaErro" class="alert alert-danger" style="display: none;"></div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary" onclick="trocarSenha()">Alterar Senha</button>
-      </div>
-    </div>
-  </div>
+<div class="modal" id="trocaSenhaModal">
+<div class="modal-backdrop"></div>
+<div class="modal-container">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title">Alterar Senha</h4>
 </div>
-
+<div class="modal-body">
+<p>Este é seu primeiro login. Por favor, altere sua senha.</p>
+<div class="form-group">
+<label class="form-label" for="novaSenha">Nova Senha:</label>
+<input class="form-control" id="novaSenha" placeholder="Digite sua nova senha" type="password"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="confirmaSenha">Confirmar Senha:</label>
+<input class="form-control" id="confirmaSenha" placeholder="Confirme sua nova senha" type="password"/>
+</div>
+<div class="alert alert-danger" id="trocaSenhaErro" style="display: none;"></div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-primary" onclick="trocarSenha()">Alterar Senha</button>
+</div>
+</div>
+</div>
+</div>
 <!-- Loading Indicator -->
-<div id="loadingIndicator" class="loading-indicator" style="display: none;">
-  <div class="spinner"></div>
+<div class="loading-indicator" id="loadingIndicator" style="display: none;">
+<div class="spinner"></div>
 </div>
-
 <script>
 // Configuração do Firebase
 const firebaseConfig = {
@@ -2320,6 +2355,20 @@ function atualizarTabelaPedidosRecentes() {
 
 // KPIs
 function atualizarKPIs(pedidos) {
+  const recebidos = pedidos.filter(p => p.status === "Solicitação Recebida").length;
+  const gerados = pedidos.filter(p => p.status === "Reserva Gerada").length;
+  const apropriados = pedidos.filter(p => p.status === "Reserva Apropriada").length;
+  const cancelados = pedidos.filter(p => p.status === "Pedido Cancelado").length;
+  const almoxarifado = pedidos.filter(p => p.status === "Aguardando Almoxarifado").length;
+  const aguardandoMaterial = pedidos.filter(p => p.status === "Aguardando Material").length;
+
+  document.getElementById("kpi-recebidos").textContent = recebidos;
+  document.getElementById("kpi-gerados").textContent = gerados;
+  document.getElementById("kpi-apropriados").textContent = apropriados;
+  document.getElementById("kpi-cancelados").textContent = cancelados;
+  document.getElementById("kpi-almoxarifado").textContent = almoxarifado;
+  document.getElementById("kpi-aguardando-material").textContent = aguardandoMaterial;
+
   // Total de pedidos
   document.getElementById("kpi-total").textContent = pedidos.length;
   
