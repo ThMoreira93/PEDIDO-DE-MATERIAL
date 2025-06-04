@@ -1051,7 +1051,56 @@
       }
     }
   </style>
-</head>
+<style>
+/* Estilo do prompt customizado */
+.custom-prompt-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.custom-prompt-container {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0,0,0,0.25);
+  z-index: 9999;
+}
+.custom-prompt-container input {
+  width: 100%;
+  padding: 0.6rem;
+  margin: 1rem 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+.custom-prompt-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+.custom-prompt-buttons button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+.custom-prompt-buttons .confirm {
+  background-color: #007bff;
+}
+.custom-prompt-buttons .cancel {
+  background-color: #6c757d;
+}
+</style></head>
 <body>
 <!-- Tela de Login -->
 <div class="login-container" id="loginContainer">
@@ -2866,28 +2915,78 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 <script>
-// Substitui a função para suportar inserção de número da reserva
+function customPrompt(message, callback) {
+  const backdrop = document.createElement("div");
+  backdrop.className = "custom-prompt-backdrop";
+
+  const container = document.createElement("div");
+  container.className = "custom-prompt-container";
+
+  const label = document.createElement("label");
+  label.textContent = message;
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = "Ex: 456789";
+
+  const buttonsDiv = document.createElement("div");
+  buttonsDiv.className = "custom-prompt-buttons";
+
+  const confirmBtn = document.createElement("button");
+  confirmBtn.className = "confirm";
+  confirmBtn.textContent = "Confirmar";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.className = "cancel";
+  cancelBtn.textContent = "Cancelar";
+
+  confirmBtn.onclick = () => {
+    document.body.removeChild(backdrop);
+    callback(input.value);
+  };
+  cancelBtn.onclick = () => {
+    document.body.removeChild(backdrop);
+    callback(null);
+  };
+
+  buttonsDiv.appendChild(confirmBtn);
+  buttonsDiv.appendChild(cancelBtn);
+
+  container.appendChild(label);
+  container.appendChild(input);
+  container.appendChild(buttonsDiv);
+  backdrop.appendChild(container);
+  document.body.appendChild(backdrop);
+}
+
+// Substitui a função de atualização com prompt estilizado
 const originalAtualizarStatusIndividual = atualizarStatusIndividual;
 atualizarStatusIndividual = function(id, valor) {
-  const numeroReserva = prompt("Informe o número da reserva (caso aplicável):");
+  if (valor === "Reserva Gerada") {
+    customPrompt("Informe o número da reserva:", (numeroReserva) => {
+      if (!numeroReserva || numeroReserva.trim() === "") {
+        showNotification("Por favor, insira o número da reserva.", "warning");
+        return;
+      }
 
-  if (valor === "Reserva Gerada" && (!numeroReserva || numeroReserva.trim() === "")) {
-    showNotification("Por favor, insira o número da reserva.", "warning");
-    return;
+      processarStatus(id, valor, numeroReserva.trim());
+    });
+  } else {
+    processarStatus(id, valor, null);
   }
+};
 
+function processarStatus(id, valor, numeroReserva) {
   showConfirmationModal(
     "Confirmar alteração de status",
     `Deseja alterar o status do pedido para "${valor}"?`,
     () => {
       showLoadingIndicator();
-
       const ref = db.collection("pedidos").doc(id);
       ref.get().then(doc => {
         if (doc.exists) {
           const dados = doc.data();
           const historico = dados.historico || [];
-
           const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
 
           historico.push({
@@ -2898,8 +2997,8 @@ atualizarStatusIndividual = function(id, valor) {
           });
 
           let observacoes = dados.observacoes || "";
-          if (valor === "Reserva Gerada") {
-            observacoes += (observacoes ? " | " : "") + "Reserva Gerada Nº " + numeroReserva.trim();
+          if (valor === "Reserva Gerada" && numeroReserva) {
+            observacoes += (observacoes ? " | " : "") + "Reserva Gerada Nº " + numeroReserva;
           }
 
           ref.update({ status: valor, historico: historico, observacoes: observacoes })
@@ -2911,7 +3010,7 @@ atualizarStatusIndividual = function(id, valor) {
                 numeroPedido: dados.numero,
                 statusAntigo: dados.status,
                 statusNovo: valor,
-                numeroReserva: numeroReserva.trim()
+                numeroReserva: numeroReserva || undefined
               });
             })
             .catch(error => {
@@ -2923,6 +3022,6 @@ atualizarStatusIndividual = function(id, valor) {
       });
     }
   );
-};
+}
 </script></body>
 </html>
