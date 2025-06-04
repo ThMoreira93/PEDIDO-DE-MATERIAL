@@ -1209,12 +1209,6 @@
 <p class="kpi-change positive">
 <i class="fas fa-arrow-up"></i> Atualizado
             </p>
-
-
-
-
-
-
 </div>
 </div>
 <div class="card kpi-card">
@@ -1399,11 +1393,11 @@
           </p>
 <div class="form-group">
 <label class="form-label" for="arquivoStatus">Selecione a planilha</label>
-<input accept=".xlsx, .xls" class="form-control" id="arquivoStatus" type="file">
+<input accept=".xlsx, .xls" class="form-control" id="arquivoStatus" type="file"/>
 <small style="display: block; margin-top: var(--space-2); color: var(--neutral-600);">
               A planilha deve conter as colunas "Número do Pedido" e "Novo Status".
             </small>
-</input></div>
+</div>
 <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4);">
 <button class="btn btn-primary" onclick="atualizarStatusEmMassa()">
 <i class="fas fa-upload"></i>
@@ -2871,5 +2865,64 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 </script>
-</body>
+<script>
+// Substitui a função para suportar inserção de número da reserva
+const originalAtualizarStatusIndividual = atualizarStatusIndividual;
+atualizarStatusIndividual = function(id, valor) {
+  const numeroReserva = prompt("Informe o número da reserva (caso aplicável):");
+
+  if (valor === "Reserva Gerada" && (!numeroReserva || numeroReserva.trim() === "")) {
+    showNotification("Por favor, insira o número da reserva.", "warning");
+    return;
+  }
+
+  showConfirmationModal(
+    "Confirmar alteração de status",
+    `Deseja alterar o status do pedido para "${valor}"?`,
+    () => {
+      showLoadingIndicator();
+
+      const ref = db.collection("pedidos").doc(id);
+      ref.get().then(doc => {
+        if (doc.exists) {
+          const dados = doc.data();
+          const historico = dados.historico || [];
+
+          const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+
+          historico.push({
+            status: valor,
+            data: new Date().toISOString(),
+            usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
+            nome: usuarioLogado ? usuarioLogado.nome : "Sistema"
+          });
+
+          let observacoes = dados.observacoes || "";
+          if (valor === "Reserva Gerada") {
+            observacoes += (observacoes ? " | " : "") + "Reserva Gerada Nº " + numeroReserva.trim();
+          }
+
+          ref.update({ status: valor, historico: historico, observacoes: observacoes })
+            .then(() => {
+              hideLoadingIndicator();
+              showNotification(`Status do pedido atualizado para "${valor}"`, "success");
+              registrarAcao("Alteração de Status", `Status do pedido ${dados.numero} alterado para "${valor}"`, {
+                pedidoId: id,
+                numeroPedido: dados.numero,
+                statusAntigo: dados.status,
+                statusNovo: valor,
+                numeroReserva: numeroReserva.trim()
+              });
+            })
+            .catch(error => {
+              hideLoadingIndicator();
+              showNotification("Erro ao atualizar status. Tente novamente.", "error");
+              console.error("Erro:", error);
+            });
+        }
+      });
+    }
+  );
+};
+</script></body>
 </html>
