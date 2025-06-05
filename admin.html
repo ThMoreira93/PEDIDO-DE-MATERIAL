@@ -1914,7 +1914,7 @@ function renderizarPedidos(lista) {
                 </tr>
               </thead>
               <tbody>
-                ${p.materiais.map((m, idx) => `
+                ${(p.materiais || []).map((m, idx) => `
                   <tr>
                     <td>${m.material}</td>
                     <td>${m.quantidade}</td>
