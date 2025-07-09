@@ -1390,7 +1390,7 @@
 </div>
 <div class="header-actions">
 <div class="search-container">
-<input class="search-input" id="buscaTextoPedidos" placeholder="Buscar por colaborador, número ou telefone..." type="text"/>
+<input class="search-input" id="buscaTextoPedidos" placeholder="Buscar por colaborador, número ou Focal..." type="text"/>
 <button class="btn-search">
 <i class="fas fa-search"></i>
 </button>
@@ -1894,8 +1894,8 @@ function renderizarPedidos(lista) {
             <div class="pedido-info-value">${p.colaborador}</div>
           </div>
           <div class="pedido-info-item">
-            <div class="pedido-info-label">Telefone:</div>
-            <div class="pedido-info-value">${p.telefone}</div>
+            <div class="pedido-info-label">Focal:</div>
+            <div class="pedido-info-value">${p.Focal}</div>
           </div>
           <div class="pedido-info-item">
             <div class="pedido-info-label">Observações:</div>
@@ -2085,7 +2085,7 @@ function aplicarFiltros() {
     (!texto || 
      p.colaborador.toLowerCase().includes(texto) || 
      p.numero.toString().includes(texto) || 
-     p.telefone.includes(texto))
+     p.Focal.includes(texto))
   );
   
   renderizarPedidos(pedidosFiltrados);
