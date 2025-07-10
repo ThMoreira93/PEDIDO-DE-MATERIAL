@@ -44,10 +44,10 @@
       /* Cores de status */
       --status-received: #9c27b0;     /* Solicitação Recebida */
       --status-generated: #1976d2;    /* Reserva Gerada */
-      --status-waiting: #e53935;      /* Aguardando Verba */
+      --status-waiting: #FFA500;      /* Aguardando Verba */
       --status-appropriated: #ec407a; /* Reserva Apropriada */
-      --status-available: #2e7d32;    /* Disponível para Retirada */
-      --status-delivered: #757575;    /* Material Entregue */
+      --status-available: #757575;    /* Disponível para Retirada */
+      --status-delivered: #2e7d32;    /* Material Entregue */
       --status-canceled: #ff0000;     /* Pedido Cancelado */
       
       /* Cores de feedback */
@@ -2335,10 +2335,10 @@ function gerarGraficoStatus(pedidos) {
   const coresReais = {
     "Solicitação Recebida": "#9c27b0",     // roxo
     "Reserva Gerada": "#1976d2",           // azul
-    "Aguardando Verba": "#e53935",         // vermelho
+    "Aguardando Verba": "#FFA500",         // laranja
     "Reserva Apropriada": "#ec407a",       // rosa
-    "Disponível para Retirada": "#2e7d32", // verde
-    "Material Entregue": "#757575",        // cinza
+    "Disponível para Retirada": "#757575", // cinza
+    "Material Entregue": "#2e7d32",        // verde
     "Pedido Cancelado": "#ff0000"          // vermelho
   };
   
