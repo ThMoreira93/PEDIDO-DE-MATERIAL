@@ -3,54 +3,47 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>GMAT - Pedido de Materiais</title>
+<title>Pedido de Materiais</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
 <style>
     :root {
       --primary-color: #2563eb;
       --primary-dark: #1d4ed8;
-      --primary-light: #60a5fa;
+      --primary-light: #3b82f6;
       --secondary-color: #10b981;
       --secondary-dark: #059669;
+      --accent-color: #f59e0b;
       --danger-color: #ef4444;
       --danger-dark: #dc2626;
-      --warning-color: #f59e0b;
-      --info-color: #3b82f6;
-      --success-color: #22c55e;
-      --text-primary: #111827;
-      --text-secondary: #4b5563;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
       --text-light: #9ca3af;
       --bg-primary: #ffffff;
-      --bg-secondary: #f9fafb;
-      --bg-tertiary: #f3f4f6;
-      --border-color: #e5e7eb;
-      --border-light: #f3f4f6;
+      --bg-secondary: #f8fafc;
+      --bg-tertiary: #f1f5f9;
+      --border-color: #e2e8f0;
+      --border-light: #f1f5f9;
       --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
-      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.08);
-      --radius-sm: 0.25rem;
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      --radius-sm: 0.375rem;
       --radius-md: 0.5rem;
       --radius-lg: 0.75rem;
       --radius-xl: 1rem;
-      --transition-speed: 0.2s;
     }
 
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
     }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg-secondary);
+      background: var(--bg-primary);
       min-height: 100vh;
-      padding: 2rem;
+      margin: 0;
+      padding: 20px;
       color: var(--text-primary);
       line-height: 1.6;
     }
@@ -62,55 +55,50 @@
 
     .header {
       text-align: center;
-      margin-bottom: 3rem;
-    }
-
-    .header h1 {
-      font-size: 2.25rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
+      margin-bottom: 2rem;
       color: var(--text-primary);
     }
 
-    .header p {
-      font-size: 1.125rem;
-      color: var(--text-secondary);
-      font-weight: 300;
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      text-shadow: none;
     }
 
-    .main-card, .consultation-section {
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.7;
+      margin: 0;
+      font-weight: 300;
+      color: var(--text-secondary);
+    }
+
+    .main-card {
       background: var(--bg-primary);
       border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-lg);
-      margin-bottom: 3rem;
-      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+      margin-bottom: 2rem;
     }
-    
-    .card-header, .consultation-header {
-      color: var(--primary-color);
+
+    .card-header {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+      color: white;
       padding: 1.5rem 2rem;
-      border-bottom: 1px solid var(--border-color);
-      background-color: var(--bg-primary);
+      border-bottom: 1px solid var(--border-light);
     }
-    
-    .consultation-header {
-      color: var(--info-color);
-    }
-    
-    .card-header h2, .consultation-header h2 {
+
+    .card-header h2 {
       margin: 0;
       font-size: 1.5rem;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
 
-    .card-body, .consultation-body {
+    .card-body {
       padding: 2rem;
     }
 
@@ -124,11 +112,18 @@
       flex-direction: column;
     }
 
-    .form-group.half { grid-column: span 1; }
-    .form-group.full { grid-column: span 2; }
+    .form-group.half {
+      grid-column: span 1;
+    }
+
+    .form-group.full {
+      grid-column: span 2;
+    }
 
     @media (min-width: 768px) {
-      .form-grid { grid-template-columns: 1fr 1fr; }
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
     }
 
     label {
@@ -136,29 +131,38 @@
       color: var(--text-primary);
       margin-bottom: 0.5rem;
       font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
-    .input-wrapper { position: relative; }
+    .input-wrapper {
+      position: relative;
+    }
 
     input, select, textarea {
       width: 100%;
       padding: 0.875rem 1rem;
-      border: 1px solid var(--border-color);
+      border: 2px solid var(--border-color);
       border-radius: var(--radius-md);
       font-size: 1rem;
       font-family: inherit;
       background: var(--bg-primary);
       color: var(--text-primary);
-      transition: all var(--transition-speed) ease;
+      transition: all 0.2s ease;
       outline: none;
     }
 
     input:focus, select:focus, textarea:focus {
       border-color: var(--primary-color);
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      transform: translateY(-1px);
+    }
+
+    input:hover, select:hover, textarea:hover {
+      border-color: var(--primary-light);
     }
 
     .input-icon {
@@ -170,38 +174,46 @@
       pointer-events: none;
     }
 
-    .input-with-icon { padding-left: 2.75rem; }
+    .input-with-icon {
+      padding-left: 2.5rem;
+    }
 
-    .autocomplete-container { position: relative; }
+    .autocomplete-container {
+      position: relative;
+    }
 
     .autocomplete-list {
       position: absolute;
       background: var(--bg-primary);
-      border: 1px solid var(--border-color);
+      border: 2px solid var(--border-color);
       border-top: none;
       border-radius: 0 0 var(--radius-md) var(--radius-md);
-      max-height: 250px;
+      max-height: 300px;
       overflow-y: auto;
       width: 100%;
       z-index: 1000;
       list-style: none;
+      margin: 0;
+      padding: 0;
       box-shadow: var(--shadow-lg);
     }
 
     .autocomplete-list li {
-      padding: 0.75rem 1.25rem;
+      padding: 0.75rem 1rem;
       cursor: pointer;
       border-bottom: 1px solid var(--border-light);
-      transition: all var(--transition-speed) ease;
-      font-size: 0.9rem;
+      transition: all 0.15s ease;
+      font-size: 0.875rem;
     }
 
-    .autocomplete-list li:hover, .autocomplete-list li.highlighted {
-      background: var(--bg-tertiary);
+    .autocomplete-list li:hover {
+      background: var(--bg-secondary);
       color: var(--primary-color);
     }
 
-    .autocomplete-list li:last-child { border-bottom: none; }
+    .autocomplete-list li:last-child {
+      border-bottom: none;
+    }
 
     .btn {
       display: inline-flex;
@@ -209,56 +221,75 @@
       justify-content: center;
       gap: 0.5rem;
       padding: 0.875rem 1.5rem;
-      border: 1px solid transparent;
+      border: none;
       border-radius: var(--radius-md);
       font-size: 1rem;
       font-weight: 500;
+      font-family: inherit;
       cursor: pointer;
-      transition: all var(--transition-speed) ease;
+      transition: all 0.2s ease;
       text-decoration: none;
+      position: relative;
+      overflow: hidden;
     }
 
     .btn:hover {
       transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
+      box-shadow: var(--shadow-lg);
     }
-    
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
     .btn-primary {
-      background: var(--primary-color);
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
       color: white;
     }
-    .btn-primary:hover { background: var(--primary-dark); }
-    
-    .btn-success {
-        background: var(--secondary-color);
-        color: white;
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
     }
-    .btn-success:hover { background: var(--secondary-dark); }
-    
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--secondary-color) 0%, #34d399 100%);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--secondary-color) 100%);
+    }
+
     .btn-danger {
-      background: var(--danger-color);
+      background: linear-gradient(135deg, var(--danger-color) 0%, #f87171 100%);
       color: white;
       padding: 0.5rem 1rem;
       font-size: 0.875rem;
     }
-    .btn-danger:hover { background: var(--danger-dark); }
+
+    .btn-danger:hover {
+      background: linear-gradient(135deg, var(--danger-dark) 0%, var(--danger-color) 100%);
+    }
 
     .btn-info {
-      background: var(--info-color);
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
       color: white;
     }
-    .btn-info:hover { background: #1d4ed8; }
+
+    .btn-info:hover {
+      background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+    }
 
     .cart {
       margin-top: 2rem;
       background: var(--bg-secondary);
       border-radius: var(--radius-lg);
       padding: 1.5rem;
-      border: 1px solid var(--border-color);
+      border: 2px solid var(--border-light);
     }
 
     .cart h3 {
-      margin-bottom: 1rem;
+      margin: 0 0 1rem 0;
       color: var(--text-primary);
       font-size: 1.25rem;
       font-weight: 600;
@@ -275,134 +306,119 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border: 1px solid var(--border-color);
-      transition: all var(--transition-speed) ease;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-light);
+      transition: all 0.2s ease;
+    }
+
+    .cart-item:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+
+    .cart-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .cart-item-info {
+      flex: 1;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .cart-item-material {
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .status-verde {
+      color: var(--secondary-color);
+      font-weight: 600;
+    }
+
+    .status-vermelho {
+      color: var(--danger-color);
+      font-weight: 600;
+    }
+
+    .consultation-section {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+    }
+
+    .consultation-header {
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+    }
+
+    .consultation-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .consultation-body {
+      padding: 2rem;
     }
     
-    .cart-item:last-child { margin-bottom: 0; }
-    .cart-item-info { flex: 1; }
-    .cart-item-material { font-weight: 500; color: var(--text-primary); }
-    .cart-item-details { font-size: 0.875rem; color: var(--text-secondary); }
-
     .consultation-tabs {
       display: flex;
       margin-bottom: 1.5rem;
       border-bottom: 1px solid var(--border-color);
-      gap: 0.25rem;
     }
     
     .tab-btn {
       padding: 0.75rem 1.5rem;
-      background: transparent;
+      background: var(--bg-tertiary);
       border: none;
-      border-bottom: 2px solid transparent;
       border-radius: var(--radius-sm) var(--radius-sm) 0 0;
       font-weight: 500;
       cursor: pointer;
-      transition: all var(--transition-speed) ease;
-      color: var(--text-secondary);
+      transition: all 0.2s ease;
     }
     
     .tab-btn.active {
-      border-bottom-color: var(--primary-color);
-      color: var(--primary-color);
-      background-color: var(--bg-tertiary);
+      background: var(--primary-color);
+      color: white;
     }
     
-    .tab-content { display: none; }
-    .tab-content.active { display: block; animation: fadeIn 0.5s; }
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
 
     .result-card {
-      background: var(--bg-primary);
-      border-radius: var(--radius-lg);
-      padding: 2rem;
-      border: 1px solid var(--border-color);
-      margin-top: 2rem;
-    }
-
-    .result-card .detail-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .result-card h4 {
-      margin: 0 0 1.5rem 0;
-      color: var(--text-primary);
-      font-weight: 600;
-      font-size: 1.25rem;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 1rem;
-    }
-
-    .result-card p, .detail-item {
-      margin: 0;
-      font-size: 1rem;
-      color: var(--text-secondary);
-    }
-    .detail-item strong {
-      color: var(--text-primary);
-      font-weight: 500;
-      display: block;
-      margin-bottom: 0.25rem;
-    }
-
-    .status-badge {
-        font-weight: 500;
-        padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
-        font-size: 0.875rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .status-recebido { background-color: #dbeafe; color: #1e40af; }
-    .status-processamento { background-color: #fef3c7; color: #92400e; }
-    .status-finalizado { background-color: #dcfce7; color: #166534; }
-    .status-pendente { background-color: #fee2e2; color: #991b1b; }
-    .status-entregue { background-color: #dcfce7; color: #166534; }
-
-    .material-list-container {
-      margin-top: 1.5rem;
-      border-top: 1px solid var(--border-color);
-      padding-top: 1.5rem;
-    }
-    
-    .material-item {
       background: var(--bg-secondary);
-      border-radius: var(--radius-md);
-      padding: 1rem;
-      margin-bottom: 0.75rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .material-info strong {
-      display: block;
-      color: var(--text-primary);
-    }
-    
-    .material-info span {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      border-left: 4px solid var(--secondary-color);
+      margin-top: 1rem;
     }
     
     .pedido-item {
       background: var(--bg-primary);
       border-radius: var(--radius-md);
-      padding: 1rem 1.5rem;
-      margin-bottom: 1rem;
-      border: 1px solid var(--border-color);
-      transition: all var(--transition-speed) ease;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-light);
+      transition: all 0.2s ease;
       cursor: pointer;
     }
     
     .pedido-item:hover {
       box-shadow: var(--shadow-md);
-      transform: translateY(-2px);
-      border-color: var(--primary-color);
+      transform: translateY(-1px);
     }
     
     .pedido-header {
@@ -412,8 +428,37 @@
       margin-bottom: 0.5rem;
     }
     
-    .pedido-numero { font-weight: 600; color: var(--primary-color); }
-    .pedido-data { font-size: 0.875rem; color: var(--text-secondary); }
+    .pedido-numero {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    .pedido-data {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+    
+    .pedido-status {
+      font-weight: 500;
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+    }
+    
+    .status-recebido {
+      background-color: #e0f2fe;
+      color: #0369a1;
+    }
+    
+    .status-processamento {
+      background-color: #ffedd5;
+      color: #c2410c;
+    }
+    
+    .status-finalizado {
+      background-color: #dcfce7;
+      color: #166534;
+    }
     
     .pedido-detalhes {
       margin-top: 0.5rem;
@@ -421,33 +466,49 @@
       color: var(--text-secondary);
     }
     
-    .pedido-detalhes strong { color: var(--text-primary); }
+    .pedido-detalhes strong {
+      color: var(--text-primary);
+    }
     
     .empty-result {
       text-align: center;
-      padding: 3rem 2rem;
-      color: var(--text-secondary);
-      background-color: var(--bg-secondary);
-      border-radius: var(--radius-lg);
-      border: 1px dashed var(--border-color);
+      padding: 2rem;
+      color: var(--text-light);
     }
-    .empty-result .fa-info-circle {
-      font-size: 2rem;
-      margin-bottom: 1rem;
+
+    .result-card h4 {
+      margin: 0 0 1rem 0;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .result-card p {
+      margin: 0.5rem 0;
+      font-size: 0.875rem;
+    }
+
+    .result-card strong {
+      color: var(--text-primary);
+      font-weight: 500;
     }
 
     .loading {
       display: inline-block;
       width: 1rem;
       height: 1rem;
-      border: 2px solid rgba(255,255,255,0.5);
-      border-top-color: currentColor;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
     }
 
     @keyframes fadeIn {
@@ -455,47 +516,204 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
     /* Responsive Design */
     @media (max-width: 768px) {
-      body { padding: 1rem; }
-      .header h1 { font-size: 1.75rem; }
-      .header p { font-size: 1rem; }
-      .card-body, .consultation-body { padding: 1.5rem; }
-      .form-grid { grid-template-columns: 1fr; }
-      .form-group.half, .form-group.full { grid-column: span 1; }
-      .btn { width: 100%; margin-bottom: 0.5rem; }
-      .consultation-tabs { flex-direction: column; }
+      body {
+        padding: 1rem;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .card-body, .consultation-body {
+        padding: 1.5rem;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-group.half,
+      .form-group.full {
+        grid-column: span 1;
+      }
+
+      .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+
+      .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .consultation-tabs {
+        flex-direction: column;
+      }
+      
+      .tab-btn {
+        border-radius: 0;
+        width: 100%;
+        text-align: left;
+      }
+    }
+
+    /* Custom Scrollbar */
+    .autocomplete-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .autocomplete-list::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    .autocomplete-list::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 3px;
+    }
+
+    .autocomplete-list::-webkit-scrollbar-thumb:hover {
+      background: var(--text-light);
     }
 </style>
 </head>
 <body>
 <div class="container">
-<header class="header">
+<div class="header">
 <h1><i class="fas fa-clipboard-list"></i> GMAT Pedidos de Materiais</h1>
-<p>Sistema para Solicitação e Consulta de Materiais</p>
-</header>
+<p>Formulário de Solicitação de Materiais</p>
+</div>
 
 <div class="main-card">
 <div class="card-header">
-<h2><i class="fas fa-plus-circle"></i> Novo Pedido</h2>
+<h2><i class="fas fa-plus-circe"></i> Novo Pedido de Material</h2>
 </div>
 <div class="card-body">
-<form id="pedidoForm" onsubmit="enviarPedido(event)">
+<form onsubmit="enviarPedido(event)">
 <div class="form-grid">
 <div class="form-group full">
-<label for="colaborador"><i class="fas fa-user"></i> Colaborador</label>
+<label for="colaborador">
+<i class="fas fa-user"></i>
+                Colaborador
+              </label>
 <div class="autocomplete-container">
 <div class="input-wrapper">
 <i class="fas fa-search input-icon"></i>
-<input autocomplete="off" class="input-with-icon" id="colaborador" placeholder="Digite para filtrar colaboradores" required="" type="text"/>
+<input class="input-with-icon" id="colaborador" placeholder="Digite para filtrar colaboradores" required="" type="text"/>
 </div>
-<ul class="autocomplete-list" id="colaborador-list"></ul>
+<ul class="autocomplete-list" id="colaborador-list">
+<li onclick="selecionarItem(this, 'colaborador')">ADAILDO SOUZA FERNANDES - 356484</li>
+<li onclick="selecionarItem(this, 'colaborador')">ADILSON DIAS DA SILVA - 340393</li>
+<li onclick="selecionarItem(this, 'colaborador')">ADRIANO DA SILVA ALVES - 346413</li>
+<li onclick="selecionarItem(this, 'colaborador')">AGNALDO DE JESUS SANTOS - 354049</li>
+<li onclick="selecionarItem(this, 'colaborador')">AILTON BATISTA DOS SANTOS - 469065</li>
+<li onclick="selecionarItem(this, 'colaborador')">ALAEL FERREIRA NASCIMENTO - 346415</li>
+<li onclick="selecionarItem(this, 'colaborador')">ALAN DE JESUS FERREIRA - 346422</li>
+<li onclick="selecionarItem(this, 'colaborador')">ALBERTO DE JESUS SANTOS  - 462694</li>
+<li onclick="selecionarItem(this, 'colaborador')">ALEX ALVES DE JESUS - 354050</li>
+<li onclick="selecionarItem(this, 'colaborador')">ANDERSON BORGES DOS SANTOS - 621262</li>
+<li onclick="selecionarItem(this, 'colaborador')">ANDERSON DA SILVA PINTO  - 465199</li>
+<li onclick="selecionarItem(this, 'colaborador')">ANDERSON DOS SANTOS FONSECA - 346435</li>
+<li onclick="selecionarItem(this, 'colaborador')">ANDERSON DOS SANTOS MENDES - 615539</li>
+<li onclick="selecionarItem(this, 'colaborador')">ANTONIO ALVES MONTEIRO NETO - 346438</li>
+<li onclick="selecionarItem(this, 'colaborador')">BISMARCK JESUS DE SANTANA - 356747</li>
+<li onclick="selecionarItem(this, 'colaborador')">BRUNA DAMASCENO SANTOS DO NASCIMENTO - 361645</li>
+<li onclick="selecionarItem(this, 'colaborador')">BRUNO DA HORA ROMA - 346445</li>
+<li onclick="selecionarItem(this, 'colaborador')">CALINE ROCHA NASCIMENTO - 615541</li>
+<li onclick="selecionarItem(this, 'colaborador')">CARLOS HENRIQUE SANTOS DE JESUS - 462673</li>
+<li onclick="selecionarItem(this, 'colaborador')">CINTIA SANTOS SILVA - 615715</li>
+<li onclick="selecionarItem(this, 'colaborador')">CLAUDIO RODRIGUES SAMPAIO - 465227</li>
+<li onclick="selecionarItem(this, 'colaborador')">CRISPIM DE SANTANA OLIVEIRA  - 465211</li>
+<li onclick="selecionarItem(this, 'colaborador')">DAVID SENA DA LUZ LIMA - 340302</li>
+<li onclick="selecionarItem(this, 'colaborador')">DERLANDIO BORGES DA SILVA - 342658</li>
+<li onclick="selecionarItem(this, 'colaborador')">DIEGO MACHADO MAIA - 461790</li>
+<li onclick="selecionarItem(this, 'colaborador')">DIOGO MATHEUS OLIVEIRA COELHO - 340305</li>
+<li onclick="selecionarItem(this, 'colaborador')">EDVALDO NAPOLEAO DOS SANTOS JUNIOR - 615538</li>
+<li onclick="selecionarItem(this, 'colaborador')">ELTON GARCIA DE ABREU - 463135</li>
+<li onclick="selecionarItem(this, 'colaborador')">ERINALDO NERY DE SOUSA - 346339</li>
+<li onclick="selecionarItem(this, 'colaborador')">FABIO JUNIOR JOSE MATOS - 357696</li>
+<li onclick="selecionarItem(this, 'colaborador')">FABIO SOUSA PORTO - 346358</li>
+<li onclick="selecionarItem(this, 'colaborador')">FARAH CARDOSO NASCIMENTO - 461334</li>
+<li onclick="selecionarItem(this, 'colaborador')">FLAVIO PARAISO SANTOS - 346419</li>
+<li onclick="selecionarItem(this, 'colaborador')">FRANKLIN SOUZA SILVA - 462720</li>
+<li onclick="selecionarItem(this, 'colaborador')">GABRIEL COSTA DE SANTANA - 621266</li>
+<li onclick="selecionarItem(this, 'colaborador')">GEORGE SILVA NEVES - 462670</li>
+<li onclick="selecionarItem(this, 'colaborador')">GILVAN SANTOS VIEIRA - 461605</li>
+<li onclick="selecionarItem(this, 'colaborador')">GIOVANNE SANTOS SOUZA - 360660</li>
+<li onclick="selecionarItem(this, 'colaborador')">JABSON LIMA BISPO DOS SANTOS - 351080</li>
+<li onclick="selecionarItem(this, 'colaborador')">JACSON DO NASCIMENTO CRUZ - 462668</li>
+<li onclick="selecionarItem(this, 'colaborador')">JEFFERSON CESAR SOUZA MARTINS - 346320</li>
+<li onclick="selecionarItem(this, 'colaborador')">JEFFERSON SANTOS DA SILVA - 358108</li>
+<li onclick="selecionarItem(this, 'colaborador')">JENIFFER FERNANDA SOUZA MARTINS - 618262</li>
+<li onclick="selecionarItem(this, 'colaborador')">JEOMICRES SANTOS SILVA - 346321</li>
+<li onclick="selecionarItem(this, 'colaborador')">JHAYON ARAUJO DA SILVA - 361643</li>
+<li onclick="selecionarItem(this, 'colaborador')">JOABSON DA SILVA DAMASIO - 346325</li>
+<li onclick="selecionarItem(this, 'colaborador')">JOAO VIRGILIO DE AARAUJO NETO - 340410</li>
+<li onclick="selecionarItem(this, 'colaborador')">JOBSON SOUZA DOS SANTOS - 346327</li>
+<li onclick="selecionarItem(this, 'colaborador')">JOELLINGTON AVILA CORREIA - 354089</li>
+<li onclick="selecionarItem(this, 'colaborador')">JONATAS LEAL DOS SANTOS - 346332</li>
+<li onclick="selecionarItem(this, 'colaborador')">JONATHA BATISTA DOS SANTOS - 621262</li>
+<li onclick="selecionarItem(this, 'colaborador')">JOSE ALFREDO SILVA DA CONCEIÇÃO - 462721</li>
+<li onclick="selecionarItem(this, 'colaborador')">LEANDRO COSTA SANTOS - 462816</li>
+<li onclick="selecionarItem(this, 'colaborador')">LEANDRO DOS SANTOS VIEIRA - 361422</li>
+<li onclick="selecionarItem(this, 'colaborador')">LEONARDO NOVAES CARDOSO - 348366</li>
+<li onclick="selecionarItem(this, 'colaborador')">LUAN LIMA GOMES DA SILVA - 352454</li>
+<li onclick="selecionarItem(this, 'colaborador')">LUCAS DOS SANTOS CUNHA - 464546</li>
+<li onclick="selecionarItem(this, 'colaborador')">LUEDSON DE JESUS SILVA - 462370</li>
+<li onclick="selecionarItem(this, 'colaborador')">MARCELO BARBOSA GOES - 340414</li>
+<li onclick="selecionarItem(this, 'colaborador')">MARCIA OLIVEIRA DA SILVA - 615540</li>
+<li onclick="selecionarItem(this, 'colaborador')">MARCOS ANDRADE DE SOUZA - 468428</li>
+<li onclick="selecionarItem(this, 'colaborador')">MARCOS ROBERTO OLIVEIRA DOS SANTOS - 462722</li>
+<li onclick="selecionarItem(this, 'colaborador')">MARCOS VINICIUS MENDES DA SILVA - 621241</li>
+<li onclick="selecionarItem(this, 'colaborador')">MARIANO SEBASTIAN RIVERO - 346462</li>
+<li onclick="selecionarItem(this, 'colaborador')">NAILTON BATISTA DOS SANTOS - 352029</li>
+<li onclick="selecionarItem(this, 'colaborador')">NAOMAR SOARES PEIXOTO - 462705</li>
+<li onclick="selecionarItem(this, 'colaborador')">OSMAR CARDOSO MELO NETO - 462826</li>
+<li onclick="selecionarItem(this, 'colaborador')">PAULO ROBERTO OLIVERIA DE JESUS JUNIOR - 621263</li>
+<li onclick="selecionarItem(this, 'colaborador')">RENAN CORREIA SANTOS - 346404</li>
+<li onclick="selecionarItem(this, 'colaborador')">RODRIGO JESUS DOS ANJOS - 462669</li>
+<li onclick="selecionarItem(this, 'colaborador')">ROMULO SILVA CONCEICAO - 346454</li>
+<li onclick="selecionarItem(this, 'colaborador')">SAIMON OLIVEIRA MARQUES RAMOS - 621245</li>
+<li onclick="selecionarItem(this, 'colaborador')">SERGIO SOARES DA SILVA - 346460</li>
+<li onclick="selecionarItem(this, 'colaborador')">TADEU DE OLIVEIRA MAGALHÃES - 356071</li>
+<li onclick="selecionarItem(this, 'colaborador')">TARCILIO PERCISIO DOS SANTOS - 621244</li>
+<li onclick="selecionarItem(this, 'colaborador')">THAIRONE MORAES SANTOS - 462710</li>
+<li onclick="selecionarItem(this, 'colaborador')">THALLYS SILVA RAMALHO DE SOUZA - 465234</li>
+<li onclick="selecionarItem(this, 'colaborador')">THIAGO DE ASSIS VIANA - 346433</li>
+<li onclick="selecionarItem(this, 'colaborador')">UILLIAM SILVA SANTOS - 340352</li>
+<li onclick="selecionarItem(this, 'colaborador')">VALDEMER DA PENHA DE JESUS FILHO - 621242</li>
+<li onclick="selecionarItem(this, 'colaborador')">VALDINEIA RODRIGUES DAMASCENO  - 616839</li>
+<li onclick="selecionarItem(this, 'colaborador')">VINICIUS MACHADO GUIMARAES - 468653</li>
+<li onclick="selecionarItem(this, 'colaborador')">VINICIUS SANTOS DA PAIXAO - 345950</li>
+<li onclick="selecionarItem(this, 'colaborador')">VINICIUS SANTOS TAVARES - 618263</li>
+<li onclick="selecionarItem(this, 'colaborador')">WANDERSON LINO SANTOS - 460799</li>
+<li onclick="selecionarItem(this, 'colaborador')">WELIGTON FARIAS OLIVIERA - 461463</li>
+<li onclick="selecionarItem(this, 'colaborador')">WELTON SOUZA TEIXEIRA - 348673</li>
+<li onclick="selecionarItem(this, 'colaborador')">WESLEY COSTA PRATA - 345138</li>
+<li onclick="selecionarItem(this, 'colaborador')">YSAK PACHECO SANTOS - 618266</li>
+</ul>
 </div>
 </div>
 <div class="form-group half">
-<label for="focal"><i class="fas fa-user-tie"></i> Focal</label>
+<label for="Focal">
+<i class="fas fa-phone"></i>
+                Focal
+              </label>
 <div class="input-wrapper">
-<select id="focal" required="">
+<i class="fas fa-user-tie input-icon"></i>
+<select class="input-with-icon" id="Focal" required="">
 <option disabled="" selected="" value="">Selecione o focal</option>
 <option value="CAMILA">CAMILA</option>
 <option value="FARAH">FARAH</option>
@@ -507,29 +725,40 @@
 </div>
 </div>
 <div class="form-group half">
-<label for="categoria"><i class="fas fa-tags"></i> Categoria</label>
+<label for="categoria">
+<i class="fas fa-tags"></i>
+                Categoria
+              </label>
 <div class="input-wrapper">
-<select id="categoria" onchange="carregarMateriais()">
-<option disabled="" selected="" value="">Selecione a categoria</option>
+<i class="fas fa-list input-icon"></i>
+<select class="input-with-icon" id="categoria" onchange="carregarMateriais()">
+<option disabled="" selected="">Selecione a categoria</option>
 <option value="EPI">EPI</option>
 <option value="EPC/FERRAMENTAL">EPC/FERRAMENTAL</option>
 </select>
 </div>
 </div>
 <div class="form-group half">
-<label for="material"><i class="fas fa-box"></i> Material</label>
+<label for="material">
+<i class="fas fa-box"></i>
+                Material
+              </label>
 <div class="autocomplete-container">
 <div class="input-wrapper">
 <i class="fas fa-search input-icon"></i>
-<input autocomplete="off" class="input-with-icon" id="material" placeholder="Selecione uma categoria primeiro" type="text"/>
+<input autocomplete="off" class="input-with-icon" id="material" inputmode="text" placeholder="Digite para buscar material" type="text"/>
 </div>
 <ul class="autocomplete-list" id="material-list"></ul>
 </div>
 </div>
 <div class="form-group half">
-<label for="quantidade"><i class="fas fa-hashtag"></i> Quantidade</label>
+<label for="quantidade">
+<i class="fas fa-calculator"></i>
+                Quantidade
+              </label>
 <div class="input-wrapper">
-<input class="input-with-icon" id="quantidade" min="1" placeholder="Ex: 1" type="number"/>
+<i class="fas fa-hashtag input-icon"></i>
+<input class="input-with-icon" id="quantidade" min="1" placeholder="Digite a quantidade" type="number"/>
 </div>
 </div>
 <div class="form-group full">
@@ -544,11 +773,14 @@
 <div id="cart-items"></div>
 </div>
 <div class="form-group full" style="margin-top: 1.5rem;">
-<label for="observacoes"><i class="fas fa-comment-alt"></i> Observações</label>
+<label for="observacoes">
+<i class="fas fa-comment-alt"></i>
+              Observações
+            </label>
 <textarea id="observacoes" placeholder="Digite observações adicionais (opcional)" rows="4"></textarea>
 </div>
 <div class="form-group full" style="margin-top: 1.5rem;">
-<button class="btn btn-success" id="submit-btn" type="submit">
+<button class="btn btn-success" type="submit">
 <i class="fas fa-paper-plane"></i>
               Enviar Pedido
             </button>
@@ -558,43 +790,52 @@
 </div>
 <div class="consultation-section">
 <div class="consultation-header">
-<h2><i class="fas fa-search-dollar"></i> Consultar Pedido</h2>
+<h2><i class="fas fa-search"></i> Consultar Status do Pedido</h2>
 </div>
 <div class="consultation-body">
-<div class="consultation-tabs">
-<button class="tab-btn active" onclick="mudarTab('numero')">Por Número</button>
-<button class="tab-btn" onclick="mudarTab('colaborador')">Por Colaborador</button>
-</div>
-<div class="tab-content active" id="tab-numero">
-<form onsubmit="consultarPedido(); return false;">
-<div class="form-group">
-<label for="consultaNumero"><i class="fas fa-hashtag"></i> Número do Pedido</label>
-<div class="input-wrapper">
-<i class="fas fa-search input-icon"></i>
-<input class="input-with-icon" id="consultaNumero" placeholder="Ex: 123456" type="number"/>
-</div>
-</div>
-<button class="btn btn-info" id="consulta-numero-btn" onclick="consultarPedido()" style="margin-top: 1rem;" type="button">
-<i class="fas fa-search"></i>
-          Consultar Status
-        </button>
-</form>
-</div>
-<div class="tab-content" id="tab-colaborador">
-<div class="form-group">
-<label for="consultaColaborador"><i class="fas fa-user"></i> Colaborador</label>
-<div class="input-wrapper">
-<select id="consultaColaborador">
-<option disabled="" selected="" value="">Selecione um colaborador</option>
-</select>
-</div>
-</div>
-<button class="btn btn-info" id="consulta-colab-btn" onclick="consultarPedidosPorColaborador()" style="margin-top: 1rem;" type="button">
-<i class="fas fa-search"></i>
-          Buscar Pedidos
-        </button>
-</div>
-<div id="resultadoConsulta" style="display: none;"></div>
+  <div class="consultation-tabs">
+    <button class="tab-btn active" onclick="mudarTab('numero')">Por Número</button>
+    <button class="tab-btn" onclick="mudarTab('colaborador')">Por Colaborador</button>
+  </div>
+  
+  <div id="tab-numero" class="tab-content active">
+    <div class="form-group">
+      <label for="consultaNumero">
+        <i class="fas fa-hashtag"></i>
+        Número do Pedido
+      </label>
+      <div class="input-wrapper">
+        <i class="fas fa-search input-icon"></i>
+        <input class="input-with-icon" id="consultaNumero" placeholder="Ex: 123456" type="number"/>
+      </div>
+    </div>
+    <button class="btn btn-info" onclick="consultarPedido()" style="margin-top: 1rem;">
+      <i class="fas fa-search"></i>
+      Consultar Status
+    </button>
+  </div>
+  
+  <div id="tab-colaborador" class="tab-content">
+    <div class="form-group">
+      <label for="consultaColaborador">
+        <i class="fas fa-user"></i>
+        Colaborador
+      </label>
+      <div class="input-wrapper">
+        <i class="fas fa-user input-icon"></i>
+        <select class="input-with-icon" id="consultaColaborador">
+          <option value="" selected disabled>Selecione um colaborador</option>
+          <!-- As opções serão preenchidas via JavaScript -->
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-info" onclick="consultarPedidosPorColaborador()" style="margin-top: 1rem;">
+      <i class="fas fa-search"></i>
+      Buscar Pedidos
+    </button>
+  </div>
+  
+  <div id="resultadoConsulta" style="display: none; margin-top: 2rem;"></div>
 </div>
 </div>
 </div>
@@ -612,345 +853,376 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const colaboradores = ['ADAILDO SOUZA FERNANDES - 356484', 'ADILSON DIAS DA SILVA - 340393', 'ADRIANO DA SILVA ALVES - 346413', 'AGNALDO DE JESUS SANTOS - 354049', 'AILTON BATISTA DOS SANTOS - 469065', 'ALAEL FERREIRA NASCIMENTO - 346415', 'ALAN DE JESUS FERREIRA - 346422', 'ALBERTO DE JESUS SANTOS  - 462694', 'ALEX ALVES DE JESUS - 354050', 'ANDERSON BORGES DOS SANTOS - 621262', 'ANDERSON DA SILVA PINTO  - 465199', 'ANDERSON DOS SANTOS FONSECA - 346435', 'ANDERSON DOS SANTOS MENDES - 615539', 'ANTONIO ALVES MONTEIRO NETO - 346438', 'BISMARCK JESUS DE SANTANA - 356747', 'BRUNA DAMASCENO SANTOS DO NASCIMENTO - 361645', 'BRUNO DA HORA ROMA - 346445', 'CALINE ROCHA NASCIMENTO - 615541', 'CARLOS HENRIQUE SANTOS DE JESUS - 462673', 'CINTIA SANTOS SILVA - 615715', 'CLAUDIO RODRIGUES SAMPAIO - 465227', 'CRISPIM DE SANTANA OLIVEIRA  - 465211', 'DAVID SENA DA LUZ LIMA - 340302', 'DERLANDIO BORGES DA SILVA - 342658', 'DIEGO MACHADO MAIA - 461790', 'DIOGO MATHEUS OLIVEIRA COELHO - 340305', 'EDVALDO NAPOLEAO DOS SANTOS JUNIOR - 615538', 'ELTON GARCIA DE ABREU - 463135', 'ERINALDO NERY DE SOUSA - 346339', 'FABIO JUNIOR JOSE MATOS - 357696', 'FABIO SOUSA PORTO - 346358', 'FARAH CARDOSO NASCIMENTO - 461334', 'FLAVIO PARAISO SANTOS - 346419', 'FRANKLIN SOUZA SILVA - 462720', 'GABRIEL COSTA DE SANTANA - 621266', 'GEORGE SILVA NEVES - 462670', 'GILVAN SANTOS VIEIRA - 461605', 'GIOVANNE SANTOS SOUZA - 360660', 'JABSON LIMA BISPO DOS SANTOS - 351080', 'JACSON DO NASCIMENTO CRUZ - 462668', 'JEFFERSON CESAR SOUZA MARTINS - 346320', 'JEFFERSON SANTOS DA SILVA - 358108', 'JENIFFER FERNANDA SOUZA MARTINS - 618262', 'JEOMICRES SANTOS SILVA - 346321', 'JHAYON ARAUJO DA SILVA - 361643', 'JOABSON DA SILVA DAMASIO - 346325', 'JOAO VIRGILIO DE AARAUJO NETO - 340410', 'JOBSON SOUZA DOS SANTOS - 346327', 'JOELLINGTON AVILA CORREIA - 354089', 'JONATAS LEAL DOS SANTOS - 346332', 'JONATHA BATISTA DOS SANTOS - 621262', 'JOSE ALFREDO SILVA DA CONCEIÇÃO - 462721', 'LEANDRO COSTA SANTOS - 462816', 'LEANDRO DOS SANTOS VIEIRA - 361422', 'LEONARDO NOVAES CARDOSO - 348366', 'LUAN LIMA GOMES DA SILVA - 352454', 'LUCAS DOS SANTOS CUNHA - 464546', 'LUEDSON DE JESUS SILVA - 462370', 'MARCELO BARBOSA GOES - 340414', 'MARCIA OLIVEIRA DA SILVA - 615540', 'MARCOS ANDRADE DE SOUZA - 468428', 'MARCOS ROBERTO OLIVEIRA DOS SANTOS - 462722', 'MARCOS VINICIUS MENDES DA SILVA - 621241', 'MARIANO SEBASTIAN RIVERO - 346462', 'NAILTON BATISTA DOS SANTOS - 352029', 'NAOMAR SOARES PEIXOTO - 462705', 'OSMAR CARDOSO MELO NETO - 462826', 'PAULO ROBERTO OLIVERIA DE JESUS JUNIOR - 621263', 'RENAN CORREIA SANTOS - 346404', 'RODRIGO JESUS DOS ANJOS - 462669', 'ROMULO SILVA CONCEICAO - 346454', 'SAIMON OLIVEIRA MARQUES RAMOS - 621245', 'SERGIO SOARES DA SILVA - 346460', 'TADEU DE OLIVEIRA MAGALHÃES - 356071', 'TARCILIO PERCISIO DOS SANTOS - 621244', 'THAIRONE MORAES SANTOS - 462710', 'THALLYS SILVA RAMALHO DE SOUZA - 465234', 'THIAGO DE ASSIS VIANA - 346433', 'UILLIAM SILVA SANTOS - 340352', 'VALDEMER DA PENHA DE JESUS FILHO - 621242', 'VALDINEIA RODRIGUES DAMASCENO  - 616839', 'VINICIUS MACHADO GUIMARAES - 468653', 'VINICIUS SANTOS DA PAIXAO - 345950', 'VINICIUS SANTOS TAVARES - 618263', 'WANDERSON LINO SANTOS - 460799', 'WELIGTON FARIAS OLIVIERA - 461463', 'WELTON SOUZA TEIXEIRA - 348673', 'WESLEY COSTA PRATA - 345138', 'YSAK PACHECO SANTOS - 618266'];
     const materiais = {
-      'EPI': ['5637054 – ALCA PARA MANGA ISOLANTE', '5638054 – BALACLAVA CAT 2 COR AREIA TAM G', '5638053 – BALACLAVA CAT 2 COR AREIA TAM M', '5638029 – BALACLAVA FLASHWEAR 1 CAMADA META ARAMID', '6411000 – BLOQUEADOR SOLAR FPS 30', '5648027 – BOLSA LONA TRANSP FERRAMENTA', '5648091 – BOLSA PORTA CAPACETE, ÓCULOS E PROTETOR', '5648010 – BOLSA PORTA CAPACETE/OCULOS', '5648003 – BOLSA PORTA ELOS FUSIVEIS', '5648007 – BOLSA PORTA MANGA ISOLANTE', '5648008 – BOLSA PORTA MANGA ISOLANTE/LUVA', '5648004 – BOLSA PORTA-LUVA', '5725002 – BONE SEM ABA COM SAIA TIPO TOUCA ARABE', '5632011 – BOTA BORRACHA PRETA CANO LONGO TAM 35', '5632012 – BOTA BORRACHA PRETA CANO LONGO TAM 36', '5632013 – BOTA BORRACHA PRETA CANO LONGO TAM 37', '5632016 – BOTA BORRACHA PRETA CANO LONGO TAM 38', '5632017 – BOTA BORRACHA PRETA CANO LONGO TAM 39', '5632020 – BOTA BORRACHA PRETA CANO LONGO TAM 40', '5632018 – BOTA BORRACHA PRETA CANO LONGO TAM 41', '5632019 – BOTA BORRACHA PRETA CANO LONGO TAM 42', '5632005 – BOTA BORRACHA PRETA CANO LONGO TAM 43', '5632001 – BOTA BORRACHA PRETA CANO LONGO TAM 44', '5632014 – BOTA BORRACHA PRETA CANO LONGO TAM 45', '5632009 – BOTA BORRACHA PRETA TAM.33 CANO LONGO', '5632010 – BOTA BORRACHA PRETA TAM.34 CANO LONGO', '5632015 – BOTA BORRACHA PRETA TAM.46 CANO LONGO', '5629010 – BOTA CONDUTIVA              41', '5629003 – BOTA CONDUTIVA   40', '5615005 – BOTA VAQUETA CANO LONGO 36', '5615010 – BOTA VAQUETA CANO LONGO 37', '5615015 – BOTA VAQUETA CANO LONGO 38', '5615020 – BOTA VAQUETA CANO LONGO 39', '5615025 – BOTA VAQUETA CANO LONGO 40', '5615035 – BOTA VAQUETA CANO LONGO 41', '5615040 – BOTA VAQUETA CANO LONGO 42', '5615050 – BOTA VAQUETA CANO LONGO 43', '5637053 – BOTAO PARA MANGA ISOLANTE', '5616000 – BOTINA SEGUR VAQUETA PRETA 33', '5616003 – BOTINA SEGUR VAQUETA PRETA 34', '5616013 – BOTINA SEGUR VAQUETA PRETA 35', '5616023 – BOTINA SEGUR VAQUETA PRETA 36', '5616033 – BOTINA SEGUR VAQUETA PRETA 37', '5616043 – BOTINA SEGUR VAQUETA PRETA 38', '5616053 – BOTINA SEGUR VAQUETA PRETA 39', '5616063 – BOTINA SEGUR VAQUETA PRETA 40', '5616073 – BOTINA SEGUR VAQUETA PRETA 41', '5616083 – BOTINA SEGUR VAQUETA PRETA 42', '5616093 – BOTINA SEGUR VAQUETA PRETA 43', '5616103 – BOTINA SEGUR VAQUETA PRETA 44', '5616113 – BOTINA SEGUR VAQUETA PRETA 45', '5616123 – BOTINA SEGUR VAQUETA PRETA 46', '5616133 – BOTINA SEGUR VAQUETA PRETA 47', '5616134 – BOTINA SEGUR VAQUETA PRETA 48', '5629033 – CALCA CONDUTIVA TAM G', '5629032 – CALCA CONDUTIVA TAM M', '5706153 – CALCA PROFISSIONAL N° 34', '5706154 – CALCA PROFISSIONAL N° 36', '5706155 – CALCA PROFISSIONAL N° 38', '5706156 – CALCA PROFISSIONAL N° 40', '5706157 – CALCA PROFISSIONAL N° 42', '5706158 – CALCA PROFISSIONAL N° 44', '5706159 – CALCA PROFISSIONAL N° 46', '5706160 – CALCA PROFISSIONAL N° 48', '5706161 – CALCA PROFISSIONAL N° 50', '5706162 – CALCA PROFISSIONAL N° 52', '5706163 – CALCA PROFISSIONAL N° 54', '5706164 – CALCA PROFISSIONAL N° 56', '5706165 – CALCA PROFISSIONAL N° 58', '5706166 – CALCA PROFISSIONAL N° 60', '5706168 – CALCA PROTEC OPER MOTO SERRA TAM M (44)', '5706167 – CALCA PROTEC OPER MOTO SERRA TAM P (40)', '5638035 – CALCA RESISTENTE ARCO ELETRICO N° 36', '5638011 – CALCA RESISTENTE ARCO ELETRICO N° 38', '5638012 – CALCA RESISTENTE ARCO ELETRICO N° 40', '5638013 – CALCA RESISTENTE ARCO ELETRICO N° 42', '5638014 – CALCA RESISTENTE ARCO ELETRICO N° 44', '5638015 – CALCA RESISTENTE ARCO ELETRICO N° 46', '5638016 – CALCA RESISTENTE ARCO ELETRICO N° 48', '5638017 – CALCA RESISTENTE ARCO ELETRICO N°50', '5638018 – CALCA RESISTENTE ARCO ELETRICO N°52', '5638019 – CALCA RESISTENTE ARCO ELETRICO N°54', '5638020 – CALCA RESISTENTE ARCO ELETRICO N°56', '5706151 – CALCA SEGURANCA MOTOSERRRA', '5703199 – CAMISA PROFISSIONAL MANGA CURTA G', '5703200 – CAMISA PROFISSIONAL MANGA CURTA GG', '5703198 – CAMISA PROFISSIONAL MANGA CURTA M', '5703197 – CAMISA PROFISSIONAL MANGA CURTA P', '5703196 – CAMISA PROFISSIONAL MANGA CURTA PP', '5703201 – CAMISA PROFISSIONAL MANGA CURTA XG', '5703202 – CAMISA PROFISSIONAL MANGA CURTA XXG', '5703206 – CAMISA PROFISSIONAL MANGA LONGA G', '5703207 – CAMISA PROFISSIONAL MANGA LONGA GG', '5703205 – CAMISA PROFISSIONAL MANGA LONGA M', '5703204 – CAMISA PROFISSIONAL MANGA LONGA P', '5703203 – CAMISA PROFISSIONAL MANGA LONGA PP', '5703208 – CAMISA PROFISSIONAL MANGA LONGA XG', '5703209 – CAMISA PROFISSIONAL MANGA LONGA XXG', '5638034 – CAMISA RESISTENTE ARCO ELETRICO EXG', '5638024 – CAMISA RESISTENTE ARCO ELETRICO G COMP 4', '5638025 – CAMISA RESISTENTE ARCO ELETRICO GG COMP', '5638023 – CAMISA RESISTENTE ARCO ELETRICO M COMP 3', '5638022 – CAMISA RESISTENTE ARCO ELETRICO P COMP 2', '5638021 – CAMISA RESISTENTE ARCO ELETRICO PP COMP', '5638026 – CAMISA RESISTENTE ARCO ELETRICO XG COMP', '5638027 – CAMISA RESISTENTE ARCO ELETRICO XXG COMP', '5638051 – CAMISA UNISSEX RESIST ARCO ELETRICO EG', '5638049 – CAMISA UNISSEX RESIST ARCO ELETRICO G', '5638050 – CAMISA UNISSEX RESIST ARCO ELETRICO GG', '5638048 – CAMISA UNISSEX RESIST ARCO ELETRICO M', '5638047 – CAMISA UNISSEX RESIST ARCO ELETRICO P', '5638046 – CAMISA UNISSEX RESIST ARCO ELETRICO PP', '5709087 – CAMISA/JAQUETA OPER MOTO SERRA TAM P', '5628013 – CAPA CHUVA LAMINADO G AMARELO', '5610062 – CAPACETE ABA FRONTAL BRANCO 3M', '5610061 – CAPACETE ABA FRONTAL BRANCO LEAL', '5610013 – CAPACETE ABA FRONTAL BRANCO MSA', '5638003 – CAPUZ RESISTENTE ARCO ELETRICO', '4013002 – CINTA TIPO SLING P ELEVACAO CARGA 2000KG', '4013003 – CINTA TIPO SLING P ELEVACAO CARGA 4000KG', '4013004 – CINTA TIPO SLING P ELEVACAO CARGA 6000KG', '5611052 – CINTO PARAQ ANTICHAMA TAM.G ULTRASAFE', '5611051 – CINTO PARAQ ANTICHAMA TAM.M ULTRASAFE', '5611050 – CINTO PARAQ ANTICHAMA TAM.P ULTRASAFE', '5611055 – CINTO PARAQUEDISTA ANTICHAMA G LEAL', '5611054 – CINTO PARAQUEDISTA ANTICHAMA M LEAL', '5611053 – CINTO PARAQUEDISTA ANTICHAMA P LEAL', '5611077 – CINTURÃO PARAQUEDISTA FR/LV G LEAL', '5611080 – CINTURÃO PARAQUEDISTA FR/LV G ULTRASAFE', '5611076 – CINTURÃO PARAQUEDISTA FR/LV M LEAL', '5611079 – CINTURÃO PARAQUEDISTA FR/LV M ULTRASAFE', '5611075 – CINTURÃO PARAQUEDISTA FR/LV P LEAL', '5611078 – CINTURÃO PARAQUEDISTA FR/LV P ULTRASAFE', '5628011 – CONJUNTO IMPERMEAVEL EXG', '5628009 – CONJUNTO IMPERMEAVEL G', '5628007 – CONJUNTO IMPERMEAVEL M', '5628025 – CONJUNTO IMPERMEAVEL P', '5628026 – CONJUNTO IMPERMEAVEL XG', '5637116 – DESCENSOR AUTO BLOCANTE ID CORDA 11-12MM', '5627000 – ESPORA PARA POSTE DUPLO T', '6411004 – HIDRATANTE LABIAL FOTOPROTETOR', '5629047 – JAQUETA CONDUTIVA COM CAPUZ TAM G', '5629046 – JAQUETA CONDUTIVA COM CAPUZ TAM M', '5637112 – KIT EPI PARA RAB EM ALTURA TAM.G ULTRASA', '5637111 – KIT EPI PARA RAB EM ALTURA TAM.M ULTRASA', '5637110 – KIT EPI PARA RAB EM ALTURA TAM.P ULTRASA', '5637105 – KIT EPI PARA TRAB EM ALTURA TAM.M LEAL', '5637104 – KIT EPI PARA TRAB EM ALTURA TAM.P LEAL', '5637106 – KIT EPI PARA TRAB. EM ALTURA TAM.G LEAL', '5636000 – KIT PARA PROTECAO FACIAL PARA MOTOSSERRI', '5637043 – KIT PARA RESGATE EM CESTAS AEREAS', '2542007 – LANTERNA A  LED P/ CAPACETE', '5634048 – LUVA BORRACHA LATEX NITRILICO TAM 8', '5612000 – LUVA COBERTURA  TAM 229 MM P/ LUVA 9,0', '5612001 – LUVA COBERTURA TAM 241 MM P/ LUVA 9,5', '5612002 – LUVA COBERTURA TAM 254 MM P/ LUVA 10,0', '5612003 – LUVA COBERTURA TAM 267 MM P/ LUVA 10,5', '5612004 – LUVA COBERTURA TAM 279 MM P/ LUVA 11,5', '5629017 – LUVA CONDUTIVA', '5614000 – LUVA PROTECAO ALGODAO TAM.120MM', '5613115 – LUVA PROTECAO REVESTIDA TAMANHO 8', '5613117 – LUVA PROTECAO REVESTIDA TAMANHO 9', '5612010 – LUVA PROTECAO VAQUETA TAM G', '5612009 – LUVA PROTECAO VAQUETA TAM M', '5612006 – LUVA PROTECAO VAQUETA TAM P', '5613002 – LUVA SEGURANCA  10,0" CL 0 TIPO I OU II', '5613056 – LUVA SEGURANCA  10,0" CL 4 TIPO I OU II', '5613008 – LUVA SEGURANCA  10,5" CL 0 TIPO I OU II', '5613051 – LUVA SEGURANCA  10,5" CL 2 TIPO I OU II', '5613109 – LUVA SEGURANCA  10,5" CL 4 TIPO I OU II', '5613110 – LUVA SEGURANCA  11" CL 4 TIPO I OU II', '5613010 – LUVA SEGURANCA  11,0" CL 0 TIPO I OU II', '5613123 – LUVA SEGURANCA  8,0" CL 0 TIPO I OU II', '5613124 – LUVA SEGURANCA  8,0" CL 2 TIPO I OU II', '5613125 – LUVA SEGURANCA  8,0" CL 4 TIPO I OU II', '5613126 – LUVA SEGURANCA  8,5" CL 0 TIPO I OU II', '5613127 – LUVA SEGURANCA  8,5" CL 2 TIPO I OU II', '5613128 – LUVA SEGURANCA  8,5" CL 4 TIPO I OU II', '5613005 – LUVA SEGURANCA  9,0" CL 0 TIPO I OU II', '5613036 – LUVA SEGURANCA  9,0" CL 2 TIPO I OU II', '5613111 – LUVA SEGURANCA  9,0" CL 4 TIPO I OU II', '5613007 – LUVA SEGURANCA  9,5" CL 0 TIPO I OU II', '5613112 – LUVA SEGURANCA  9,5" CL 4 TIPO I OU II', '5613046 – LUVA SEGURANCA 10,0" CL 2 TIPO I OU II', '5613012 – LUVA SEGURANCA 11" CL 2 TIPO I OU II', '5613041 – LUVA SEGURANCA 9,5" CL 2 TIPO I OU II', '4610572 – MACACAO COM CAPUZ PARA PINTURA TAM XG', '5637066 – MACACAO DE APICULTOR BRIM C/ MASCARA', '5638005 – MACACAO RESISTENTE ARCO ELETRICO EG', '5638008 – MACACAO RESISTENTE ARCO ELETRICO ESP1', '5638009 – MACACAO RESISTENTE ARCO ELETRICO ESP2', '5638010 – MACACAO RESISTENTE ARCO ELETRICO ESP3', '5638006 – MACACAO RESISTENTE ARCO ELETRICO EXG', '5638007 – MACACAO RESISTENTE ARCO ELETRICO EXXG', '5638002 – MACACAO RESISTENTE ARCO ELETRICO G', '5638004 – MACACAO RESISTENTE ARCO ELETRICO GG', '5638001 – MACACAO RESISTENTE ARCO ELETRICO M', '5638000 – MACACAO RESISTENTE ARCO ELETRICO P', '5621002 – MANGA PROT SEG CL 0 1KV TIPO I OU II G', '5621001 – MANGA PROT SEG CL 0 1KV TIPO I OU II M', '5621009 – MANGA PROT SEG CL 2 17KV TIPO I OU II  G', '5621004 – MANGA PROT SEG CL 2 17KV TIPO I OU II  M', '5621014 – MANGA PROT SEG CL 4 36KV TIPO I OU II M', '5643059 – MANTA ISOL DE BORRACHA 800 X 330 MM', '5636018 – MASCARA  DE  PROTECAO SEMI-FACIAL', '5625003 – MASCARA AUTONOMA RESPIRACAO', '5624002 – MASCARA DE CONFORTO 3 M', '5629031 – MEIA CONDUTIVA', '5618078 – OCULOS SEGUR ANTIEMBACANTE-LENTE INCOLOR', '5618079 – OCULOS SEGUR ANTIEMBACANTE-LENTES CINZA', '5618006 – OCULOS SEGUR. LENTES SOBREPOS. CINZA', '5618075 – OCULOS SEGUR. LENTES SOBREPOS. INCOLOR', '5618003 – OCULOS SEGURANCA - INCOLOR', '5618074 – ÓCULOS SEGURANCA - LENTES AMBAR', '5618002 – OCULOS SEGURANCA - LENTES CINZA', '5620001 – PERNEIRA DE SEGURANCA', '5619011 – PROTETOR AURICULAR CONCHA', '5619012 – PROTETOR AURICULAR CONCHA PARA CAPACETE', '5619002 – PROTETOR AURICULAR PLUG', '5636020 – PROTETOR FACIAL PROT. ELETRICI VERDE 3M', '5636021 – PROTETOR FACIAL PROT. ELETRICI VERDE LEA', '5636019 – PROTETOR FACIAL PROT. ELETRICI VERDE MSA', '4606023 – ROCADEIRA COSTAL', '5629038 – ROUPA CONDUTIVA G', '5629045 – ROUPA CONDUTIVA M', '5610057 – SUSPENSÃO 3M COM CATRACA E JUGULAR', '5610038 – SUSPENSAO CAPACETE SEGUR V-GARD MSA 04PO', '5610058 – SUSPENSÃO LEALCOM CATRACA E JUGULAR', '5611101 – TALABARTE POLIESTER 5000MM TAM2 LEAL', '5611061 – TALABARTE SEGURANÇA REGULADOR LEAL', '5611060 – TALABARTE SEGURANÇA REGULADOR ULTRASAFE', '5611082 – TALABARTE TIPO I C/ ABSORV. FAB.LEAL', '5611084 – TALABARTE TIPO I C/ABSORV. FAB.ULTRASAFE', '5611073 – TALABARTE Y C/ ABSORVEDOR 55MM FAB.ULTRA', '5611074 – TALABARTE Y C/ABSORVEDOR 2 MOSQ. FAB.LEA', '7719146 – TALCO'],
-      'EPC/FERRAMENTAL': ['4601010 – ALICATE ANEL EXTERNO RETO 19-60 MM', '4601020 – ALICATE ANEL INTERNO RETA 19-60 MM', '4601005 – ALICATE ANEL SEG EXTERNO BICO CURVO 7"', '4601015 – ALICATE ANEL SEG INTERNO BICO CURVO 7"', '4601021 – ALICATE BICO CHATO LONGO', '4601019 – ALICATE BICO CURVO 200 MM', '4601035 – ALICATE BICO RETO 200 MM', '4601027 – ALICATE BOMBA D AGUA 10 POL', "4630007 – ALICATE BOMBA D'AGUA 12 POL", '4632010 – ALICATE COMP BATERIA 12000 DAN C/ MATRIZ', '4632009 – ALICATE COMP BATERIA 6000 DAN C/ MATRIZ', '4632008 – ALICATE COMPRESSAO BATERIA 12000 DAN', '4632006 – ALICATE COMPRESSAO BATERIA 6000 DAN', '4600000 – ALICATE CORTADOR CATRACA CREMALHEIRA 10', '4600198 – ALICATE CORTADOR CATRACA CREMALHEIRA 11"', '4606024 – ALICATE DE CORTE A BATERIA REMOTO', '4600012 – ALICATE DE CORTE DIAGONAL', '4631002 – ALICATE DE PRESSAO 10 POL', '4631024 – ALICATE DESENCAPADOR DE FIOS P/ TERMINAL', '4631005 – ALICATE PRENSA TERMINAL  0,5 A 6,0 MM2', '4631001 – ALICATE PRENSA TERMINAL 1,5-4MM2', '4600065 – ALICATE UNIVERSAL 200 MM', '1804024 – ALICATE VOLTAMPERIMETRO DIGITAL', '1805013 – ANALISADOR DESVIO DE CONSUMO ENERGIA', '4600008 – ARCO DE SERRA MAN AJUSTAVEL ATE 12 POL', '4641005 – ARCO DE SERRA PARA PODA A DISTÂNCIA 21"', '5637025 – BAINHA DE COURO PARA FACAO', '5648000 – BALDE DE LONA COM GANCHO 300 X 350 MM', '5642005 – BANDEIROLA SINALIZACAO', '4641000 – BANQUETA ISOLADA FB VIDRO 500X500X320MM', '4611335 – BASTAO ALAVANCA', '5640021 – BASTAO ISOLANTE 300MM ATERR TEMP', '4611013 – BASTAO MANOBRA PEGA TUDO 2650 MM', '4611012 – BASTAO MANOBRA PEGA TUDO 3260 MM', '4611016 – BASTAO PODADOR 32 POL CABECOTE UNIVERS', '4611164 – BASTAO TRACAO COM ESPIRAL 32 X 1340 MM', '4611174 – BASTAO TRACAO COM ESPIRAL 32 X 700MM', '4611007 – BASTAO TRACAO GANCHO OLHAL 32X 370MM', '4611002 – BASTAO UNIVERSAL 32 X 2550 MM', '704068 – BATERIA 14,4 V 3,0 AH ION LITIO', '704067 – BATERIA 14,4 VDC 2,6 AH NIMH', '704070 – BATERIA 18 V 2,0 AH ION LITIO', '704069 – BATERIA 18 V 3,0 AH ION LITIO', '704066 – BATERIA 18 VDC 2,6 AH NIMH', '1863008 – BINOCULO 8 X 40 MM', '5637013 – BOIA CIRCULAR CLASSE II  500MM', '4644020 – CABEÇOTE CORTADOR DE RAMAL', '4644019 – CABECOTE DE MANOBRA 25 GRAUS', '4644000 – CABECOTE DE MANOBRA P/ GRAMPO DE ATERR', '4644001 – CABECOTE DISP ANTIQUEDA CARTUCHO (DAQC)', '3426182 – CABECOTE INST ESPACADOR LOSANGULAR SOLO', '3426172 – CABECOTE INSTAL ESPACADOR BT DO SOLO', '4644008 – CABECOTE PARA MANOBRA DE CHAVES', '4607016 – CAIXA FERRAMENTA BAU', '4607021 – CAIXA TIPO SANFONA PARA FERRAMENTAS', '3967011 – CALCO PARA VEICULO', '750025 – CARREGADOR BATERIA NIMH 7,2/14,4 V', '750024 – CARREGADOR BATERIA NIMH 7,2/18 V', '750026 – CARREGADOR DUPLO LI-ION 14,4 E 18 V', '4610007 – CARRETILHA GANCHO E TRAVA 5/8" 450 DAN', '4601049 – CHAVE AJUSTAVEL PROTEGIDA BOCA 19MM 6""', '4601050 – CHAVE AJUSTAVEL PROTEGIDA BOCA 34MM 12""', '4601892 – CHAVE ALONGADA REMOCAO PARAF. LOBULAR', '4601165 – CHAVE CANHAO   3/ 8     POL', '4601082 – CHAVE CANHAO 10 MM HASTE PROTEGIDA 1KV', '4601083 – CHAVE CANHAO 11 MM HASTE PROTEGIDA 1KV', '4601084 – CHAVE CANHAO 12 MM HASTE PROTEGIDA 1KV', '4601086 – CHAVE CANHAO 13 MM HASTE PROTEGIDA 1KV', '4601087 – CHAVE CANHAO 14 MM HASTE PROTEGIDA 1KV', '4601088 – CHAVE CANHAO 17 MM HASTE PROTEGIDA 1KV', '4601081 – CHAVE CANHAO 9 MM HASTE PROTEGIDA 1KV', '4601052 – CHAVE FENDA HASTE PROTEGIDA 1/4X4""', '4601672 – CHAVE FENDA HASTE PROTEGIDA 1/4X6"', '4601091 – CHAVE FENDA HASTE PROTEGIDA 1/8X4""', '4601813 – CHAVE FENDA HASTE PROTEGIDA 1/8X6"', '4601380 – CHAVE FENDA HASTE PROTEGIDA 3/16X4""', '4601821 – CHAVE FENDA HASTE PROTEGIDA 3/16X6"', '4601098 – CHAVE FENDA HASTE PROTEGIDA 3/8X8""', '4601365 – CHAVE FENDA HASTE PROTEGIDA 5/16X6""', '4601097 – CHAVE FENDA HASTE PROTEGIDA 5/16X8""', '1362737 – CHAVE FENDA SIMPLES 1/8X3"" 3X75MM', '4601420 – CHAVE FENDA SIMPLES 3/8X8"" 9,5X200MM', '4601076 – CHAVE INST PARAFUSO LOBULAR E LOB ALONG', '4601287 – CHAVE L ABER/FEC PARAF CAIXA BLINDAGEM', '4601002 – CHAVE PARAFUSO SEGURANCA MEDICAO', '4601102 – CHAVE PHILLIPS HASTE PROTEGIDA 1/4X4""', '4601100 – CHAVE PHILLIPS HASTE PROTEGIDA 1/8X2.3/8', '4601101 – CHAVE PHILLIPS HASTE PROTEGIDA 3/16X3""', '4601103 – CHAVE PHILLIPS HASTE PROTEGIDA 5/16X6""', '1362797 – CHAVE PLAN CATR COMBINADA 13 MM', '1362798 – CHAVE PLAN CATR COMBINADA 14 MM', '4601551 – CHAVE PLAN CATR COMBINADA 17 MM', '1362803 – CHAVE PLAN CATR COMBINADA 19 MM', '1362805 – CHAVE PLAN CATR COMBINADA 22 MM', '4601074 – CHAVE REMOCAO PARAFUSO LOBULAR FIXAR', '4601145 – CHAVE SOQUETE CANHAO 10 MM', '4601150 – CHAVE SOQUETE CANHAO 11 MM', '4601153 – CHAVE SOQUETE CANHAO 12 MM', '4601155 – CHAVE SOQUETE CANHAO 13 MM', '4601140 – CHAVE SOQUETE CANHAO 8 MM', '4601143 – CHAVE SOQUETE CANHAO 9 MM', '4601902 – CHAVE TORX TIPO L CURTA', '5646058 – COBERTURA RIGIDA P/ POSTE 15KV 6" 600MM', '5646131 – COBERTURA RIGIDA P/POSTE 34,5KV 6"600MM', '5646068 – COBERTURA RIGIDA P/POSTE 34,5KV 9"300MM', '5645007 – COBERTURA RIGIDA PARA CONDUTOR 15KV', '5645022 – COBERTURA RIGIDA PARA CONDUTOR 34,5 KV', '5642018 – CONE SINALIZACAO', '5640089 – CONJ ATERR TEMP TRIFASICO 15/36,2KV', '5640024 – CONJ ATERRAMENTO TEMP SE CABO COBRE', '5640014 – CONJ ATERRAMENTO TEMP SEC MULTIPLEX NE', '5640013 – CONJUNTO ATERRAMENTO TEMP. RD CONV BT', '5640012 – CONJUNTO ATERRAMENTO TEMPORARIO MRT', '5640093 – CONJUNTO ATERRAMENTO TEMPORARIO PRIMARIO', '4411016 – CORDA FIBRA SINTETICA 1/2"', '5637185 – CORDA GUIA ("LINHA VIDA" RESGATE) - 40 M', '4411021 – CORDA TRANCADA BRANCA DIAMETRO 10 MM', '4411000 – CORDA TRANCADA BRANCA DIAMETRO 12 MM', '4600001 – CORTA TUBOS 10-50MM', '4610000 – CRUZETA AUXILIAR C MASTRO E PRESILHAS', '4631057 – DECAPADOR CABOS XLPE', '7719256 – DEGRAU FIBRA DE VIDRO ESCALADA EM POSTE', '5641026 – DETECTOR TENSAO POR CONTATO 0,07 A 1KV', '5641018 – DETECTOR TENSAO POR CONTATO 3,8 A 36KV', '5641007 – DETETOR FALTA TENSAO 36KV CONTATO', '1913002 – DINAMOMETRO 45 DAN PADRAO DE ENTRADA', '4613004 – DISP ABERTURA DE CHAVE EM CARGA 27KV DAC', '4613008 – DISP ABERTURA DE CHAVE EM CARGA 38KV DAC', '5637007 – DISP ANCORAGEM POSTE COM ESTRUTURA', '5637005 – DISP ANCORAGEM POSTE DT', '5637006 – DISP ANCORAGEM POSTE SEM ESTRUTURA', '5637182 – DISP ANCORAGEM POSTE SEM ESTRUTURA ICC3', '4804000 – ESCADA ALUMINIO 7 DEGRAUS', '4803016 – ESCADA DE FIBRA DE 3 DEGRAUS', '4802021 – ESCADA FB VIDRO EXTENSIVEL 10800 MM', '4802022 – ESCADA FB VIDRO EXTENSIVEL 13200 MM', '4802019 – ESCADA FB VIDRO EXTENSIVEL 6600 MM', '4802020 – ESCADA FB VIDRO EXTENSIVEL 8400 MM', '4802018 – ESCADA FB VIDRO SINGELA 4050 MM', '4802012 – ESCADA FB VIDRO TIPO "A" 7 DEGRAUS2440MM', '4802000 – ESCADA FIBRA SINGELA 3710 MM', '4803076 – ESCADA ISOLADA 500KV EXTENSIVEL 12190MM', '4641002 – ESCOVA DE ACO EM V PARA CONDUTORES', '3451070 – ESTICADOR    ACO    2- 5MM', '3453030 – ESTICADOR BRONZE 5,8 A 10,16MM 800KGF', '3453070 – ESTICADOR BRONZE 7,87 A 13,46MM 800KGF', '4601611 – ESTILETE RETRATIL', '4610629 – ESTRADO ISOLANTE ELET DE BORRACHA', '4610011 – ESTROPO NAILON 800 MM 454 DAN', '4600126 – FACA CURVA DESEMCAPADORA COM CAPA', '4600125 – FACAO 20"', '2535001 – FAROL DE PUNHO', '2535000 – FAROL MANEJO', '4633016 – FERRAMENTA INSTALACAO CONETOR IMPACTO', '5644015 – FITA DE ANC. OU DE TRANSPOSICAO LV-0,8M', '5644018 – FITA DE ANC. OU DE TRANSPOSICAO LV-1,2M', '5644016 – FITA DE ANC. OU DE TRANSPOSICAO LV-2,0M', '5644014 – FITA DE ANCORAGEM PARA ESCADA', '5644001 – FITA ISOLAMENTO AREAS', '4013139 – FITA REGULAVEL PARA PROGRESSAO DE POSTE', '4100017 – FURADEIRA / PARAFUSADEIRA BATERIA 14,4V', '4606025 – FURADEIRA/PARAFUSADEIRA STC REC ENERGIA', '4641020 – GANCHO DE ANCORAGEM', '1913004 – GANCHO DINAMOMETRO 45 DAN', '4610225 – GANCHO P/CORDA ACO FORJ 150MM', '7011217 – GARRAFAO TERMICO 5L', '4610016 – GRAMPO BUCHA TRANSFORMADOR', '5640025 – GRAMPO DE ATERR C/ PARAFUSO T P/ LINHAS', '5640026 – GRAMPO MULTIANGULAR 6,5-73MM 400 A', '4013104 – GUINCHO E SUPORTE P/ POSTE - 800 KG', '1909027 – INFLADOR LUVA VALV AR COMPRIMIDO 30LB', '4610553 – JAMPE PROVISORIO 15KV 2AWG 3,50M - GRAMP', '4601000 – JOGO CHAVE HEXAGONAL ALLEN T 1/8 A 1/2', '4601001 – JOGO CHAVE HEXAGONAL ALLEN T 3 A 14MM', '4601013 – JOGO CHAVE SOQUETE SEXTAVADO 1/2POL', '4620004 – JOGO DE BROCA 1/16" A 1/2"', '4601325 – JOGO DE CHAVE COMBINADA 6 A 32 MM', '4811007 – KIT ANDAIME MODULAR ISOLANTE', '4600009 – LAMINA SERRA 300 MM 18 DENTES POR POL', '2542006 – LANTERNA HOLOFOTE REGARREGAVEL', '5649004 – LANTERNA MANUAL PILHA ELETRICA 6V', '5649024 – LENCOL BORR LISA 3,0 X 914MM 4-34,5KV', '5649028 – LENCOL BORR LISA C/FENDA 3X914MM 4-34,5K', '4601451 – MACHADO 3,5 LIBRAS COM CABO', '4601073 – MARRETA 1000 G', '4601460 – MARRETA 500 G', '4601450 – MARRETA 5000 G', '4601047 – MARTELO BOLA 360MM', '4634157 – MATRIZ P/ ALICATE COMP HIDR Y35 MOD B/BG', '4634145 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 162', '4634146 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 163', '4634147 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 166', '4634182 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 167', '4634183 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 168', '4634184 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 236', '4634148 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 237', '4634185 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 238', '4634149 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 239', '4634190 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 243', '4634150 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 245', '4634151 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 248', '4634152 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 249', '4634153 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 261', '4634154 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 316', '4634155 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 317', '4634156 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 321', '4634187 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 350', '4634188 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 468', '4634189 – MATRIZ P/ ALICATE COMP HIDR Y35 MODE 490', '4634160 – MATRIZ P/ ALICATE COMP HIDR Y35 MODEL D3', '4634158 – MATRIZ P/ ALICATE COMP HIDR Y35 MODELO C', '4634159 – MATRIZ P/ ALICATE COMP HIDR Y35 MODELO D', '4634161 – MATRIZ P/ ALICATE COMP HIDR Y35 MODELO H', '4634162 – MATRIZ P/ ALICATE COMP HIDR Y35 MODELO L', '4634163 – MATRIZ P/ ALICATE COMP HIDR Y35 MODELO M', '4634164 – MATRIZ P/ ALICATE COMP HIDR Y35 MODELO N', '4634165 – MATRIZ P/ ALICATE COMP HIDR Y35 MODELO O', '4634166 – MATRIZ P/ ALICATE COMP HIDR Y35 MODELO R', '4634167 – MATRIZ P/ ALICATE COMP MEC MD6 MODEL 162', '4634168 – MATRIZ P/ ALICATE COMP MEC MD6 MODEL 163', '4634169 – MATRIZ P/ ALICATE COMP MEC MD6 MODEL 167', '4634170 – MATRIZ P/ ALICATE COMP MEC MD6 MODEL 236', '4634171 – MATRIZ P/ ALICATE COMP MEC MD6 MODEL 237', '4634172 – MATRIZ P/ ALICATE COMP MEC MD6 MODEL 238', '4634173 – MATRIZ P/ ALICATE COMP MEC MD6 MODEL 239', '4634174 – MATRIZ P/ ALICATE COMP MEC MD6 MODEL 242', '4634175 – MATRIZ P/ ALICATE COMP MEC MD6 MODEL 243', '4634176 – MATRIZ P/ ALICATE COMP MEC MD6 MODEL 245', '4634177 – MATRIZ P/ ALICATE COMP MEC MD6 MODEL 248', '4634178 – MATRIZ P/ ALICATE COMP MEC MD6 MODEL 249', '4634179 – MATRIZ P/ ALICATE COMP MEC MD6 MODELO C', '4634180 – MATRIZ P/ ALICATE COMP MEC MD6 MODELO L', '4634181 – MATRIZ P/ ALICATE COMP MEC MD6 MODELO O', '4634186 – MATRIZ P/ALICATE COMPR HIDR MODELO 242', '5629024 – MEIA CONDUTIVA G', '1868166 – METRO DUPLO EM POLIMERO', '3455197 – MOITAO ACO 1200 KGF', '3455121 – MOITAO PLT 2R     12MM 1000DAN', '5637019 – MOSQUETAO TRIPLA TRAVA', '4107006 – MOTOPODA TELECOPICA 1,3 A 1,6 KW', '4107095 – MOTOPODA TELESCOPICA C ACESSORIOS', '4107089 – MOTOSSERRA GASOLINA 400 MM 3,6 KW', '3485896 – PARAFUSO SEGURANCA PETALADO COPINHO', '5642029 – PLACA 250X180MM CUIDADO ALTA TENSAO...', '5642007 – PLACA 250X200MM PERIGO ACESSO...', '5642003 – PLACA 250X200MM PERIGO RISCO MORTE', '5642011 – PLACA 250X200MM SEGURANCA: LEMBRE-SE...', '5642022 – PLACA 350X250MM ALTA TENSAO RISCO DE...', '5642006 – PLACA 350X250MM PERIGO ACESSO...', '5642025 – PLACA 350X250MM PERIGO RISCO MORTE', '7511257 – PLACA DE SINALIZACAO NAO LIGUE', '7511019 – PLACA INDICATIVA ACO LOCALIZACAO EQUIP', '7511022 – PLACA INDICATIVA LOCALIZACAO EQUIP AL', '5642023 – PLACA250X180MM ATENCAONAOOPEREESSEEQUIP', '7511008 – PLACA-EM MANUTENCAO NAO LIGUE CHAVE', '3455001 – POLIA DUPLA', '4601274 – PONTEIRA HASTE PROTEGIDA TIPO FENDA', '4601281 – PONTEIRA HASTE PROTEGIDA TIPO PHILIPS', '5649005 – PRENDEDOR MANUAL DE COBERTURA', '7708019 – REBOBINADOR FITA SINALIZACAO', '5625004 – RESPIRADOR DESC SL FACE PFFI SEM VALVULA', '5648001 – SACOLA CONJ. ATERR SE 600X300X450MM', '5648018 – SACOLA LONA VARA DE MANOBRA 5 ELEMENTOS', '5648011 – SACOLA LONA VARA TELESCOP VD 1760X120MM', '5648006 – SACOLA PARA ACONDICIONAR MATERIAIS', '4610570 – SELA PLATAFORMA PARA TRABALHO EM ALTURA', '4107015 – SERRA PARA PODA CABECOTE UNIVERSAL', '4600145 – SERROTE  FIXO  PODA', '4600036 – SERROTE PODA GALHOS ALTOS', '4108051 – SUPORTE MOTOPODA SERRA HIDR CESTA AEREA', '3419284 – SUPORTE P/EQUIP CHAVE BY-PASS 680X63,5M', '4108045 – SUPORTE PARA MOTOPODA ESCADA', '4013079 – TALHA MANUAL DE ALAVANCA 750 KG', '4610003 – TALHA TIRFOR 1600 DAN', '4600155 – TALHADEIRA CHATA 19,0 X 200MM', '4610002 – TENAZ MULTIANGULAR C/ AJUSTE DE ANGULO', '4600165 – TESOURA ACO  200MM', '4600185 – TESOURA CHAPA CLASSICA   250MM', '4600233 – TESOURAO VERGALHAO RETO 18POL', '5640092 – TRADO ATERRAM ROSCA CONIFICADA 820MM', '4601530 – TRADO PERFURADOR MANUAL PARA SOLO', '5611070 – TRAVA QUEDAS CORDA 10-12MM ULTRASAFE', '5611012 – TRAVA QUEDAS PARA CORDA 10-12MM ALTISEG', '5611071 – TRAVA QUEDAS PARA CORDA 10-12MM LEAL', '1868143 – TRENA DE RODA 1000M', '1868003 – TRENA FITA FIBRA 50M ABERTA', '1868161 – TRENA LASER 150 M', '4611314 – VARA MANOBRA FIBRA VIDRO 6,45M 5 ELEM', '4611009 – VARA TELESCOPICA FIBRA 8 ELEM 10500MM', '4611340 – VARA TELESCOPICA TRIANGULAR 10600 MM', '4611359 – VARA TELESCOPICA TRIANGULAR 7200 MM', '0701033 - BATERIA CHUMBO-ACIDO 12V/12AH', '7702005 - LONA ENCERADO VD 2000X2000MM']
+      'EPI': ['5637054 – ALCA PARA MANGA ISOLANTE', '5638054 – BALACLAVA CAT 2 COR AREIA TAM G', /* ... outros materiais ... */],
+      'EPC/FERRAMENTAL': ['4601010 – ALICATE ANEL EXTERNO RETO 19-60 MM', '4601020 – ALICATE ANEL INTERNO RETA 19-60 MM', /* ... outros materiais ... */]
     };
+
     let carrinho = [];
 
-    // --- FUNÇÕES DO CARRINHO --- //
     function adicionarAoCarrinho() {
-        const materialInput = document.getElementById('material');
-        const quantidadeInput = document.getElementById('quantidade');
-        
-        const material = materialInput.value.trim();
-        const quantidade = quantidadeInput.value;
-
-        if (!material || !quantidade || parseInt(quantidade) < 1) {
-            alert('Por favor, selecione um material e informe uma quantidade válida.');
-            return;
-        }
-
-        carrinho.push({ material, quantidade: parseInt(quantidade) });
-        atualizarCarrinho();
-
-        materialInput.value = '';
-        quantidadeInput.value = '';
-        document.getElementById('material-list').style.display = 'none';
-        materialInput.focus();
+      const material = document.getElementById('material').value;
+      const quantidade = document.getElementById('quantidade').value;
+      
+      if (!material || !quantidade) {
+        alert('Por favor, selecione um material e informe a quantidade.');
+        return;
+      }
+      
+      const item = { material, quantidade: parseInt(quantidade) };
+      carrinho.push(item);
+      
+      atualizarCarrinho();
+      
+      // Limpar campos
+      document.getElementById('material').value = '';
+      document.getElementById('quantidade').value = '';
+      document.getElementById('material-list').style.display = 'none';
     }
 
     function atualizarCarrinho() {
-        const carrinhoDiv = document.getElementById('carrinho');
-        const cartItemsDiv = document.getElementById('cart-items');
-
-        if (carrinho.length === 0) {
-            carrinhoDiv.style.display = 'none';
-            return;
-        }
-
-        carrinhoDiv.style.display = 'block';
-        cartItemsDiv.innerHTML = '';
-
-        carrinho.forEach((item, index) => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'cart-item';
-            itemDiv.innerHTML = `
-                <div class="cart-item-info">
-                    <div class="cart-item-material">${item.material}</div>
-                    <div class="cart-item-details">Quantidade: ${item.quantidade}</div>
-                </div>
-                <button class="btn btn-danger" onclick="removerDoCarrinho(${index})" title="Remover Item">
-                    <i class="fas fa-trash"></i>
-                </button>
-            `;
-            cartItemsDiv.appendChild(itemDiv);
-        });
+      const carrinhoDiv = document.getElementById('carrinho');
+      const cartItemsDiv = document.getElementById('cart-items');
+      
+      if (carrinho.length === 0) {
+        carrinhoDiv.style.display = 'none';
+        return;
+      }
+      
+      carrinhoDiv.style.display = 'block';
+      carrinhoDiv.classList.add('fade-in');
+      
+      cartItemsDiv.innerHTML = '';
+      
+      carrinho.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'cart-item fade-in';
+        itemDiv.innerHTML = `
+          <div class="cart-item-info">
+            <div class="cart-item-material">${item.material}</div>
+            <div>Quantidade: ${item.quantidade}</div>
+          </div>
+          <button class="btn btn-danger" onclick="removerDoCarrinho(${index})">
+            <i class="fas fa-trash"></i>
+            Remover
+          </button>
+        `;
+        cartItemsDiv.appendChild(itemDiv);
+      });
     }
 
     function removerDoCarrinho(index) {
-        carrinho.splice(index, 1);
-        atualizarCarrinho();
+      carrinho.splice(index, 1);
+      atualizarCarrinho();
     }
 
-    // --- FUNÇÕES DE PEDIDO E CONSULTA --- //
-    async function enviarPedido(event) {
-        event.preventDefault();
-
-        const colaborador = document.getElementById('colaborador').value;
-        const focal = document.getElementById('focal').value;
-        const observacoes = document.getElementById('observacoes').value;
-
-        if (!colaborador || !focal) {
-            alert('Por favor, preencha o colaborador e o focal.');
-            return;
-        }
-
-        if (carrinho.length === 0) {
-            alert('Adicione pelo menos um item ao carrinho antes de enviar.');
-            return;
-        }
-
-        const submitBtn = document.getElementById('submit-btn');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<span class="loading"></span> Enviando...';
-        submitBtn.disabled = true;
-
-        const pedido = {
-            colaborador,
-            focal,
-            observacoes,
-            materiais: carrinho,
-            status: 'Solicitação Recebida',
-            numero: Math.floor(100000 + Math.random() * 900000),
-            data: new Date().toISOString()
-        };
-
-        try {
-            await db.collection('pedidos').add(pedido);
-            alert(`Pedido enviado com sucesso! Nº: ${pedido.numero}`);
-            window.location.reload();
-        } catch (error) {
-            console.error('Erro ao enviar pedido:', error);
-            alert('Ocorreu um erro ao enviar o pedido. Tente novamente.');
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        }
-    }
-
-    function setButtonLoading(btnId, isLoading) {
-      const button = document.getElementById(btnId);
-      if(!button) return;
-
-      if(isLoading) {
-        button.dataset.originalHtml = button.innerHTML;
-        button.innerHTML = '<span class="loading"></span> Consultando...';
-        button.disabled = true;
-      } else {
-        button.innerHTML = button.dataset.originalHtml;
-        button.disabled = false;
+    function enviarPedido(event) {
+      event.preventDefault();
+      
+      const colaborador = document.getElementById('colaborador').value;
+      const Focal = document.getElementById('Focal').value;
+      const observacoes = document.getElementById('observacoes').value;
+      
+      if (!colaborador || !Focal) {
+        alert('Por favor, preencha todos os campos obrigatórios.');
+        return;
       }
+      
+      if (carrinho.length === 0) {
+        alert('Por favor, adicione pelo menos um item ao carrinho.');
+        return;
+      }
+      
+      const submitBtn = event.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<span class="loading"></span> Enviando...';
+      submitBtn.disabled = true;
+      
+      const pedido = {
+        colaborador,
+        Focal,
+        observacoes,
+        materiais: carrinho,
+        status: 'Solicitação Recebida',
+        numero: Math.floor(Math.random() * 1000000),
+        data: new Date().toISOString()
+      };
+      
+      db.collection('pedidos').add(pedido)
+      .then(() => {
+        alert('Pedido enviado com sucesso! Nº: ' + pedido.numero);
+        location.reload();
+      })
+      .catch((error) => {
+        console.error('Erro ao enviar pedido:', error);
+        alert('Erro ao enviar pedido.');
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      });
     }
 
-    async function consultarPedido() {
-        const numero = document.getElementById('consultaNumero').value;
-        const resultadoDiv = document.getElementById('resultadoConsulta');
-        
-        if (!numero) {
-            alert('Digite o número do pedido para consultar.');
-            return;
-        }
+    function consultarPedido() {
+      const numero = document.getElementById('consultaNumero').value;
+      const resultado = document.getElementById('resultadoConsulta');
+      const consultBtn = document.querySelector('button[onclick="consultarPedido()"]');
+      
+      if (!numero) {
+        alert('Digite o número do pedido!');
+        return;
+      }
 
-        setButtonLoading('consulta-numero-btn', true);
-        resultadoDiv.style.display = 'none';
+      const originalText = consultBtn.innerHTML;
+      consultBtn.innerHTML = '<span class="loading"></span> Consultando...';
+      consultBtn.disabled = true;
 
-        try {
-            const snapshot = await db.collection('pedidos').where('numero', '==', parseInt(numero)).get();
-            setButtonLoading('consulta-numero-btn', false);
-
-            if (snapshot.empty) {
-                resultadoDiv.innerHTML = '<div class="empty-result"><i class="fas fa-info-circle"></i><p>Nenhum pedido encontrado com este número.</p></div>';
-            } else {
-                const pedidoData = snapshot.docs[0].data();
-                resultadoDiv.innerHTML = criarCardDetalhesPedido(pedidoData);
-            }
-            resultadoDiv.style.display = 'block';
-
-        } catch (error) {
-            console.error("Erro ao consultar pedido:", error);
-            setButtonLoading('consulta-numero-btn', false);
-            resultadoDiv.innerHTML = '<div class="empty-result"><i class="fas fa-exclamation-triangle"></i><p>Ocorreu um erro ao buscar o pedido.</p></div>';
-            resultadoDiv.style.display = 'block';
-        }
-    }
-
-    async function consultarPedidosPorColaborador() {
-        const colaborador = document.getElementById('consultaColaborador').value;
-        const resultadoDiv = document.getElementById('resultadoConsulta');
-
-        if (!colaborador) {
-            alert('Por favor, selecione um colaborador.');
-            return;
-        }
-
-        setButtonLoading('consulta-colab-btn', true);
-        resultadoDiv.style.display = 'none';
-        resultadoDiv.innerHTML = '';
-        
-        try {
-          const snapshot = await db.collection('pedidos').where('colaborador', '==', colaborador).orderBy('data', 'desc').get();
-          setButtonLoading('consulta-colab-btn', false);
+      db.collection('pedidos').where('numero', '==', parseInt(numero)).get()
+        .then(snapshot => {
+          consultBtn.innerHTML = originalText;
+          consultBtn.disabled = false;
           
           if (snapshot.empty) {
-            resultadoDiv.innerHTML = '<div class="empty-result"><i class="fas fa-info-circle"></i><p>Nenhum pedido encontrado para este colaborador.</p></div>';
-          } else {
-            let html = '<h4 style="margin-bottom: 1.5rem; font-weight: 600;">Pedidos encontrados:</h4>';
-            snapshot.forEach(doc => {
-              const p = doc.data();
-              const statusClass = getStatusClass(p.status);
+            resultado.innerHTML = '<div class="result-card" style="border-left-color: var(--danger-color);"><p style="color: var(--danger-color); font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> Pedido não encontrado.</p></div>';
+            resultado.style.display = 'block';
+            resultado.classList.add('fade-in');
+            return;
+          }
 
-              const pedidoDiv = document.createElement('div');
-              pedidoDiv.className = 'pedido-item';
-              pedidoDiv.innerHTML = `
-                <div class="pedido-header">
-                  <div class="pedido-numero">#${p.numero}</div>
-                  <span class="status-badge ${statusClass}">${p.status}</span>
-                </div>
-                <div class="pedido-detalhes">
-                  <strong>Focal:</strong> ${p.focal} &bull; 
-                  <strong>Data:</strong> ${new Date(p.data).toLocaleDateString('pt-BR')} &bull;
-                  <strong>Itens:</strong> ${p.materiais.length}
+          snapshot.forEach(doc => {
+            const p = doc.data();
+            let listaMateriais = '';
+            p.materiais.forEach(m => {
+              const status = m.status === 'Material Entregue' ?
+                `<span class='status-verde'><i class="fas fa-check-circle"></i> ${m.status}</span>` :
+                `<span class='status-vermelho'><i class="fas fa-clock"></i> ${m.status || 'Pendente'}</span>`;
+              listaMateriais += `
+                <div style="background: var(--bg-primary); padding: 0.75rem; margin: 0.5rem 0; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+                  <strong>${m.material}</strong><br>
+                  <small>Quantidade: ${m.quantidade} | Status: ${status}</small>
                 </div>
               `;
-              pedidoDiv.onclick = () => mostrarDetalhesPedido(p);
-              resultadoDiv.appendChild(pedidoDiv);
             });
-          }
-          resultadoDiv.style.display = 'block';
-
-        } catch(error) {
-          console.error("Erro ao buscar pedidos:", error);
-          setButtonLoading('consulta-colab-btn', false);
-          resultadoDiv.innerHTML = '<div class="empty-result"><i class="fas fa-exclamation-triangle"></i><p>Ocorreu um erro ao buscar os pedidos.</p></div>';
-          resultadoDiv.style.display = 'block';
-        }
-    }
-    
-    // --- FUNÇÕES DE UI E HELPERS --- //
-    function getStatusClass(status) {
-        if (!status) return 'status-pendente';
-        const s = status.toLowerCase();
-        if (s.includes('finalizado') || s.includes('entregue')) return 'status-finalizado';
-        if (s.includes('processamento')) return 'status-processamento';
-        if (s.includes('recebida')) return 'status-recebido';
-        return 'status-pendente';
-    }
-    
-    function mostrarDetalhesPedido(pedidoData) {
-        const resultadoDiv = document.getElementById('resultadoConsulta');
-        resultadoDiv.innerHTML = criarCardDetalhesPedido(pedidoData, true);
-    }
-    
-    function criarCardDetalhesPedido(p, showBackButton = false) {
-        let listaMateriaisHtml = '';
-        p.materiais.forEach(m => {
-            const statusText = m.status || 'Pendente';
-            const statusClass = getStatusClass(m.status);
-            const icon = m.status === 'Material Entregue' ? 'fa-check-circle' : 'fa-clock';
             
-            listaMateriaisHtml += `
-                <div class="material-item">
-                    <div class="material-info">
-                        <strong>${m.material}</strong>
-                        <span>Quantidade: ${m.quantidade}</span>
-                    </div>
-                    <span class="status-badge ${statusClass}"><i class="fas ${icon}"></i>${statusText}</span>
-                </div>
+            resultado.innerHTML = `
+              <div class="result-card">
+                <h4><i class="fas fa-file-alt"></i> Detalhes do Pedido #${p.numero}</h4>
+                <p><strong><i class="fas fa-user"></i> Colaborador:</strong> ${p.colaborador}</p>
+                <p><strong><i class="fas fa-phone"></i> Focal:</strong> ${p.Focal}</p>
+                <p><strong><i class="fas fa-info-circle"></i> Status geral:</strong> <span style="color: var(--secondary-color); font-weight: 600;"><i class="fas fa-check"></i> ${p.status}</span></p>
+                <p><strong><i class="fas fa-box"></i> Materiais:</strong></p>
+                <div>${listaMateriais}</div>
+                <p><strong><i class="fas fa-comment"></i> Observações:</strong> ${p.observacoes || 'Nenhuma observação'}</p>
+                <p><strong><i class="fas fa-calendar"></i> Data do Pedido:</strong> ${new Date(p.data).toLocaleString('pt-BR')}</p>
+              </div>
             `;
+            resultado.style.display = 'block';
+            resultado.classList.add('fade-in');
+          });
+        })
+        .catch(error => {
+          console.error(error);
+          consultBtn.innerHTML = originalText;
+          consultBtn.disabled = false;
+          resultado.innerHTML = '<div class="result-card" style="border-left-color: var(--danger-color);"><p style="color: var(--danger-color); font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> Erro ao buscar pedido.</p></div>';
+          resultado.style.display = 'block';
+          resultado.classList.add('fade-in');
         });
-        
-        const backButtonHtml = showBackButton ? `
-            <button class="btn btn-primary" onclick="consultarPedidosPorColaborador()" style="margin-top: 1.5rem; width: auto;">
-                <i class="fas fa-arrow-left"></i> Voltar para lista
-            </button>
-        ` : '';
-
-        return `
-            <div class="result-card">
-                <h4>Detalhes do Pedido #${p.numero}</h4>
-                <div class="detail-grid">
-                    <div class="detail-item"><strong>Colaborador:</strong> ${p.colaborador}</div>
-                    <div class="detail-item"><strong>Focal:</strong> ${p.focal}</div>
-                    <div class="detail-item"><strong>Data do Pedido:</strong> ${new Date(p.data).toLocaleString('pt-BR')}</div>
-                    <div class="detail-item"><strong>Status Geral:</strong> <span class="status-badge ${getStatusClass(p.status)}">${p.status}</span></div>
-                </div>
-                ${p.observacoes ? `<div class="detail-item" style="margin-bottom: 1.5rem;"><strong>Observações:</strong> ${p.observacoes}</div>` : ''}
-                
-                <div class="material-list-container">
-                    <h5 style="font-weight: 600; margin-bottom: 1rem;">Itens Solicitados</h5>
-                    ${listaMateriaisHtml}
-                </div>
-                ${backButtonHtml}
-            </div>
-        `;
     }
 
     function setupAutocomplete(inputId, listId, data) {
-        const input = document.getElementById(inputId);
-        const list = document.getElementById(listId);
+      const input = document.getElementById(inputId);
+      const list = document.getElementById(listId);
+      
+      input.addEventListener('focus', () => renderList(data, inputId, listId));
+      input.addEventListener('input', () => {
+        const filtered = data.filter(item => item.toLowerCase().includes(input.value.toLowerCase()));
+        renderList(filtered, inputId, listId);
+      });
+      
+      document.addEventListener('click', function(e) {
+        if (!input.contains(e.target) && !list.contains(e.target)) {
+          list.style.display = 'none';
+        }
+      });
+    }
 
-        const renderList = (items) => {
-            list.innerHTML = '';
-            items.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = item;
-                li.onclick = () => selecionarItem(li, inputId, listId);
-                list.appendChild(li);
-            });
-            list.style.display = items.length ? 'block' : 'none';
-        };
-
-        input.addEventListener('input', () => {
-            const filtered = data.filter(item => item.toLowerCase().includes(input.value.toLowerCase()));
-            renderList(filtered);
-        });
-        
-        input.addEventListener('focus', () => {
-            const filtered = data.filter(item => item.toLowerCase().includes(input.value.toLowerCase()));
-            renderList(filtered);
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!input.contains(e.target) && !list.contains(e.target)) {
-                list.style.display = 'none';
-            }
-        });
+    function renderList(items, inputId, listId) {
+      const list = document.getElementById(listId);
+      list.innerHTML = '';
+      
+      items.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        li.onclick = () => selecionarItem(li, inputId, listId);
+        list.appendChild(li);
+      });
+      
+      list.style.display = items.length ? 'block' : 'none';
     }
 
     function selecionarItem(element, inputId, listId) {
-        document.getElementById(inputId).value = element.textContent;
-        document.getElementById(listId).style.display = 'none';
+      document.getElementById(inputId).value = element.textContent;
+      document.getElementById(listId).style.display = 'none';
     }
 
     function carregarMateriais() {
-        const categoria = document.getElementById('categoria').value;
-        const materialInput = document.getElementById('material');
-        if (materiais[categoria]) {
-            setupAutocomplete('material', 'material-list', materiais[categoria]);
-            materialInput.placeholder = "Digite para buscar o material";
-            materialInput.disabled = false;
-        } else {
-            materialInput.placeholder = "Selecione uma categoria primeiro";
-            materialInput.disabled = true;
-        }
-    }
-    
-    function mudarTab(tab) {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-        
-        document.querySelector(`button[onclick="mudarTab('${tab}')"]`).classList.add('active');
-        document.getElementById(`tab-${tab}`).classList.add('active');
-        
-        document.getElementById('resultadoConsulta').style.display = 'none';
-    }
-    
-    function carregarColaboradoresSelect() {
-        const select = document.getElementById('consultaColaborador');
-        colaboradores.sort().forEach(colab => {
-            const option = document.createElement('option');
-            option.value = colab;
-            option.textContent = colab;
-            select.appendChild(option);
-        });
+      const categoria = document.getElementById('categoria').value;
+      if (materiais[categoria]) {
+        setupAutocomplete('material', 'material-list', materiais[categoria]);
+        renderList(materiais[categoria], 'material', 'material-list');
+      }
     }
 
-    // --- INICIALIZAÇÃO --- //
+    // Função para mudar entre as abas de consulta
+    function mudarTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      document.querySelector(`button[onclick="mudarTab('${tab}')"]`).classList.add('active');
+      document.getElementById(`tab-${tab}`).classList.add('active');
+      
+      // Limpar resultados anteriores
+      document.getElementById('resultadoConsulta').style.display = 'none';
+    }
+    
+    // Função para carregar colaboradores no select
+    function carregarColaboradores() {
+      const colaboradoresList = Array.from(document.querySelectorAll('#colaborador-list li')).map(li => li.textContent);
+      const select = document.getElementById('consultaColaborador');
+      
+      colaboradoresList.forEach(colab => {
+        const option = document.createElement('option');
+        option.value = colab;
+        option.textContent = colab;
+        select.appendChild(option);
+      });
+    }
+    
+    // Função para consultar pedidos por colaborador
+    function consultarPedidosPorColaborador() {
+      const colaborador = document.getElementById('consultaColaborador').value;
+      const resultado = document.getElementById('resultadoConsulta');
+      const consultBtn = document.querySelector('button[onclick="consultarPedidosPorColaborador()"]');
+      
+      if (!colaborador) {
+        alert('Por favor, selecione um colaborador.');
+        return;
+      }
+
+      const originalText = consultBtn.innerHTML;
+      consultBtn.innerHTML = '<span class="loading"></span> Buscando...';
+      consultBtn.disabled = true;
+      
+      resultado.innerHTML = '';
+      
+      db.collection('pedidos').where('colaborador', '==', colaborador).orderBy('data', 'desc').get()
+        .then(snapshot => {
+          consultBtn.innerHTML = originalText;
+          consultBtn.disabled = false;
+          
+          if (snapshot.empty) {
+            resultado.innerHTML = '<div class="empty-result"><i class="fas fa-info-circle fa-2x"></i><p>Nenhum pedido encontrado para este colaborador.</p></div>';
+            resultado.style.display = 'block';
+            resultado.classList.add('fade-in');
+            return;
+          }
+          
+          resultado.innerHTML = '<h4 style="margin-bottom: 1rem;"><i class="fas fa-list"></i> Pedidos encontrados:</h4>';
+          
+          snapshot.forEach(doc => {
+            const p = doc.data();
+            const pedidoDiv = document.createElement('div');
+            pedidoDiv.className = 'pedido-item fade-in';
+            
+            // Determinar classe de status
+            let statusClass = 'status-recebido';
+            if (p.status.includes('Processamento')) statusClass = 'status-processamento';
+            if (p.status.includes('Finalizado') || p.status.includes('Entregue')) statusClass = 'status-finalizado';
+            
+            pedidoDiv.innerHTML = `
+              <div class="pedido-header">
+                <div class="pedido-numero">#${p.numero}</div>
+                <div class="pedido-data">${new Date(p.data).toLocaleDateString('pt-BR')}</div>
+                <div class="pedido-status ${statusClass}">${p.status}</div>
+              </div>
+              <div class="pedido-detalhes">
+                <strong>Focal:</strong> ${p.Focal}<br>
+                <strong>Itens:</strong> ${p.materiais.length} itens solicitados
+              </div>
+            `;
+            
+            pedidoDiv.addEventListener('click', () => {
+              mostrarDetalhesPedido(p);
+            });
+            
+            resultado.appendChild(pedidoDiv);
+          });
+          
+          resultado.style.display = 'block';
+          resultado.classList.add('fade-in');
+        })
+        .catch(error => {
+          console.error(error);
+          consultBtn.innerHTML = originalText;
+          consultBtn.disabled = false;
+          resultado.innerHTML = '<div class="result-card" style="border-left-color: var(--danger-color);"><p style="color: var(--danger-color); font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> Erro ao buscar pedidos.</p></div>';
+          resultado.style.display = 'block';
+          resultado.classList.add('fade-in');
+        });
+    }
+    
+    // Função para mostrar detalhes de um pedido
+    function mostrarDetalhesPedido(p) {
+      const resultado = document.getElementById('resultadoConsulta');
+      
+      let listaMateriais = '';
+      p.materiais.forEach(m => {
+        const status = m.status === 'Material Entregue' ?
+          `<span class='status-verde'><i class="fas fa-check-circle"></i> ${m.status}</span>` :
+          `<span class='status-vermelho'><i class="fas fa-clock"></i> ${m.status || 'Pendente'}</span>`;
+        listaMateriais += `
+          <div style="background: var(--bg-primary); padding: 0.75rem; margin: 0.5rem 0; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+            <strong>${m.material}</strong><br>
+            <small>Quantidade: ${m.quantidade} | Status: ${status}</small>
+          </div>
+        `;
+      });
+      
+      resultado.innerHTML = `
+        <div class="result-card">
+          <h4><i class="fas fa-file-alt"></i> Detalhes do Pedido #${p.numero}</h4>
+          <p><strong><i class="fas fa-user"></i> Colaborador:</strong> ${p.colaborador}</p>
+          <p><strong><i class="fas fa-phone"></i> Focal:</strong> ${p.Focal}</p>
+          <p><strong><i class="fas fa-info-circle"></i> Status geral:</strong> <span style="color: var(--secondary-color); font-weight: 600;"><i class="fas fa-check"></i> ${p.status}</span></p>
+          <p><strong><i class="fas fa-box"></i> Materiais:</strong></p>
+          <div>${listaMateriais}</div>
+          <p><strong><i class="fas fa-comment"></i> Observações:</strong> ${p.observacoes || 'Nenhuma observação'}</p>
+          <p><strong><i class="fas fa-calendar"></i> Data do Pedido:</strong> ${new Date(p.data).toLocaleString('pt-BR')}</p>
+          <button class="btn btn-primary" onclick="consultarPedidosPorColaborador()" style="margin-top: 1rem;">
+            <i class="fas fa-arrow-left"></i> Voltar para lista
+          </button>
+        </div>
+      `;
+      resultado.style.display = 'block';
+      resultado.classList.add('fade-in');
+    }
+
+    // Inicialização
     document.addEventListener('DOMContentLoaded', () => {
-        setupAutocomplete('colaborador', 'colaborador-list', colaboradores);
-        carregarColaboradoresSelect();
-        carregarMateriais();
+      const colabs = Array.from(document.querySelectorAll('#colaborador-list li')).map(li => li.textContent);
+      setupAutocomplete('colaborador', 'colaborador-list', colabs);
+      
+      // Preencher o select de colaboradores para consulta
+      carregarColaboradores();
+      
+      // Adicionar animação de entrada
+      document.body.classList.add('fade-in');
+      
+      // Adicionar suporte para Enter na consulta por número
+      document.getElementById('consultaNumero').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          consultarPedido();
+        }
+      });
     });
   </script>
 </body>
