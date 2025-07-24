@@ -1212,7 +1212,7 @@
 </header>
 <!-- KPIs -->
 <div class="kpi-cards">
-<div class="card kpi-card">
+<div class="card kpi-card" onclick="filtrarPorStatus('')" style="cursor: pointer;">
 <div class="kpi-icon">
 <i class="fas fa-clipboard-list"></i>
 </div>
@@ -1224,7 +1224,7 @@
             </p>
 </div>
 </div>
-<div class="card kpi-card">
+<div class="card kpi-card" onclick="filtrarPorStatus('Aguardando Verba')" style="cursor: pointer;">
 <div class="kpi-icon" style="background-color: #ffecb3; color: #ff9800;">
 <i class="fas fa-clock"></i>
 </div>
@@ -1236,7 +1236,7 @@
             </p>
 </div>
 </div>
-<div class="card kpi-card">
+<div class="card kpi-card" onclick="filtrarPorStatus('Disponível para Retirada')" style="cursor: pointer;">
 <div class="kpi-icon" style="background-color: #c8e6c9; color: #2e7d32;">
 <i class="fas fa-check-circle"></i>
 </div>
@@ -1248,7 +1248,7 @@
             </p>
 </div>
 </div>
-<div class="card kpi-card">
+<div class="card kpi-card" onclick="filtrarPorStatus('Material Entregue')" style="cursor: pointer;">
 <div class="kpi-icon" style="background-color: #e0e0e0; color: #616161;">
 <i class="fas fa-truck"></i>
 </div>
@@ -1260,7 +1260,7 @@
             </p>
 </div>
 </div>
-<div class="card kpi-card">
+<div class="card kpi-card" onclick="filtrarPorStatus('Solicitação Recebida')" style="cursor: pointer;">
 <div class="kpi-icon" style="background-color: #e1bee7; color: #9c27b0;">
 <i class="fas fa-inbox"></i>
 </div>
@@ -1271,7 +1271,7 @@
 <i class="fas fa-arrow-up"></i> Atualizado
     </p>
 </div>
-</div><div class="card kpi-card">
+</div><div class="card kpi-card" onclick="filtrarPorStatus('Reserva Gerada')" style="cursor: pointer;">
 <div class="kpi-icon" style="background-color: #bbdefb; color: #1976d2;">
 <i class="fas fa-dolly-flatbed"></i>
 </div>
@@ -1282,7 +1282,7 @@
 <i class="fas fa-arrow-up"></i> Atualizado
     </p>
 </div>
-</div><div class="card kpi-card">
+</div><div class="card kpi-card" onclick="filtrarPorStatus('Reserva Apropriada')" style="cursor: pointer;">
 <div class="kpi-icon" style="background-color: #f8bbd0; color: #ec407a;">
 <i class="fas fa-file-signature"></i>
 </div>
@@ -1293,7 +1293,7 @@
 <i class="fas fa-arrow-up"></i> Atualizado
     </p>
 </div>
-</div><div class="card kpi-card">
+</div><div class="card kpi-card" onclick="filtrarPorStatus('Pedido Cancelado')" style="cursor: pointer;">
 <div class="kpi-icon" style="background-color: #ffcdd2; color: #f44336;">
 <i class="fas fa-ban"></i>
 </div>
@@ -1304,7 +1304,7 @@
 <i class="fas fa-arrow-up"></i> Atualizado
     </p>
 </div>
-</div><div class="card kpi-card">
+</div><div class="card kpi-card" onclick="filtrarPorStatus('Aguardando Almoxarifado')" style="cursor: pointer;">
 <div class="kpi-icon" style="background-color: #dcedc8; color: #7cb342;">
 <i class="fas fa-warehouse"></i>
 </div>
@@ -1315,7 +1315,7 @@
 <i class="fas fa-arrow-up"></i> Atualizado
     </p>
 </div>
-</div><div class="card kpi-card">
+</div><div class="card kpi-card" onclick="filtrarPorStatus('Aguardando Material')" style="cursor: pointer;">
 <div class="kpi-icon" style="background-color: #ffe0b2; color: #fb8c00;">
 <i class="fas fa-box-open"></i>
 </div>
@@ -1470,12 +1470,134 @@
 </div>
 <div class="card-body">
 <p style="margin-bottom: var(--space-4);">
-            Exporte todos os pedidos para uma planilha Excel para análise ou backup.
+            Configure os filtros desejados e exporte os pedidos para uma planilha Excel personalizada.
           </p>
-<button class="btn btn-primary" onclick="exportarExcel()">
-<i class="fas fa-file-export"></i>
-            Exportar Excel
-          </button>
+          
+          <!-- Filtros de Exportação -->
+          <div class="form-group">
+            <h4 style="margin-bottom: var(--space-3); color: var(--neutral-700);">Filtros de Exportação</h4>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-4);">
+              
+              <!-- Filtro por Focal -->
+              <div class="form-group">
+                <label class="form-label" for="exportFiltroFocal">Focal:</label>
+                <select class="form-select" id="exportFiltroFocal" multiple>
+                  <option value="">Todos os Focais</option>
+                </select>
+                <small style="color: var(--neutral-600); font-size: 0.75rem;">Ctrl+Click para múltipla seleção</small>
+              </div>
+              
+              <!-- Filtro por Status do Pedido -->
+              <div class="form-group">
+                <label class="form-label" for="exportFiltroStatusPedido">Status do Pedido:</label>
+                <select class="form-select" id="exportFiltroStatusPedido" multiple>
+                  <option value="">Todos os Status</option>
+                  <option value="Solicitação Recebida">Solicitação Recebida</option>
+                  <option value="Reserva Gerada">Reserva Gerada</option>
+                  <option value="Aguardando Verba">Aguardando Verba</option>
+                  <option value="Reserva Apropriada">Reserva Apropriada</option>
+                  <option value="Disponível para Retirada">Disponível para Retirada</option>
+                  <option value="Material Entregue">Material Entregue</option>
+                  <option value="Pedido Cancelado">Pedido Cancelado</option>
+                  <option value="Aguardando Almoxarifado">Aguardando Almoxarifado</option>
+                  <option value="Aguardando Material">Aguardando Material</option>
+                </select>
+                <small style="color: var(--neutral-600); font-size: 0.75rem;">Ctrl+Click para múltipla seleção</small>
+              </div>
+              
+              <!-- Filtro por Status do Item -->
+              <div class="form-group">
+                <label class="form-label" for="exportFiltroStatusItem">Status do Item:</label>
+                <select class="form-select" id="exportFiltroStatusItem" multiple>
+                  <option value="">Todos os Status</option>
+                  <option value="Solicitação Recebida">Solicitação Recebida</option>
+                  <option value="Reserva Gerada">Reserva Gerada</option>
+                  <option value="Aguardando Verba">Aguardando Verba</option>
+                  <option value="Reserva Apropriada">Reserva Apropriada</option>
+                  <option value="Disponível para Retirada">Disponível para Retirada</option>
+                  <option value="Material Entregue">Material Entregue</option>
+                  <option value="Pedido Cancelado">Pedido Cancelado</option>
+                  <option value="Aguardando Almoxarifado">Aguardando Almoxarifado</option>
+                  <option value="Aguardando Material">Aguardando Material</option>
+                </select>
+                <small style="color: var(--neutral-600); font-size: 0.75rem;">Ctrl+Click para múltipla seleção</small>
+              </div>
+              
+              <!-- Filtro por Material -->
+              <div class="form-group">
+                <label class="form-label" for="exportFiltroMaterial">Material:</label>
+                <input class="form-control" id="exportFiltroMaterial" type="text" placeholder="Digite o nome do material...">
+                <small style="color: var(--neutral-600); font-size: 0.75rem;">Busca por nome do material</small>
+              </div>
+              
+              <!-- Filtro por Colaborador -->
+              <div class="form-group">
+                <label class="form-label" for="exportFiltroColaborador">Colaborador:</label>
+                <input class="form-control" id="exportFiltroColaborador" type="text" placeholder="Digite o nome do colaborador...">
+                <small style="color: var(--neutral-600); font-size: 0.75rem;">Busca por nome do colaborador</small>
+              </div>
+              
+              <!-- Filtro por Data -->
+              <div class="form-group">
+                <label class="form-label" for="exportDataInicio">Data Início:</label>
+                <input class="form-control" id="exportDataInicio" type="date">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="exportDataFim">Data Fim:</label>
+                <input class="form-control" id="exportDataFim" type="date">
+              </div>
+              
+            </div>
+            
+            <!-- Opções de Colunas -->
+            <div class="form-group" style="margin-top: var(--space-4);">
+              <h4 style="margin-bottom: var(--space-3); color: var(--neutral-700);">Colunas para Exportar</h4>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-2);">
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colNumeroPedido" checked style="margin-right: var(--space-2);"> Número do Pedido
+                </label>
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colColaborador" checked style="margin-right: var(--space-2);"> Colaborador
+                </label>
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colFocal" checked style="margin-right: var(--space-2);"> Focal
+                </label>
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colStatusPedido" checked style="margin-right: var(--space-2);"> Status do Pedido
+                </label>
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colMaterial" checked style="margin-right: var(--space-2);"> Material
+                </label>
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colQuantidade" checked style="margin-right: var(--space-2);"> Quantidade
+                </label>
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colStatusItem" checked style="margin-right: var(--space-2);"> Status do Item
+                </label>
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colObservacoes" checked style="margin-right: var(--space-2);"> Observações
+                </label>
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colData" checked style="margin-right: var(--space-2);"> Data
+                </label>
+              </div>
+            </div>
+            
+            <!-- Botões de Ação -->
+            <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); align-items: center;">
+              <button class="btn btn-primary" onclick="exportarExcelFiltrado()">
+                <i class="fas fa-file-export"></i>
+                Exportar Excel Filtrado
+              </button>
+              <button class="btn btn-secondary" onclick="limparFiltrosExportacao()">
+                <i class="fas fa-eraser"></i>
+                Limpar Filtros
+              </button>
+              <span id="contadorResultados" style="color: var(--neutral-600); font-size: 0.875rem;"></span>
+            </div>
+          </div>
 </div>
 </div>
 </div>
@@ -1853,6 +1975,7 @@ function carregarPedidos() {
     gerarGraficoStatus(todosPedidos);
     atualizarKPIs(todosPedidos);
     popularFiltroFocal(todosPedidos);
+    inicializarFiltrosExportacao();
     
     hideLoadingIndicator();
   }, error => {
@@ -1993,7 +2116,27 @@ function atualizarStatusIndividual(id, valor) {
           
           historico.push(novaEntrada);
           
-          ref.update({ status: valor, historico: historico })
+          // Atualizar também os status dos itens individuais
+          const materiais = dados.materiais || [];
+          materiais.forEach(material => {
+            // Criar ou atualizar o histórico do item
+            if (!material.historico) {
+              material.historico = [];
+            }
+            
+            // Adicionar entrada ao histórico do item
+            material.historico.push({
+              status: valor,
+              data: new Date().toISOString(),
+              usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
+              nome: usuarioLogado ? usuarioLogado.nome : "Sistema"
+            });
+            
+            // Atualizar o status do item
+            material.status = valor;
+          });
+          
+          ref.update({ status: valor, historico: historico, materiais: materiais })
             .then(() => {
               hideLoadingIndicator();
               showNotification(`Status do pedido atualizado para "${valor}"`, "success");
@@ -2005,6 +2148,9 @@ function atualizarStatusIndividual(id, valor) {
                 statusAntigo: dados.status,
                 statusNovo: valor
               });
+              
+              // Reaplicar filtros para manter a filtragem ativa
+              aplicarFiltros();
             })
             .catch(error => {
               console.error("Erro ao atualizar status:", error);
@@ -2065,6 +2211,9 @@ function atualizarStatusItem(pedidoId, itemIndex, novoStatus) {
                   statusAntigo: materiais[itemIndex].status || dados.status,
                   statusNovo: novoStatus
                 });
+                
+                // Reaplicar filtros para manter a filtragem ativa
+                aplicarFiltros();
               })
               .catch(error => {
                 console.error("Erro ao atualizar status do item:", error);
@@ -2132,6 +2281,21 @@ function popularFiltroFocal(pedidos) {
     option.textContent = focal;
     filtroFocal.appendChild(option);
   });
+}
+
+// Função para filtrar por status ao clicar nos cards do dashboard
+function filtrarPorStatus(status) {
+  // Mudar para a seção de pedidos
+  mostrarSecao('pedidos');
+  
+  // Definir o filtro de status
+  const filtroStatus = document.getElementById("filtroStatus");
+  if (filtroStatus) {
+    filtroStatus.value = status;
+  }
+  
+  // Aplicar os filtros
+  aplicarFiltros();
 }
 
 // Atualização em massa
@@ -2279,6 +2443,7 @@ function exportarExcel() {
       p.materiais.forEach(m => linhas.push({
         "Número do Pedido": p.numero,
         "Colaborador": p.colaborador,
+        "Focal": p.Focal,
         "Status do Pedido": p.status,
         "Material": m.material,
         "Quantidade": m.quantidade,
@@ -2302,6 +2467,191 @@ function exportarExcel() {
     hideLoadingIndicator();
     showNotification("Erro ao exportar dados. Tente novamente.", "error");
   }
+}
+
+// Funções para Exportação Filtrada
+function inicializarFiltrosExportacao() {
+  // Popular filtro de focais
+  const selectFocal = document.getElementById("exportFiltroFocal");
+  if (selectFocal) {
+    // Limpar opções existentes (exceto "Todos os Focais")
+    while (selectFocal.children.length > 1) {
+      selectFocal.removeChild(selectFocal.lastChild);
+    }
+    
+    // Obter focais únicos dos pedidos
+    const focaisUnicos = [...new Set(todosPedidos.map(p => p.Focal).filter(f => f))];
+    focaisUnicos.sort().forEach(focal => {
+      const option = document.createElement("option");
+      option.value = focal;
+      option.textContent = focal;
+      selectFocal.appendChild(option);
+    });
+  }
+  
+  // Atualizar contador de resultados
+  atualizarContadorResultados();
+}
+
+function atualizarContadorResultados() {
+  const contador = document.getElementById("contadorResultados");
+  if (contador) {
+    const pedidosFiltrados = aplicarFiltrosExportacao();
+    let totalItens = 0;
+    pedidosFiltrados.forEach(p => totalItens += p.materiais.length);
+    contador.textContent = `${pedidosFiltrados.length} pedidos (${totalItens} itens) encontrados`;
+  }
+}
+
+function aplicarFiltrosExportacao() {
+  let pedidosFiltrados = [...todosPedidos];
+  
+  // Filtro por Focal
+  const focaisSelecionados = Array.from(document.getElementById("exportFiltroFocal").selectedOptions)
+    .map(option => option.value).filter(v => v);
+  if (focaisSelecionados.length > 0) {
+    pedidosFiltrados = pedidosFiltrados.filter(p => focaisSelecionados.includes(p.Focal));
+  }
+  
+  // Filtro por Status do Pedido
+  const statusPedidoSelecionados = Array.from(document.getElementById("exportFiltroStatusPedido").selectedOptions)
+    .map(option => option.value).filter(v => v);
+  if (statusPedidoSelecionados.length > 0) {
+    pedidosFiltrados = pedidosFiltrados.filter(p => statusPedidoSelecionados.includes(p.status));
+  }
+  
+  // Filtro por Status do Item
+  const statusItemSelecionados = Array.from(document.getElementById("exportFiltroStatusItem").selectedOptions)
+    .map(option => option.value).filter(v => v);
+  if (statusItemSelecionados.length > 0) {
+    pedidosFiltrados = pedidosFiltrados.filter(p => 
+      p.materiais.some(m => statusItemSelecionados.includes(m.status || p.status))
+    );
+  }
+  
+  // Filtro por Material
+  const filtroMaterial = document.getElementById("exportFiltroMaterial").value.trim().toLowerCase();
+  if (filtroMaterial) {
+    pedidosFiltrados = pedidosFiltrados.filter(p => 
+      p.materiais.some(m => m.material.toLowerCase().includes(filtroMaterial))
+    );
+  }
+  
+  // Filtro por Colaborador
+  const filtroColaborador = document.getElementById("exportFiltroColaborador").value.trim().toLowerCase();
+  if (filtroColaborador) {
+    pedidosFiltrados = pedidosFiltrados.filter(p => 
+      p.colaborador.toLowerCase().includes(filtroColaborador)
+    );
+  }
+  
+  // Filtro por Data
+  const dataInicio = document.getElementById("exportDataInicio").value;
+  const dataFim = document.getElementById("exportDataFim").value;
+  
+  if (dataInicio) {
+    const inicio = new Date(dataInicio);
+    pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.data) >= inicio);
+  }
+  
+  if (dataFim) {
+    const fim = new Date(dataFim);
+    fim.setHours(23, 59, 59, 999); // Incluir todo o dia
+    pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.data) <= fim);
+  }
+  
+  return pedidosFiltrados;
+}
+
+function exportarExcelFiltrado() {
+  showLoadingIndicator();
+  
+  try {
+    const pedidosFiltrados = aplicarFiltrosExportacao();
+    
+    if (pedidosFiltrados.length === 0) {
+      hideLoadingIndicator();
+      showNotification("Nenhum pedido encontrado com os filtros aplicados.", "warning");
+      return;
+    }
+    
+    // Obter colunas selecionadas
+    const colunasSelecionadas = {
+      numeroPedido: document.getElementById("colNumeroPedido").checked,
+      colaborador: document.getElementById("colColaborador").checked,
+      focal: document.getElementById("colFocal").checked,
+      statusPedido: document.getElementById("colStatusPedido").checked,
+      material: document.getElementById("colMaterial").checked,
+      quantidade: document.getElementById("colQuantidade").checked,
+      statusItem: document.getElementById("colStatusItem").checked,
+      observacoes: document.getElementById("colObservacoes").checked,
+      data: document.getElementById("colData").checked
+    };
+    
+    const wb = XLSX.utils.book_new();
+    const linhas = [];
+    
+    pedidosFiltrados.forEach(p => {
+      p.materiais.forEach(m => {
+        const linha = {};
+        
+        if (colunasSelecionadas.numeroPedido) linha["Número do Pedido"] = p.numero;
+        if (colunasSelecionadas.colaborador) linha["Colaborador"] = p.colaborador;
+        if (colunasSelecionadas.focal) linha["Focal"] = p.Focal;
+        if (colunasSelecionadas.statusPedido) linha["Status do Pedido"] = p.status;
+        if (colunasSelecionadas.material) linha["Material"] = m.material;
+        if (colunasSelecionadas.quantidade) linha["Quantidade"] = m.quantidade;
+        if (colunasSelecionadas.statusItem) linha["Status do Item"] = m.status || p.status;
+        if (colunasSelecionadas.observacoes) linha["Observações"] = p.observacoes || "";
+        if (colunasSelecionadas.data) linha["Data"] = new Date(p.data).toLocaleString();
+        
+        linhas.push(linha);
+      });
+    });
+    
+    const ws = XLSX.utils.json_to_sheet(linhas);
+    XLSX.utils.book_append_sheet(wb, ws, "Pedidos_Filtrados");
+    
+    // Timeout para simular processamento
+    setTimeout(() => {
+      const nomeArquivo = `Pedidos_Filtrados_${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, nomeArquivo);
+      hideLoadingIndicator();
+      showNotification(`Exportação concluída! ${linhas.length} itens exportados.`, "success");
+    }, 1000);
+    
+  } catch (error) {
+    console.error("Erro ao exportar dados filtrados:", error);
+    hideLoadingIndicator();
+    showNotification("Erro ao exportar dados. Tente novamente.", "error");
+  }
+}
+
+function limparFiltrosExportacao() {
+  // Limpar todos os filtros
+  document.getElementById("exportFiltroFocal").selectedIndex = -1;
+  document.getElementById("exportFiltroStatusPedido").selectedIndex = -1;
+  document.getElementById("exportFiltroStatusItem").selectedIndex = -1;
+  document.getElementById("exportFiltroMaterial").value = "";
+  document.getElementById("exportFiltroColaborador").value = "";
+  document.getElementById("exportDataInicio").value = "";
+  document.getElementById("exportDataFim").value = "";
+  
+  // Marcar todas as colunas
+  document.getElementById("colNumeroPedido").checked = true;
+  document.getElementById("colColaborador").checked = true;
+  document.getElementById("colFocal").checked = true;
+  document.getElementById("colStatusPedido").checked = true;
+  document.getElementById("colMaterial").checked = true;
+  document.getElementById("colQuantidade").checked = true;
+  document.getElementById("colStatusItem").checked = true;
+  document.getElementById("colObservacoes").checked = true;
+  document.getElementById("colData").checked = true;
+  
+  // Atualizar contador
+  atualizarContadorResultados();
+  
+  showNotification("Filtros limpos com sucesso!", "info");
 }
 
 // Gráfico de Status
@@ -2926,6 +3276,31 @@ function exportarRelatorioExcel() {
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
   verificaLogin();
+  
+  // Event listeners para filtros de exportação
+  setTimeout(() => {
+    // Adicionar event listeners para atualizar contador quando filtros mudarem
+    const filtros = [
+      'exportFiltroFocal',
+      'exportFiltroStatusPedido', 
+      'exportFiltroStatusItem',
+      'exportFiltroMaterial',
+      'exportFiltroColaborador',
+      'exportDataInicio',
+      'exportDataFim'
+    ];
+    
+    filtros.forEach(filtroId => {
+      const elemento = document.getElementById(filtroId);
+      if (elemento) {
+        if (elemento.tagName === 'SELECT') {
+          elemento.addEventListener('change', atualizarContadorResultados);
+        } else {
+          elemento.addEventListener('input', atualizarContadorResultados);
+        }
+      }
+    });
+  }, 1000);
 });
 </script>
 <script>
@@ -3029,12 +3404,32 @@ function processarStatus(id, valor, numeroReserva) {
             nome: usuarioLogado ? usuarioLogado.nome : "Sistema"
           });
 
+          // Atualizar também os status dos itens individuais
+          const materiais = dados.materiais || [];
+          materiais.forEach(material => {
+            // Criar ou atualizar o histórico do item
+            if (!material.historico) {
+              material.historico = [];
+            }
+            
+            // Adicionar entrada ao histórico do item
+            material.historico.push({
+              status: valor,
+              data: new Date().toISOString(),
+              usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
+              nome: usuarioLogado ? usuarioLogado.nome : "Sistema"
+            });
+            
+            // Atualizar o status do item
+            material.status = valor;
+          });
+
           let observacoes = dados.observacoes || "";
           if (valor === "Reserva Gerada" && numeroReserva) {
             observacoes += (observacoes ? " | " : "") + "Reserva Gerada Nº " + numeroReserva;
           }
 
-          ref.update({ status: valor, historico: historico, observacoes: observacoes })
+          ref.update({ status: valor, historico: historico, observacoes: observacoes, materiais: materiais })
             .then(() => {
               hideLoadingIndicator();
               showNotification(`Status do pedido atualizado para "${valor}"`, "success");
@@ -3045,6 +3440,9 @@ function processarStatus(id, valor, numeroReserva) {
                 statusNovo: valor,
                 numeroReserva: numeroReserva || undefined
               });
+              
+              // Reaplicar filtros para manter a filtragem ativa
+              aplicarFiltros();
             })
             .catch(error => {
               hideLoadingIndicator();
