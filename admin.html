@@ -9,7 +9,6 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -1115,15 +1114,15 @@
 </div>
 <form class="login-form" onsubmit="realizarLogin(event)">
 <div class="form-group">
-<label class="form-label" for="user">E-mail</label>
-<input class="form-control" id="user" placeholder="Digite seu e-mail" required="" type="email"/>
+<label class="form-label" for="user">Usuário</label>
+<input class="form-control" id="user" placeholder="Digite seu usuário" required="" type="text"/>
 </div>
 <div class="form-group">
 <label class="form-label" for="pass">Senha</label>
 <input class="form-control" id="pass" placeholder="Digite sua senha" required="" type="password"/>
 </div>
 <p id="loginErro" style="color: var(--error); font-size: 0.875rem; margin-top: var(--space-2); display: none;">
-        E-mail ou senha incorretos.
+        Usuário ou senha incorretos.
       </p>
 <button class="btn btn-primary" style="width: 100%; margin-top: var(--space-4);" type="submit">
 <i class="fas fa-sign-in-alt"></i>
@@ -1726,7 +1725,6 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const auth = firebase.auth();
 
 // Constantes
 const STATUS_OPTIONS = [
@@ -1767,103 +1765,115 @@ let pedidosFiltrados = [];
 let confirmCallback = null;
 
 // Usuários do sistema
-// Autenticação com Firebase
+const USUARIOS = {
+  "CLB354374": { senha: "*2025*Coelba", nome: "THIAGO MOREIRA", cargo: "ADMINISTRADOR", primeiroLogin: false },
+  "CLB149233": { senha: "FCNASCIMENTO", nome: "FARAH", cargo: "FOCAL DE PERDAS", primeiroLogin: false },
+  "CLB123633": { senha: "WLINO", nome: "WANDERSON", cargo: "FOCAL DE COBRANÇA", primeiroLogin: false },
+  "CLB614908": { senha: "Coelba*2025", nome: "PERÔNICO", cargo: "SUPERVISOR", primeiroLogin: false },
+  "CLB961017": { senha: "12345", nome: "MARCOS", cargo: "TEC. ESPECIALISTA", primeiroLogin: false },
+  "LEO.SILVA": { senha: "teste@01", nome: "LEONARDO SILVA", cargo: "SUPERINTENDENTE", primeiroLogin: false },
+  "CLB346462": { senha: "Coelba@01", nome: "MARIANO", cargo: "FOCAL DE MATERIAL", primeiroLogin: false },
+  "CLB620245": { senha: "Camilinha@28", nome: "CAMILA", cargo: "FOCAL PREVENTIVA", primeiroLogin: false }
+};
+
+// Autenticação
 function realizarLogin(e) {
   e.preventDefault();
   showLoadingIndicator();
-
-  const email = document.getElementById("user").value;
-  const password = document.getElementById("pass").value;
-
-  auth.signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      // Login bem-sucedido!
-      const user = userCredential.user;
+  
+  const u = document.getElementById("user").value;
+  const p = document.getElementById("pass").value;
+  
+  // Simulação de delay para mostrar o loading
+  setTimeout(() => {
+    hideLoadingIndicator();
+    
+    if (USUARIOS[u] && USUARIOS[u].senha === p) {
+      // Armazenar informações do usuário logado
+      const usuarioLogado = {
+        usuario: u,
+        nome: USUARIOS[u].nome,
+        cargo: USUARIOS[u].cargo,
+        primeiroLogin: USUARIOS[u].primeiroLogin,
+        timestamp: Date.now()
+      };
       
-      // Buscar dados do usuário no Firestore
-      db.collection("usuarios").doc(user.uid).get()
-        .then((doc) => {
-          let nomeUsuario = "Usuário";
-          let cargoUsuario = "Usuário";
-          
-          if (doc.exists) {
-            // Se encontrou o documento do usuário no Firestore
-            const dadosUsuario = doc.data();
-            nomeUsuario = dadosUsuario.nome || "Usuário";
-            cargoUsuario = dadosUsuario.cargo || "Usuário";
-          } else {
-            // Se não encontrou, usar dados padrão
-            console.warn("Documento do usuário não encontrado no Firestore. Usando dados padrão.");
-            nomeUsuario = user.displayName || user.email.split('@')[0].toUpperCase();
-          }
-          
-          // Armazenar informações do usuário logado
-          localStorage.setItem("usuarioLogado", JSON.stringify({
-              email: user.email,
-              uid: user.uid,
-              usuario: user.email.split('@')[0], // Usar parte antes do @ como nome de usuário
-              nome: nomeUsuario,
-              cargo: cargoUsuario,
-              timestamp: Date.now()
-          }));
-
-          hideLoadingIndicator();
-          document.getElementById("loginContainer").style.display = "none";
-          document.getElementById("conteudo").style.display = "block";
-          
-          // Atualizar informações do usuário na interface
-          document.querySelector(".user-name").textContent = nomeUsuario;
-          document.querySelector(".user-role").textContent = cargoUsuario;
-
-          carregarPedidos();
-          showNotification("Login realizado com sucesso!", "success");
-        })
-        .catch((error) => {
-          // Erro ao buscar dados do usuário no Firestore
-          console.error("Erro ao buscar dados do usuário:", error);
-          
-          // Usar dados padrão em caso de erro
-          const nomeUsuario = user.displayName || user.email.split('@')[0].toUpperCase();
-          const cargoUsuario = "Usuário";
-          
-          localStorage.setItem("usuarioLogado", JSON.stringify({
-              email: user.email,
-              uid: user.uid,
-              usuario: user.email.split('@')[0],
-              nome: nomeUsuario,
-              cargo: cargoUsuario,
-              timestamp: Date.now()
-          }));
-
-          hideLoadingIndicator();
-          document.getElementById("loginContainer").style.display = "none";
-          document.getElementById("conteudo").style.display = "block";
-          
-          document.querySelector(".user-name").textContent = nomeUsuario;
-          document.querySelector(".user-role").textContent = cargoUsuario;
-
-          carregarPedidos();
-          showNotification("Login realizado com sucesso!", "success");
-        });
-    })
-    .catch((error) => {
-      // Falha no login
-      hideLoadingIndicator();
-      console.error("Erro de login:", error.message);
+      localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
+      
+      // Verificar se é primeiro login
+      if (USUARIOS[u].primeiroLogin) {
+        // Mostrar modal para troca de senha
+        showTrocaSenhaModal();
+      } else {
+        // Login normal
+        document.getElementById("loginContainer").style.display = "none";
+        document.getElementById("conteudo").style.display = "block";
+        
+        // Atualizar informações do usuário na interface
+        document.querySelector(".user-name").textContent = USUARIOS[u].nome;
+        document.querySelector(".user-role").textContent = USUARIOS[u].cargo;
+        
+        carregarPedidos();
+        showNotification("Login realizado com sucesso!", "success");
+      }
+    } else {
       document.getElementById("loginErro").style.display = "block";
-      showNotification("Falha no login. Verifique seu e-mail e senha.", "error");
-    });
+      showNotification("Falha no login. Verifique suas credenciais.", "error");
+    }
+  }, 1000);
 }
 
-// Modal para troca de senha no primeiro login (removido - não necessário com Firebase Auth)
+// Modal para troca de senha no primeiro login
 function showTrocaSenhaModal() {
-  // Funcionalidade removida - Firebase gerencia senhas
-  showNotification("Para alterar sua senha, use a opção 'Esqueci minha senha' na tela de login.", "info");
+  const modal = document.getElementById('trocaSenhaModal');
+  modal.classList.add('show');
 }
 
-// Função para trocar senha no primeiro login (removido - não necessário com Firebase Auth)
+// Função para trocar senha no primeiro login
 function trocarSenha() {
-  // Funcionalidade removida - Firebase gerencia senhas
+  const novaSenha = document.getElementById("novaSenha").value;
+  const confirmaSenha = document.getElementById("confirmaSenha").value;
+  
+  // Validar senha
+  if (novaSenha.length < 6) {
+    document.getElementById("trocaSenhaErro").textContent = "A senha deve ter pelo menos 6 caracteres";
+    document.getElementById("trocaSenhaErro").style.display = "block";
+    return;
+  }
+  
+  if (novaSenha !== confirmaSenha) {
+    document.getElementById("trocaSenhaErro").textContent = "As senhas não coincidem";
+    document.getElementById("trocaSenhaErro").style.display = "block";
+    return;
+  }
+  
+  // Obter usuário logado
+  const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+  
+  // Atualizar senha
+  USUARIOS[usuarioLogado.usuario].senha = novaSenha;
+  USUARIOS[usuarioLogado.usuario].primeiroLogin = false;
+  
+  // Atualizar informações do usuário logado
+  usuarioLogado.primeiroLogin = false;
+  localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
+  
+  // Registrar alteração de senha
+  registrarAcao("Alteração de senha", "Senha alterada no primeiro login");
+  
+  // Fechar modal
+  fecharModal('trocaSenhaModal');
+  
+  // Mostrar conteúdo
+  document.getElementById("loginContainer").style.display = "none";
+  document.getElementById("conteudo").style.display = "block";
+  
+  // Atualizar informações do usuário na interface
+  document.querySelector(".user-name").textContent = usuarioLogado.nome;
+  document.querySelector(".user-role").textContent = usuarioLogado.cargo;
+  
+  carregarPedidos();
+  showNotification("Senha alterada com sucesso!", "success");
 }
 
 // Registro de ações do usuário
@@ -1921,19 +1931,13 @@ function realizarLogout() {
       // Registrar ação de logout
       registrarAcao("Logout", "Usuário realizou logout do sistema");
       
-      // Fazer logout no Firebase
-      auth.signOut().then(() => {
-        // Remover dados de login
-        localStorage.removeItem("usuarioLogado");
-        
-        // Redirecionar para tela de login
-        document.getElementById("loginContainer").style.display = "flex";
-        document.getElementById("conteudo").style.display = "none";
-        showNotification("Logout realizado com sucesso!", "info");
-      }).catch((error) => {
-        console.error("Erro ao fazer logout:", error);
-        showNotification("Erro ao fazer logout. Tente novamente.", "error");
-      });
+      // Remover dados de login
+      localStorage.removeItem("usuarioLogado");
+      
+      // Redirecionar para tela de login
+      document.getElementById("loginContainer").style.display = "flex";
+      document.getElementById("conteudo").style.display = "none";
+      showNotification("Logout realizado com sucesso!", "info");
     }
   );
 }
@@ -3271,20 +3275,6 @@ function exportarRelatorioExcel() {
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
-  // Listener de autenticação do Firebase
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      // Usuário está logado
-      console.log("Usuário autenticado:", user.email);
-      verificaLogin();
-    } else {
-      // Usuário não está logado
-      console.log("Usuário não autenticado");
-      document.getElementById("loginContainer").style.display = "flex";
-      document.getElementById("conteudo").style.display = "none";
-    }
-  });
-  
   verificaLogin();
   
   // Event listeners para filtros de exportação
