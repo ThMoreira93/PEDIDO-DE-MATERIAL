@@ -1179,11 +1179,12 @@
 <span>Relatórios</span>
 </a>
 </li>
+
 <li class="nav-item">
-<a href="#catalogo" onclick="mostrarSecao('catalogo')">
-<i class="fas fa-book-open"></i>
-<span>Catálogo</span>
-</a>
+  <a href="#catalogo" onclick="mostrarSecao('catalogo')">
+    <i class="fas fa-book-open"></i>
+    <span>Catálogo</span>
+  </a>
 </li>
 </ul>
 </nav>
@@ -1361,26 +1362,11 @@
 </div>
 </div>
 </div>
-
-
-<!-- Gráficos (Top 10 / Focais) movidos para logo após KPIs -->
-
-
-<!-- Seção de Gráficos -->
-<div class="grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: var(--space-4); margin-top: var(--space-4);">
-<div class="card"><div class="card-header"><h3>Top 10 Colaboradores — Itens Entregues</h3></div><div class="card-body"><canvas height="240" id="grafTopColabEntregues"></canvas></div></div>
-<div class="card"><div class="card-header"><h3>Top 10 Colaboradores — Itens Solicitados</h3></div><div class="card-body"><canvas height="240" id="grafTopColabSolicitados"></canvas></div></div>
-<div class="card"><div class="card-header"><h3>Top 10 Itens Mais Solicitados</h3></div><div class="card-body"><canvas height="240" id="grafTopItensSolicitados"></canvas></div></div>
-<div class="card"><div class="card-header"><h3>Top 10 Itens Mais Entregues</h3></div><div class="card-body"><canvas height="240" id="grafTopItensEntregues"></canvas></div></div>
-<div class="card"><div class="card-header"><h3>Top Focais — Pedidos em "solicitação recebida"</h3></div><div class="card-body"><canvas height="240" id="grafTopFocaisRecebida"></canvas></div></div>
-<div class="card"><div class="card-header"><h3>Pedidos por Focal (barras empilhadas por status)</h3></div><div class="card-body"><canvas height="240" id="grafFocalStacked"></canvas></div></div>
-</div>
-
-<!-- Seção Pedidos Recentes - Separada dos gráficos -->
-<section style="margin-top: var(--space-8);">
-<div class="section-header" style="margin-bottom: var(--space-4);">
-<h3 style="font-size: 1.5rem; font-weight: 600; color: var(--neutral-800);">Pedidos Recentes</h3>
-<a class="btn-link" href="#pedidos" onclick="mostrarSecao('pedidos')" style="font-weight: 500;">Ver todos</a>
+<!-- Pedidos Recentes -->
+<section>
+<div class="section-header">
+<h3>Pedidos Recentes</h3>
+<a class="btn-link" href="#pedidos" onclick="mostrarSecao('pedidos')">Ver todos</a>
 </div>
 <div class="card">
 <div class="table-responsive">
@@ -1411,7 +1397,6 @@
 </div>
 </section>
 </div>
-</div>
 <!-- Seção Pedidos -->
 <div id="secao-pedidos" style="display: none;">
 <header class="content-header">
@@ -1426,19 +1411,19 @@
 <i class="fas fa-search"></i>
 </button>
 </div>
-<select class="form-select" id="filtroStatus" style="width: auto; margin-right: var(--space-3);">
-<option value="">Todos os Status</option>
-<option>Solicitação Recebida</option>
-<option>Reserva Gerada</option>
-<option>Aguardando Verba</option>
-<option>Reserva Apropriada</option>
-<option>Disponível para Retirada</option>
-<option>Material Entregue</option>
-<option>Pedido Cancelado</option>
-</select>
-<select class="form-select" id="filtroFocal" style="width: auto; margin-right: var(--space-3);">
-<option value="">Todos os Focais</option>
-</select>
+            <select class="form-select" id="filtroStatus" style="width: auto; margin-right: var(--space-3);">
+              <option value="">Todos os Status</option>
+              <option>Solicitação Recebida</option>
+              <option>Reserva Gerada</option>
+              <option>Aguardando Verba</option>
+              <option>Reserva Apropriada</option>
+              <option>Disponível para Retirada</option>
+              <option>Material Entregue</option>
+              <option>Pedido Cancelado</option>
+            </select>
+            <select class="form-select" id="filtroFocal" style="width: auto; margin-right: var(--space-3);">
+              <option value="">Todos os Focais</option>
+            </select>
 <button class="btn btn-primary">
 <i class="fas fa-plus"></i>
 <span>Novo Pedido</span>
@@ -1503,120 +1488,132 @@
 <p style="margin-bottom: var(--space-4);">
             Configure os filtros desejados e exporte os pedidos para uma planilha Excel personalizada.
           </p>
-<!-- Filtros de Exportação -->
-<div class="form-group">
-<h4 style="margin-bottom: var(--space-3); color: var(--neutral-700);">Filtros de Exportação</h4>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-4);">
-<!-- Filtro por Focal -->
-<div class="form-group">
-<label class="form-label" for="exportFiltroFocal">Focal:</label>
-<select class="form-select" id="exportFiltroFocal" multiple="">
-<option value="">Todos os Focais</option>
-</select>
-<small style="color: var(--neutral-600); font-size: 0.75rem;">Ctrl+Click para múltipla seleção</small>
-</div>
-<!-- Filtro por Status do Pedido -->
-<div class="form-group">
-<label class="form-label" for="exportFiltroStatusPedido">Status do Pedido:</label>
-<select class="form-select" id="exportFiltroStatusPedido" multiple="">
-<option value="">Todos os Status</option>
-<option value="Solicitação Recebida">Solicitação Recebida</option>
-<option value="Reserva Gerada">Reserva Gerada</option>
-<option value="Aguardando Verba">Aguardando Verba</option>
-<option value="Reserva Apropriada">Reserva Apropriada</option>
-<option value="Disponível para Retirada">Disponível para Retirada</option>
-<option value="Material Entregue">Material Entregue</option>
-<option value="Pedido Cancelado">Pedido Cancelado</option>
-<option value="Aguardando Almoxarifado">Aguardando Almoxarifado</option>
-<option value="Aguardando Material">Aguardando Material</option>
-</select>
-<small style="color: var(--neutral-600); font-size: 0.75rem;">Ctrl+Click para múltipla seleção</small>
-</div>
-<!-- Filtro por Status do Item -->
-<div class="form-group">
-<label class="form-label" for="exportFiltroStatusItem">Status do Item:</label>
-<select class="form-select" id="exportFiltroStatusItem" multiple="">
-<option value="">Todos os Status</option>
-<option value="Solicitação Recebida">Solicitação Recebida</option>
-<option value="Reserva Gerada">Reserva Gerada</option>
-<option value="Aguardando Verba">Aguardando Verba</option>
-<option value="Reserva Apropriada">Reserva Apropriada</option>
-<option value="Disponível para Retirada">Disponível para Retirada</option>
-<option value="Material Entregue">Material Entregue</option>
-<option value="Pedido Cancelado">Pedido Cancelado</option>
-<option value="Aguardando Almoxarifado">Aguardando Almoxarifado</option>
-<option value="Aguardando Material">Aguardando Material</option>
-</select>
-<small style="color: var(--neutral-600); font-size: 0.75rem;">Ctrl+Click para múltipla seleção</small>
-</div>
-<!-- Filtro por Material -->
-<div class="form-group">
-<label class="form-label" for="exportFiltroMaterial">Material:</label>
-<input class="form-control" id="exportFiltroMaterial" placeholder="Digite o nome do material..." type="text"/>
-<small style="color: var(--neutral-600); font-size: 0.75rem;">Busca por nome do material</small>
-</div>
-<!-- Filtro por Colaborador -->
-<div class="form-group">
-<label class="form-label" for="exportFiltroColaborador">Colaborador:</label>
-<input class="form-control" id="exportFiltroColaborador" placeholder="Digite o nome do colaborador..." type="text"/>
-<small style="color: var(--neutral-600); font-size: 0.75rem;">Busca por nome do colaborador</small>
-</div>
-<!-- Filtro por Data -->
-<div class="form-group">
-<label class="form-label" for="exportDataInicio">Data Início:</label>
-<input class="form-control" id="exportDataInicio" type="date"/>
-</div>
-<div class="form-group">
-<label class="form-label" for="exportDataFim">Data Fim:</label>
-<input class="form-control" id="exportDataFim" type="date"/>
-</div>
-</div>
-<!-- Opções de Colunas -->
-<div class="form-group" style="margin-top: var(--space-4);">
-<h4 style="margin-bottom: var(--space-3); color: var(--neutral-700);">Colunas para Exportar</h4>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-2);">
-<label style="display: flex; align-items: center; font-size: 0.875rem;">
-<input checked="" id="colNumeroPedido" style="margin-right: var(--space-2);" type="checkbox"/> Número do Pedido
+          
+          <!-- Filtros de Exportação -->
+          <div class="form-group">
+            <h4 style="margin-bottom: var(--space-3); color: var(--neutral-700);">Filtros de Exportação</h4>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-4);">
+              
+              <!-- Filtro por Focal -->
+              <div class="form-group">
+                <label class="form-label" for="exportFiltroFocal">Focal:</label>
+                <select class="form-select" id="exportFiltroFocal" multiple>
+                  <option value="">Todos os Focais</option>
+                </select>
+                <small style="color: var(--neutral-600); font-size: 0.75rem;">Ctrl+Click para múltipla seleção</small>
+              </div>
+              
+              <!-- Filtro por Status do Pedido -->
+              <div class="form-group">
+                <label class="form-label" for="exportFiltroStatusPedido">Status do Pedido:</label>
+                <select class="form-select" id="exportFiltroStatusPedido" multiple>
+                  <option value="">Todos os Status</option>
+                  <option value="Solicitação Recebida">Solicitação Recebida</option>
+                  <option value="Reserva Gerada">Reserva Gerada</option>
+                  <option value="Aguardando Verba">Aguardando Verba</option>
+                  <option value="Reserva Apropriada">Reserva Apropriada</option>
+                  <option value="Disponível para Retirada">Disponível para Retirada</option>
+                  <option value="Material Entregue">Material Entregue</option>
+                  <option value="Pedido Cancelado">Pedido Cancelado</option>
+                  <option value="Aguardando Almoxarifado">Aguardando Almoxarifado</option>
+                  <option value="Aguardando Material">Aguardando Material</option>
+                </select>
+                <small style="color: var(--neutral-600); font-size: 0.75rem;">Ctrl+Click para múltipla seleção</small>
+              </div>
+              
+              <!-- Filtro por Status do Item -->
+              <div class="form-group">
+                <label class="form-label" for="exportFiltroStatusItem">Status do Item:</label>
+                <select class="form-select" id="exportFiltroStatusItem" multiple>
+                  <option value="">Todos os Status</option>
+                  <option value="Solicitação Recebida">Solicitação Recebida</option>
+                  <option value="Reserva Gerada">Reserva Gerada</option>
+                  <option value="Aguardando Verba">Aguardando Verba</option>
+                  <option value="Reserva Apropriada">Reserva Apropriada</option>
+                  <option value="Disponível para Retirada">Disponível para Retirada</option>
+                  <option value="Material Entregue">Material Entregue</option>
+                  <option value="Pedido Cancelado">Pedido Cancelado</option>
+                  <option value="Aguardando Almoxarifado">Aguardando Almoxarifado</option>
+                  <option value="Aguardando Material">Aguardando Material</option>
+                </select>
+                <small style="color: var(--neutral-600); font-size: 0.75rem;">Ctrl+Click para múltipla seleção</small>
+              </div>
+              
+              <!-- Filtro por Material -->
+              <div class="form-group">
+                <label class="form-label" for="exportFiltroMaterial">Material:</label>
+                <input class="form-control" id="exportFiltroMaterial" type="text" placeholder="Digite o nome do material...">
+                <small style="color: var(--neutral-600); font-size: 0.75rem;">Busca por nome do material</small>
+              </div>
+              
+              <!-- Filtro por Colaborador -->
+              <div class="form-group">
+                <label class="form-label" for="exportFiltroColaborador">Colaborador:</label>
+                <input class="form-control" id="exportFiltroColaborador" type="text" placeholder="Digite o nome do colaborador...">
+                <small style="color: var(--neutral-600); font-size: 0.75rem;">Busca por nome do colaborador</small>
+              </div>
+              
+              <!-- Filtro por Data -->
+              <div class="form-group">
+                <label class="form-label" for="exportDataInicio">Data Início:</label>
+                <input class="form-control" id="exportDataInicio" type="date">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="exportDataFim">Data Fim:</label>
+                <input class="form-control" id="exportDataFim" type="date">
+              </div>
+              
+            </div>
+            
+            <!-- Opções de Colunas -->
+            <div class="form-group" style="margin-top: var(--space-4);">
+              <h4 style="margin-bottom: var(--space-3); color: var(--neutral-700);">Colunas para Exportar</h4>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-2);">
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colNumeroPedido" checked style="margin-right: var(--space-2);"> Número do Pedido
                 </label>
-<label style="display: flex; align-items: center; font-size: 0.875rem;">
-<input checked="" id="colColaborador" style="margin-right: var(--space-2);" type="checkbox"/> Colaborador
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colColaborador" checked style="margin-right: var(--space-2);"> Colaborador
                 </label>
-<label style="display: flex; align-items: center; font-size: 0.875rem;">
-<input checked="" id="colFocal" style="margin-right: var(--space-2);" type="checkbox"/> Focal
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colFocal" checked style="margin-right: var(--space-2);"> Focal
                 </label>
-<label style="display: flex; align-items: center; font-size: 0.875rem;">
-<input checked="" id="colStatusPedido" style="margin-right: var(--space-2);" type="checkbox"/> Status do Pedido
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colStatusPedido" checked style="margin-right: var(--space-2);"> Status do Pedido
                 </label>
-<label style="display: flex; align-items: center; font-size: 0.875rem;">
-<input checked="" id="colMaterial" style="margin-right: var(--space-2);" type="checkbox"/> Material
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colMaterial" checked style="margin-right: var(--space-2);"> Material
                 </label>
-<label style="display: flex; align-items: center; font-size: 0.875rem;">
-<input checked="" id="colQuantidade" style="margin-right: var(--space-2);" type="checkbox"/> Quantidade
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colQuantidade" checked style="margin-right: var(--space-2);"> Quantidade
                 </label>
-<label style="display: flex; align-items: center; font-size: 0.875rem;">
-<input checked="" id="colStatusItem" style="margin-right: var(--space-2);" type="checkbox"/> Status do Item
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colStatusItem" checked style="margin-right: var(--space-2);"> Status do Item
                 </label>
-<label style="display: flex; align-items: center; font-size: 0.875rem;">
-<input checked="" id="colObservacoes" style="margin-right: var(--space-2);" type="checkbox"/> Observações
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colObservacoes" checked style="margin-right: var(--space-2);"> Observações
                 </label>
-<label style="display: flex; align-items: center; font-size: 0.875rem;">
-<input checked="" id="colData" style="margin-right: var(--space-2);" type="checkbox"/> Data
+                <label style="display: flex; align-items: center; font-size: 0.875rem;">
+                  <input type="checkbox" id="colData" checked style="margin-right: var(--space-2);"> Data
                 </label>
-</div>
-</div>
-<!-- Botões de Ação -->
-<div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); align-items: center;">
-<button class="btn btn-primary" onclick="exportarExcelFiltrado()">
-<i class="fas fa-file-export"></i>
+              </div>
+            </div>
+            
+            <!-- Botões de Ação -->
+            <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); align-items: center;">
+              <button class="btn btn-primary" onclick="exportarExcelFiltrado()">
+                <i class="fas fa-file-export"></i>
                 Exportar Excel Filtrado
               </button>
-<button class="btn btn-secondary" onclick="limparFiltrosExportacao()">
-<i class="fas fa-eraser"></i>
+              <button class="btn btn-secondary" onclick="limparFiltrosExportacao()">
+                <i class="fas fa-eraser"></i>
                 Limpar Filtros
               </button>
-<span id="contadorResultados" style="color: var(--neutral-600); font-size: 0.875rem;"></span>
-</div>
-</div>
+              <span id="contadorResultados" style="color: var(--neutral-600); font-size: 0.875rem;"></span>
+            </div>
+          </div>
 </div>
 </div>
 </div>
@@ -1643,12 +1640,12 @@
 </div>
 <div class="form-group">
 <label class="form-label" for="dataInicioRelatorio">Data Início:</label>
-<input class="form-control" id="dataInicioRelatorio" type="date">
-</input></div>
+<input class="form-control" id="dataInicioRelatorio" type="date"/>
+</div>
 <div class="form-group">
 <label class="form-label" for="dataFimRelatorio">Data Fim:</label>
-<input class="form-control" id="dataFimRelatorio" type="date">
-</input></div>
+<input class="form-control" id="dataFimRelatorio" type="date"/>
+</div>
 <button class="btn btn-primary" onclick="gerarRelatorio()">
 <i class="fas fa-cogs"></i>
             Gerar Relatório
@@ -1677,42 +1674,44 @@
 </div>
 </div>
 </div>
+
 <!-- Seção Catálogo -->
 <div id="secao-catalogo" style="display: none;">
-<header class="content-header">
-<div class="page-title">
-<h2>Catálogo de Materiais</h2>
-<p class="breadcrumb">Home &gt; Catálogo</p>
-</div>
-<div class="header-actions">
-<div class="search-container" style="margin-right: 0;">
-<input class="search-input" id="catalogoSearch" oninput="filtrarCatalogo()" placeholder="Buscar por código, descrição, unidade..." type="text">
-<button class="btn-search"><i class="fas fa-search"></i></button>
-</input></div>
-<select class="form-select" id="catalogoCategoria" onchange="filtrarCatalogo()" style="width: auto; margin-left: 12px;"><option value="">Todas as categorias</option><option>EPC/FERRAMENTAL</option><option>EPI</option><option>MATERIAL TECNICO</option></select>
-</div>
-</header>
-<div class="card">
-<div class="card-header">
-<h3>Lista de Materiais</h3>
-<div class="card-actions">
-<span id="catalogoCount" style="font-size: 0.875rem; color: var(--neutral-600);"></span>
-</div>
-</div>
-<div class="card-body">
-<div class="table-responsive">
-<table class="table" id="tabelaCatalogo">
-<thead>
-<tr>
-<th>CÓDIGO</th><th>TIPO</th><th>DESCRIÇÃO DO MATERIAL</th>
-<th>Ação</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
-</div>
-</div>
+  <header class="content-header">
+    <div class="page-title">
+      <h2>Catálogo de Materiais</h2>
+      <p class="breadcrumb">Home &gt; Catálogo</p>
+    </div>
+    <div class="header-actions">
+      <div class="search-container" style="margin-right: 0;">
+        <input class="search-input" id="catalogoSearch" placeholder="Buscar por código, descrição, unidade..." type="text" oninput="filtrarCatalogo()"/>
+        <button class="btn-search"><i class="fas fa-search"></i></button>
+      </div>
+      <select class="form-select" id="catalogoCategoria" style="width: auto; margin-left: 12px;" onchange="filtrarCatalogo()"><option value="">Todas as categorias</option><option>EPC/FERRAMENTAL</option><option>EPI</option><option>MATERIAL TECNICO</option></select>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>Lista de Materiais</h3>
+      <div class="card-actions">
+        <span id="catalogoCount" style="font-size: 0.875rem; color: var(--neutral-600);"></span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table" id="tabelaCatalogo">
+          <thead>
+            <tr>
+              <th>CÓDIGO</th><th>TIPO</th><th>DESCRIÇÃO DO MATERIAL</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 </main>
 </div>
@@ -1751,12 +1750,12 @@
 <p>Este é seu primeiro login. Por favor, altere sua senha.</p>
 <div class="form-group">
 <label class="form-label" for="novaSenha">Nova Senha:</label>
-<input class="form-control" id="novaSenha" placeholder="Digite sua nova senha" type="password">
-</input></div>
+<input class="form-control" id="novaSenha" placeholder="Digite sua nova senha" type="password"/>
+</div>
 <div class="form-group">
 <label class="form-label" for="confirmaSenha">Confirmar Senha:</label>
-<input class="form-control" id="confirmaSenha" placeholder="Confirme sua nova senha" type="password">
-</input></div>
+<input class="form-control" id="confirmaSenha" placeholder="Confirme sua nova senha" type="password"/>
+</div>
 <div class="alert alert-danger" id="trocaSenhaErro" style="display: none;"></div>
 </div>
 <div class="modal-footer">
@@ -2850,93 +2849,39 @@ function gerarGraficoStatus(pedidos) {
     chartInstance.destroy();
   }
   
-  // Criar novo gráfico com estética melhorada
+  // Criar novo gráfico
   new Chart(chartElement, {
-    type: "doughnut",
+    type: "pie",
     data: {
       labels: labels,
       datasets: [{
         data: data,
-        backgroundColor: backgroundColor,
-        borderWidth: 3,
-        borderColor: '#ffffff',
-        hoverBorderWidth: 4,
-        hoverBorderColor: '#ffffff',
-        hoverOffset: 8
+        backgroundColor: backgroundColor
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '45%',
       plugins: {
         legend: {
-          position: 'bottom',
+          position: 'right',
           labels: {
-            padding: 30,
-            boxWidth: 20,
-            boxHeight: 20,
-            usePointStyle: true,
-            pointStyle: 'circle',
+            padding: 20,
+            boxWidth: 12,
             font: {
-              size: 16,
-              family: "'Roboto', sans-serif",
-              weight: '600'
-            },
-            color: '#212121',
-            textAlign: 'left'
-          }
-        },
-        tooltip: {
-          backgroundColor: 'rgba(33, 33, 33, 0.95)',
-          titleColor: '#ffffff',
-          bodyColor: '#ffffff',
-          borderColor: '#e0e0e0',
-          borderWidth: 1,
-          cornerRadius: 8,
-          displayColors: true,
-          boxPadding: 6,
-          titleFont: {
-            size: 14,
-            weight: '600'
-          },
-          bodyFont: {
-            size: 13,
-            weight: '400'
-          },
-          callbacks: {
-            label: function(context) {
-              const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
-              const percentage = ((context.raw * 100) / total).toFixed(1);
-              return `${context.label}: ${context.raw} pedidos (${percentage}%)`;
+              size: 12
             }
           }
         },
         datalabels: {
-          color: '#ffffff',
-          font: { 
-            weight: 'bold',
-            size: 12,
-            family: "'Roboto', sans-serif"
-          },
+          color: "#fff",
+          font: { weight: "bold" },
           formatter: (value, ctx) => {
             const total = ctx.dataset.data.reduce((acc, val) => acc + val, 0);
-            const percentage = (value * 100 / total).toFixed(1);
-            return value > 0 ? `${percentage}%` : '';
-          },
-          textShadowColor: 'rgba(0, 0, 0, 0.5)',
-          textShadowBlur: 2
+            const percentage = (value * 100 / total).toFixed(1) + '%';
+            return value > 0 ? percentage : '';
+          }
         }
-      },
-      animation: {
-        animateRotate: true,
-        animateScale: true,
-        duration: 1200,
-        easing: 'easeOutQuart'
-      },
-      interaction: {
-        intersect: false,
-        mode: 'index'
       }
     },
     plugins: [ChartDataLabels]
@@ -3744,6 +3689,7 @@ function selecionarMaterial(item) {
   }
 })();
 </script>
+
 <script>
 function editarItem(pedidoId, idx) {
   const matSpan = document.getElementById(`mat-${pedidoId}-${idx}`);
@@ -3863,348 +3809,6 @@ async function salvarEdicaoItem(pedidoId, idx) {
     showNotification && showNotification("Erro ao salvar edição do item.", "error");
   }
 }
-</script>
-
-<script>
-// ===== Helpers de contagem =====
-function aggregateTopData(pedidos) {
-  const byColabSolic = new Map();   // colaborador -> soma de quantidades solicitadas
-  const byColabEntreg = new Map();  // colaborador -> soma de quantidades entregues
-  const byItemSolic = new Map();    // material -> soma solicitada
-  const byItemEntreg = new Map();   // material -> soma entregue
-  const focaisRecebida = new Map(); // Focal -> contagem de pedidos com status "solicitação recebida"
-
-  const norm = s => (s || "").toString().toLowerCase().trim();
-
-  (pedidos || []).forEach(p => {
-    const colab = p.colaborador || "—";
-    const foc = p.Focal || "—";
-    const status = norm(p.status);
-    const materiais = Array.isArray(p.materiais) ? p.materiais : [];
-
-    if (status === "solicitação recebida") {
-      focaisRecebida.set(foc, (focaisRecebida.get(foc) || 0) + 1);
-    }
-
-    materiais.forEach(m => {
-      const qtd = Number(m.quantidade || 0) || 0;
-      const mstatus = norm(m.status || p.status);
-      const statusRaw = (p.status || "").toString().trim();
-      const mstatusRaw = (m.status || p.status || "").toString().trim();
-
-      // Solicitados: somar todas as quantidades
-      byColabSolic.set(colab, (byColabSolic.get(colab) || 0) + qtd);
-      byItemSolic.set(m.material || "—", (byItemSolic.get(m.material || "—") || 0) + qtd);
-
-      // Entregues: somar somente itens com status "entregue"
-      if (mstatusRaw === "Material Entregue" || statusRaw === "Material Entregue") {
-        byColabEntreg.set(colab, (byColabEntreg.get(colab) || 0) + qtd);
-        byItemEntreg.set(m.material || "—", (byItemEntreg.get(m.material || "—") || 0) + qtd);
-      }
-    });
-  });
-
-  function topN(map, n=10) {
-    return [...map.entries()].sort((a,b) => b[1]-a[1]).slice(0, n);
-  }
-
-  return {
-    topColabSolic: topN(byColabSolic),
-    topColabEntreg: topN(byColabEntreg),
-    topItemSolic: topN(byItemSolic),
-    topItemEntreg: topN(byItemEntreg),
-    topFocaisRecebida: topN(focaisRecebida, 15) // pode ter mais focais
-  };
-}
-
-function buildBarChart(ctxId, labels, data, title) {
-  const ctx = document.getElementById(ctxId);
-  if (!ctx) return;
-  const existing = Chart.getChart(ctxId);
-  if (existing) existing.destroy();
-  
-  // Cores profissionais para os gráficos de barras
-  const colors = [
-    '#1976d2', '#2e7d32', '#f57c00', '#7b1fa2', '#c62828',
-    '#00796b', '#5d4037', '#455a64', '#e65100', '#ad1457'
-  ];
-  
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: title,
-        data,
-        backgroundColor: colors.slice(0, data.length),
-        borderColor: colors.slice(0, data.length).map(color => color + 'CC'),
-        borderWidth: 2,
-        borderRadius: 6,
-        borderSkipped: false,
-        hoverBackgroundColor: colors.slice(0, data.length).map(color => color + 'DD'),
-        hoverBorderColor: colors.slice(0, data.length),
-        hoverBorderWidth: 3
-      }]
-    },
-    options: {
-      indexAxis: 'y', // Torna o gráfico horizontal
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false
-        },
-        tooltip: {
-          backgroundColor: 'rgba(33, 33, 33, 0.95)',
-          titleColor: '#ffffff',
-          bodyColor: '#ffffff',
-          borderColor: '#e0e0e0',
-          borderWidth: 1,
-          cornerRadius: 8,
-          displayColors: true,
-          boxPadding: 6,
-          titleFont: {
-            size: 14,
-            weight: '600',
-            family: "'Roboto', sans-serif"
-          },
-          bodyFont: {
-            size: 13,
-            weight: '400',
-            family: "'Roboto', sans-serif"
-          }
-        }
-      },
-      scales: {
-        x: {
-          beginAtZero: true,
-          ticks: {
-            font: {
-              size: 12,
-              family: "'Roboto', sans-serif",
-              weight: '600'
-            },
-            color: '#212121'
-          },
-          grid: {
-            color: '#f5f5f5',
-            lineWidth: 1
-          },
-          border: {
-            color: '#e0e0e0',
-            width: 1
-          }
-        },
-        y: {
-          ticks: {
-            font: {
-              size: 12,
-              family: "'Roboto', sans-serif",
-              weight: '600'
-            },
-            color: '#212121',
-            callback: function(value, index, values) {
-              // Truncar textos muito longos para melhor legibilidade
-              const label = this.getLabelForValue(value);
-              if (label && label.length > 25) {
-                return label.substring(0, 22) + '...';
-              }
-              return label;
-            }
-          },
-          grid: {
-            display: false
-          },
-          border: {
-            color: '#e0e0e0',
-            width: 1
-          }
-        }
-      },
-      animation: {
-        duration: 1000,
-        easing: 'easeOutQuart'
-      },
-      interaction: {
-        intersect: false,
-        mode: 'index'
-      }
-    }
-  });
-}
-
-function buildStackedByFocal(pedidos) {
-  // Descobrir todos os status usados e focais
-  const focals = [...new Set(pedidos.map(p => p.Focal || "—"))];
-  const statuses = [...new Set(pedidos.map(p => (p.status || "").toString()))];
-
-  // Cores profissionais para cada status (usando as mesmas do gráfico de pizza)
-  const statusColors = {
-    "Solicitação Recebida": "#9c27b0",
-    "Reserva Gerada": "#1976d2",
-    "Aguardando Verba": "#FFA500",
-    "Reserva Apropriada": "#ec407a",
-    "Disponível para Retirada": "#757575",
-    "Material Entregue": "#2e7d32",
-    "Pedido Cancelado": "#ff0000",
-    "Aguardando Almoxarifado": "#7cb342",
-    "Aguardando Material": "#fb8c00"
-  };
-
-  const matrix = {};
-  focals.forEach(f => matrix[f] = {});
-  pedidos.forEach(p => {
-    const f = p.Focal || "—";
-    const s = (p.status || "").toString();
-    matrix[f][s] = (matrix[f][s] || 0) + 1;
-  });
-
-  const labels = focals;
-  const datasets = statuses.map(s => ({
-    label: s,
-    data: labels.map(f => matrix[f][s] || 0),
-    backgroundColor: statusColors[s] || '#9e9e9e',
-    borderColor: statusColors[s] ? statusColors[s] + 'CC' : '#9e9e9eCC',
-    borderWidth: 1,
-    stack: 'stack1'
-  }));
-
-  const ctx = document.getElementById('grafFocalStacked');
-  if (!ctx) return;
-  const existing = Chart.getChart('grafFocalStacked');
-  if (existing) existing.destroy();
-  
-  new Chart(ctx, {
-    type: 'bar',
-    data: { labels, datasets },
-    options: {
-      indexAxis: 'y', // Torna o gráfico horizontal
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'right',
-          labels: {
-            padding: 20,
-            boxWidth: 16,
-            boxHeight: 16,
-            usePointStyle: true,
-            pointStyle: 'rect',
-            font: {
-              size: 14,
-              family: "'Roboto', sans-serif",
-              weight: '600'
-            },
-            color: '#212121'
-          }
-        },
-        tooltip: {
-          backgroundColor: 'rgba(33, 33, 33, 0.95)',
-          titleColor: '#ffffff',
-          bodyColor: '#ffffff',
-          borderColor: '#e0e0e0',
-          borderWidth: 1,
-          cornerRadius: 8,
-          displayColors: true,
-          boxPadding: 6,
-          titleFont: {
-            size: 14,
-            weight: '600',
-            family: "'Roboto', sans-serif"
-          },
-          bodyFont: {
-            size: 13,
-            weight: '400',
-            family: "'Roboto', sans-serif"
-          },
-          callbacks: {
-            label: function(context) {
-              return `${context.dataset.label}: ${context.raw} pedidos`;
-            }
-          }
-        }
-      },
-      scales: {
-        x: {
-          stacked: true,
-          beginAtZero: true,
-          ticks: {
-            font: {
-              size: 12,
-              family: "'Roboto', sans-serif",
-              weight: '600'
-            },
-            color: '#212121'
-          },
-          grid: {
-            color: '#f5f5f5',
-            lineWidth: 1
-          },
-          border: {
-            color: '#e0e0e0',
-            width: 1
-          }
-        },
-        y: {
-          stacked: true,
-          ticks: {
-            font: {
-              size: 12,
-              family: "'Roboto', sans-serif",
-              weight: '600'
-            },
-            color: '#212121',
-            callback: function(value, index, values) {
-              // Truncar textos muito longos para melhor legibilidade
-              const label = this.getLabelForValue(value);
-              if (label && label.length > 15) {
-                return label.substring(0, 12) + '...';
-              }
-              return label;
-            }
-          },
-          grid: {
-            display: false
-          },
-          border: {
-            color: '#e0e0e0',
-            width: 1
-          }
-        }
-      },
-      animation: {
-        duration: 1000,
-        easing: 'easeOutQuart'
-      },
-      interaction: {
-        intersect: false,
-        mode: 'index'
-      }
-    }
-  });
-}
-
-// Função principal para desenhar extras (chame após carregar/renderizar pedidos)
-function gerarGraficosDashboardExtras(pedidos) {
-  try {
-    const agg = aggregateTopData(pedidos);
-    buildBarChart('grafTopColabEntregues', agg.topColabEntreg.map(x => x[0]), agg.topColabEntreg.map(x => x[1]), 'Itens Entregues');
-    buildBarChart('grafTopColabSolicitados', agg.topColabSolic.map(x => x[0]), agg.topColabSolic.map(x => x[1]), 'Itens Solicitados');
-    buildBarChart('grafTopItensSolicitados', agg.topItemSolic.map(x => x[0]), agg.topItemSolic.map(x => x[1]), 'Solicitações');
-    buildBarChart('grafTopItensEntregues', agg.topItemEntreg.map(x => x[0]), agg.topItemEntreg.map(x => x[1]), 'Entregas');
-    buildBarChart('grafTopFocaisRecebida', agg.topFocaisRecebida.map(x => x[0]), agg.topFocaisRecebida.map(x => x[1]), 'Pedidos "solicitação recebida"');
-    buildStackedByFocal(pedidos);
-  } catch(e) { console.error(e); }
-}
-
-// Hook: após gerar gráfico status/atualizar KPIs, redesenhar extras
-(function(){
-  const _gerarGraficoStatus = window.gerarGraficoStatus;
-  window.gerarGraficoStatus = function(pedidos) {
-    try { if (typeof _gerarGraficoStatus === 'function') _gerarGraficoStatus(pedidos); } catch(e){}
-    try { gerarGraficosDashboardExtras(pedidos); } catch(e){ console.error(e); }
-  }
-})();
 </script>
 </body>
 </html>
