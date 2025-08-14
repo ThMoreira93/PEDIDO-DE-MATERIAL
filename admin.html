@@ -1055,6 +1055,10 @@
 /* Catálogo */
 #secao-catalogo .table td, #secao-catalogo .table th { white-space: nowrap; }
 #secao-catalogo .table td:nth-child(n+3) { white-space: normal; }
+
+/* Estilo extra para histórico */
+.pedido-historico-item .hist-time { color: var(--neutral-600); margin-right: 6px; font-size: .85em; }
+.pedido-historico-item .hist-user { color: var(--neutral-700); font-size: .85em; }
 </style>
 <style>
 /* Estilo do prompt customizado */
@@ -2048,9 +2052,26 @@ function renderizarPedidos(lista) {
   }
   
   lista.forEach(p => {
-    const historico = (p.historico || []).map(h => 
-      `<li class="pedido-historico-item">${new Date(h.data).toLocaleString()} - ${h.status}</li>`
-    ).join("");
+    
+const historico = (p.historico || []).map(h => {
+  const quando = h.data ? new Date(h.data).toLocaleString() : "";
+  const quem = (h.nome || h.usuario || "").toString();
+  const quemFmt = quem ? ` <span class="hist-user">(${quem})</span>` : "";
+  if (h.campo) {
+    if (typeof h.de !== "undefined" || typeof h.para !== "undefined") {
+      return `<li class="pedido-historico-item"><span class="hist-time">${quando}</span>${quemFmt} alterou <strong>${h.campo}</strong> de "<em>${String(h.de ?? "")}</em>" para "<em>${String(h.para ?? "")}</em>"</li>`;
+    }
+    if (h.antes || h.depois) {
+      const antes = h.antes ? JSON.stringify(h.antes) : "";
+      const depois = h.depois ? JSON.stringify(h.depois) : "";
+      return `<li class="pedido-historico-item"><span class="hist-time">${quando}</span>${quemFmt} alterou <strong>${h.campo}</strong>: ${antes} &rarr; ${depois}</li>`;
+    }
+    return `<li class="pedido-historico-item"><span class="hist-time">${quando}</span>${quemFmt} alterou <strong>${h.campo}</strong></li>`;
+  }
+  const desc = h.status || h.acao || "Atualização";
+  return `<li class="pedido-historico-item"><span class="hist-time">${quando}</span>${quemFmt} ${desc}</li>`;
+}).join("");
+
     
     const card = document.createElement("div");
     card.className = "card pedido-card";
@@ -2171,6 +2192,21 @@ function atualizarStatusIndividual(id, valor) {
         if (doc.exists) {
           const dados = doc.data();
           const historico = dados.historico || [];
+          // Registro detalhado no histórico do pedido
+          (function(){
+            try {
+              const u = JSON.parse(localStorage.getItem("usuarioLogado"));
+              historico.push({
+                acao: "alterar_status_pedido",
+                campo: "status",
+                de: dados.status,
+                para: valor,
+                data: new Date().toISOString(),
+                usuario: u ? (u.usuario || u.email || "sistema") : "sistema",
+                nome: u ? (u.nome || u.displayName || "Sistema") : "Sistema"
+              });
+            } catch(e) {}
+          })();
           
           // Obter usuário logado
           const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
@@ -2244,6 +2280,7 @@ function atualizarStatusItem(pedidoId, itemIndex, novoStatus) {
         if (doc.exists) {
           const dados = doc.data();
           const materiais = dados.materiais || [];
+          const historicoPedido = dados.historico || [];
           
           // Verificar se o índice é válido
           if (itemIndex >= 0 && itemIndex < materiais.length) {
@@ -3711,7 +3748,7 @@ async function salvarEdicaoItem(pedidoId, idx) {
     if (!snap.exists) throw new Error("Pedido não encontrado");
 
     const dados = snap.data();
-    if ((dados.status || "").toLowerCase() !== "solicitação recebida") {
+    const historicoPedido = dados.historico || [];if ((dados.status || "").toLowerCase() !== "solicitação recebida") {
       hideLoadingIndicator && hideLoadingIndicator();
       showNotification && showNotification("Edição permitida apenas quando o pedido está em 'solicitação recebida'.", "error");
       return;
@@ -3724,7 +3761,23 @@ async function salvarEdicaoItem(pedidoId, idx) {
     materiais[idx].material = novoMaterial;
     materiais[idx].quantidade = novaQtd;
 
-    // histórico do item
+    
+    // Registro no histórico do pedido (edição de item)
+    (function(){
+      try {
+        const u = window.usuarioLogado || JSON.parse(localStorage.getItem("usuarioLogado"));
+        historicoPedido.push({
+          acao: "editar_item_pedido",
+          campo: "material/quantidade",
+          item: materiais[idx].material,
+          antes: antigo,
+          depois: { material: novoMaterial, quantidade: novaQtd },
+          data: new Date().toISOString(),
+          usuario: u ? (u.usuario || u.email || "sistema") : "sistema",
+          nome: u ? (u.nome || u.displayName || "Sistema") : "Sistema"
+        });
+      } catch(e) {}
+    })();// histórico do item
     if (!materiais[idx].historico) materiais[idx].historico = [];
     const usuario = (window.usuarioLogado && (window.usuarioLogado.nome || window.usuarioLogado.usuario)) || "Sistema";
     materiais[idx].historico.push({
@@ -3735,7 +3788,7 @@ async function salvarEdicaoItem(pedidoId, idx) {
       usuario
     });
 
-    await ref.update({ materiais });
+    await ref.update({ materiais, historico: historicoPedido });
 
     hideLoadingIndicator && hideLoadingIndicator();
     showNotification && showNotification("Item atualizado com sucesso.", "success");
