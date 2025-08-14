@@ -2297,25 +2297,60 @@ function atualizarStatusItem(pedidoId, itemIndex, novoStatus) {
 }
 
 // Filtros
-function aplicarFiltros() {
-  const status = document.getElementById("filtroStatus").value;
-  const focal = document.getElementById("filtroFocal").value;
-  const texto = document.getElementById("buscaTextoPedidos").value.toLowerCase() || 
-                document.getElementById("buscaTexto").value.toLowerCase();
-  
-  pedidosFiltrados = todosPedidos.filter(p =>
-    (!status || p.status === status) &&
-    (!focal || p.Focal === focal) &&
-    (!texto || 
-     p.colaborador.toLowerCase().includes(texto) || 
-     p.numero.toString().includes(texto) || 
-     p.Focal.includes(texto))
-  );
-  
-  renderizarPedidos(pedidosFiltrados);
-  gerarGraficoStatus(pedidosFiltrados);
-}
 
+function aplicarFiltros() {
+  const status = document.getElementById("filtroStatus") ? document.getElementById("filtroStatus").value : "";
+  const focal = document.getElementById("filtroFocal") ? document.getElementById("filtroFocal").value : "";
+  const textoInput = (document.getElementById("buscaTextoPedidos")?.value || document.getElementById("buscaTexto")?.value || "").toString();
+  const texto = textoInput.toLowerCase().trim();
+
+  pedidosFiltrados = todosPedidos.filter(p => {
+    if (status && p.status !== status) return false;
+    if (focal && p.Focal !== focal) return false;
+    if (!texto) return true;
+
+    // Busca em todos os campos do pedido
+    let found = false;
+    for (let key in p) {
+      if (!p.hasOwnProperty(key)) continue;
+      const val = p[key];
+      if (val === null || val === undefined) continue;
+
+      // Array de materiais / histórico
+      if (Array.isArray(val)) {
+        for (let item of val) {
+          if (item && typeof item === "object") {
+            for (let k in item) {
+              if (item[k] !== null && item[k] !== undefined) {
+                if (String(item[k]).toLowerCase().includes(texto)) { found = true; break; }
+              }
+            }
+          } else {
+            if (String(item).toLowerCase().includes(texto)) { found = true; }
+          }
+          if (found) break;
+        }
+      } else if (typeof val === "object") {
+        // Objeto aninhado
+        try {
+          const flat = JSON.stringify(val);
+          if (flat && flat.toLowerCase().includes(texto)) { found = true; }
+        } catch (e) {}
+      } else {
+        if (String(val).toLowerCase().includes(texto)) { found = true; }
+      }
+      if (found) break;
+    }
+
+    return found;
+  });
+
+  renderizarPedidos(pedidosFiltrados);
+  atualizarTabelaPedidosRecentes();
+  atualizarKPIs(pedidosFiltrados);
+  gerarGraficoStatus(pedidosFiltrados);
+  atualizarContadorResultados();
+}
 // Event Listeners para filtros
 document.addEventListener('DOMContentLoaded', function() {
   const buscaTexto = document.getElementById("buscaTexto");
