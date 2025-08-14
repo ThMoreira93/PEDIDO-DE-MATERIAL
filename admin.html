@@ -1361,6 +1361,55 @@
 <canvas height="250" id="graficoStatus"></canvas>
 </div>
 </div>
+<!-- New charts inserted for additional dashboard analytics -->
+<div class="card chart-card">
+  <div class="card-header">
+    <h3>Top Colaboradores - Itens Entregues</h3>
+  </div>
+  <div class="card-body">
+    <canvas height="250" id="graficoTopColabEntregues"></canvas>
+  </div>
+</div>
+<div class="card chart-card">
+  <div class="card-header">
+    <h3>Top Colaboradores - Itens Solicitados</h3>
+  </div>
+  <div class="card-body">
+    <canvas height="250" id="graficoTopColabSolicitados"></canvas>
+  </div>
+</div>
+<div class="card chart-card">
+  <div class="card-header">
+    <h3>Top Itens - Mais Solicitados</h3>
+  </div>
+  <div class="card-body">
+    <canvas height="250" id="graficoTopItensSolicitados"></canvas>
+  </div>
+</div>
+<div class="card chart-card">
+  <div class="card-header">
+    <h3>Top Itens - Mais Entregues</h3>
+  </div>
+  <div class="card-body">
+    <canvas height="250" id="graficoTopItensEntregues"></canvas>
+  </div>
+</div>
+<div class="card chart-card">
+  <div class="card-header">
+    <h3>Top Focais - Solicitações Recebidas</h3>
+  </div>
+  <div class="card-body">
+    <canvas height="250" id="graficoTopFocaisRecebidos"></canvas>
+  </div>
+</div>
+<div class="card chart-card">
+  <div class="card-header">
+    <h3>Pedidos por Focal e Status</h3>
+  </div>
+  <div class="card-body">
+    <canvas height="250" id="graficoStatusFocal"></canvas>
+  </div>
+</div>
 </div>
 <!-- Pedidos Recentes -->
 <section>
@@ -2022,7 +2071,14 @@ function carregarPedidos() {
     
     renderizarPedidos(todosPedidos);
     atualizarTabelaPedidosRecentes();
+    // Atualiza gráfico de status e demais gráficos com os dados completos
     gerarGraficoStatus(todosPedidos);
+    gerarGraficoTopColabEntregues(todosPedidos);
+    gerarGraficoTopColabSolicitados(todosPedidos);
+    gerarGraficoTopItensSolicitados(todosPedidos);
+    gerarGraficoTopItensEntregues(todosPedidos);
+    gerarGraficoTopFocaisRecebidos(todosPedidos);
+    gerarGraficoStatusFocal(todosPedidos);
     atualizarKPIs(todosPedidos);
     popularFiltroFocal(todosPedidos);
     inicializarFiltrosExportacao();
@@ -2386,6 +2442,13 @@ function aplicarFiltros() {
   atualizarTabelaPedidosRecentes();
   atualizarKPIs(pedidosFiltrados);
   gerarGraficoStatus(pedidosFiltrados);
+  // Atualizar gráficos adicionais com base nos filtros aplicados
+  gerarGraficoTopColabEntregues(pedidosFiltrados);
+  gerarGraficoTopColabSolicitados(pedidosFiltrados);
+  gerarGraficoTopItensSolicitados(pedidosFiltrados);
+  gerarGraficoTopItensEntregues(pedidosFiltrados);
+  gerarGraficoTopFocaisRecebidos(pedidosFiltrados);
+  gerarGraficoStatusFocal(pedidosFiltrados);
   atualizarContadorResultados();
 }
 // Event Listeners para filtros
@@ -2881,6 +2944,323 @@ function gerarGraficoStatus(pedidos) {
             const percentage = (value * 100 / total).toFixed(1) + '%';
             return value > 0 ? percentage : '';
           }
+        }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
+
+// === Additional Chart Functions ===
+function gerarGraficoTopColabEntregues(pedidos) {
+  const contagem = {};
+  pedidos.forEach(p => {
+    const colab = p.colaborador || p.Colaborador || p.colab;
+    if (!colab) return;
+    const itens = Array.isArray(p.materiais) ? p.materiais : [];
+    itens.forEach(item => {
+      const statusItem = (item.status || p.status || "").toString().toLowerCase();
+      const qtd = parseFloat(item.quantidade) || 0;
+      if (statusItem === "material entregue") {
+        contagem[colab] = (contagem[colab] || 0) + qtd;
+      }
+    });
+  });
+  const entries = Object.entries(contagem).sort((a,b) => b[1] - a[1]).slice(0, 10);
+  const labels = entries.map(e => e[0]);
+  const data = entries.map(e => e[1]);
+  const chartEl = document.getElementById("graficoTopColabEntregues");
+  if (!chartEl) return;
+  const old = Chart.getChart(chartEl);
+  if (old) old.destroy();
+  new Chart(chartEl, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Itens Entregues",
+        data: data,
+        backgroundColor: "#2e7d32"
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          color: "#000",
+          anchor: "end",
+          align: "end",
+          formatter: (value) => value
+        }
+      },
+      scales: {
+        x: { beginAtZero: true },
+        y: { beginAtZero: true }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
+
+function gerarGraficoTopColabSolicitados(pedidos) {
+  const contagem = {};
+  pedidos.forEach(p => {
+    const colab = p.colaborador || p.Colaborador || p.colab;
+    if (!colab) return;
+    const itens = Array.isArray(p.materiais) ? p.materiais : [];
+    itens.forEach(item => {
+      const qtd = parseFloat(item.quantidade) || 0;
+      contagem[colab] = (contagem[colab] || 0) + qtd;
+    });
+  });
+  const entries = Object.entries(contagem).sort((a,b) => b[1] - a[1]).slice(0, 10);
+  const labels = entries.map(e => e[0]);
+  const data = entries.map(e => e[1]);
+  const chartEl = document.getElementById("graficoTopColabSolicitados");
+  if (!chartEl) return;
+  const old = Chart.getChart(chartEl);
+  if (old) old.destroy();
+  new Chart(chartEl, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Itens Solicitados",
+        data: data,
+        backgroundColor: "#1976d2"
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          color: "#000",
+          anchor: "end",
+          align: "end",
+          formatter: (value) => value
+        }
+      },
+      scales: {
+        x: { beginAtZero: true },
+        y: { beginAtZero: true }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
+
+function gerarGraficoTopItensSolicitados(pedidos) {
+  const contagem = {};
+  pedidos.forEach(p => {
+    const itens = Array.isArray(p.materiais) ? p.materiais : [];
+    itens.forEach(item => {
+      const nome = item.material || item.nome || "";
+      const qtd = parseFloat(item.quantidade) || 0;
+      if (!nome) return;
+      contagem[nome] = (contagem[nome] || 0) + qtd;
+    });
+  });
+  const entries = Object.entries(contagem).sort((a,b) => b[1] - a[1]).slice(0, 10);
+  const labels = entries.map(e => e[0]);
+  const data = entries.map(e => e[1]);
+  const chartEl = document.getElementById("graficoTopItensSolicitados");
+  if (!chartEl) return;
+  const old = Chart.getChart(chartEl);
+  if (old) old.destroy();
+  new Chart(chartEl, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Quantidade Solicitada",
+        data: data,
+        backgroundColor: "#42a5f5"
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          color: "#000",
+          anchor: "end",
+          align: "end",
+          formatter: (value) => value
+        }
+      },
+      scales: {
+        x: { beginAtZero: true },
+        y: { beginAtZero: true }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
+
+function gerarGraficoTopItensEntregues(pedidos) {
+  const contagem = {};
+  pedidos.forEach(p => {
+    const itens = Array.isArray(p.materiais) ? p.materiais : [];
+    itens.forEach(item => {
+      const statusItem = (item.status || p.status || "").toString().toLowerCase();
+      if (statusItem !== "material entregue") return;
+      const nome = item.material || item.nome || "";
+      const qtd = parseFloat(item.quantidade) || 0;
+      if (!nome) return;
+      contagem[nome] = (contagem[nome] || 0) + qtd;
+    });
+  });
+  const entries = Object.entries(contagem).sort((a,b) => b[1] - a[1]).slice(0, 10);
+  const labels = entries.map(e => e[0]);
+  const data = entries.map(e => e[1]);
+  const chartEl = document.getElementById("graficoTopItensEntregues");
+  if (!chartEl) return;
+  const old = Chart.getChart(chartEl);
+  if (old) old.destroy();
+  new Chart(chartEl, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Quantidade Entregue",
+        data: data,
+        backgroundColor: "#66bb6a"
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          color: "#000",
+          anchor: "end",
+          align: "end",
+          formatter: (value) => value
+        }
+      },
+      scales: {
+        x: { beginAtZero: true },
+        y: { beginAtZero: true }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
+
+function gerarGraficoTopFocaisRecebidos(pedidos) {
+  const contagem = {};
+  pedidos.forEach(p => {
+    const status = (p.status || "").toString().toLowerCase();
+    if (status !== "solicitação recebida") return;
+    const focal = p.Focal || p.focal || "";
+    if (!focal) return;
+    contagem[focal] = (contagem[focal] || 0) + 1;
+  });
+  const entries = Object.entries(contagem).sort((a,b) => b[1] - a[1]).slice(0, 10);
+  const labels = entries.map(e => e[0]);
+  const data = entries.map(e => e[1]);
+  const chartEl = document.getElementById("graficoTopFocaisRecebidos");
+  if (!chartEl) return;
+  const old = Chart.getChart(chartEl);
+  if (old) old.destroy();
+  new Chart(chartEl, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Solicitações Recebidas",
+        data: data,
+        backgroundColor: "#9c27b0"
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          color: "#000",
+          anchor: "end",
+          align: "end",
+          formatter: (value) => value
+        }
+      },
+      scales: {
+        x: { beginAtZero: true },
+        y: { beginAtZero: true }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
+
+function gerarGraficoStatusFocal(pedidos) {
+  // Prepare counts by focal and status
+  const focaisSet = new Set();
+  const contagem = {};
+  pedidos.forEach(p => {
+    const focal = p.Focal || p.focal || "Não informado";
+    focaisSet.add(focal);
+    const status = p.status || "";
+    if (!contagem[focal]) contagem[focal] = {};
+    contagem[focal][status] = (contagem[focal][status] || 0) + 1;
+  });
+  const focais = Array.from(focaisSet);
+  const statuses = STATUS_OPTIONS || [];
+  // Map real colors for each status (should match status chart)
+  const coresReaisStatus = {
+    "Solicitação Recebida": "#9c27b0",
+    "Reserva Gerada": "#1976d2",
+    "Aguardando Verba": "#FFA500",
+    "Reserva Apropriada": "#ec407a",
+    "Disponível para Retirada": "#757575",
+    "Material Entregue": "#2e7d32",
+    "Pedido Cancelado": "#ff0000",
+    "Aguardando Almoxarifado": "#7cb342",
+    "Aguardando Material": "#fb8c00"
+  };
+  const datasets = statuses.map(status => {
+    const data = focais.map(f => (contagem[f] && contagem[f][status]) ? contagem[f][status] : 0);
+    return {
+      label: status,
+      data: data,
+      backgroundColor: coresReaisStatus[status] || '#ccc'
+    };
+  });
+  const chartEl = document.getElementById("graficoStatusFocal");
+  if (!chartEl) return;
+  const old = Chart.getChart(chartEl);
+  if (old) old.destroy();
+  new Chart(chartEl, {
+    type: 'bar',
+    data: {
+      labels: focais,
+      datasets: datasets
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { stacked: true, beginAtZero: true },
+        y: { stacked: true }
+      },
+      plugins: {
+        legend: { position: 'right' },
+        datalabels: {
+          color: '#fff',
+          formatter: (value) => value > 0 ? value : ''
         }
       }
     },
