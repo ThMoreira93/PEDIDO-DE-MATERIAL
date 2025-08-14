@@ -2090,18 +2090,41 @@ function renderizarPedidos(lista) {
               </thead>
               <tbody>
                 ${(p.materiais || []).map((m, idx) => `
-                  <tr>
-                    <td>${m.material}</td>
-                    <td>${m.quantidade}</td>
+                  <tr id="item-${p.id}-${idx}">
+                    <td>
+                      <span id="mat-${p.id}-${idx}" class="item-material">${m.material}</span>
+                      <input id="matInput-${p.id}-${idx}" class="form-input" style="display:none; max-width: 360px;" value="${m.material}" />
+                    </td>
+                    <td>
+                      <span id="qtd-${p.id}-${idx}" class="item-quant">${m.quantidade}</span>
+                      <input id="qtdInput-${p.id}-${idx}" class="form-input" type="number" min="1" step="1" style="display:none; width: 120px;" value="${m.quantidade}" />
+                    </td>
                     <td>
                       <span style="color: #2e7d32; font-weight: bold;">${m.status || p.status}</span>
                     </td>
                     <td>
-                      <select class="form-select" onchange="atualizarStatusItem('${p.id}', ${idx}, this.value)">
-                        ${STATUS_OPTIONS.map(s => 
-                          `<option value="${s}" ${s === (m.status || p.status) ? "selected" : ""}>${s}</option>`
-                        ).join("")}
-                      </select>
+                      <div class="btn-group" style="gap: 8px; display: flex; align-items: center;">
+                        ${((p.status || "").toString().toLowerCase().trim() === "solicitação recebida") ? `
+                          <button class="btn btn-secondary" id="btnEditar-${p.id}-${idx}" onclick="editarItem('${p.id}', ${idx})">
+                            <i class="fas fa-pen"></i> Editar
+                          </button>
+                          <button class="btn btn-success" id="btnSalvar-${p.id}-${idx}" style="display:none;" onclick="salvarEdicaoItem('${p.id}', ${idx})">
+                            <i class="fas fa-check"></i> Salvar
+                          </button>
+                          <button class="btn btn-light" id="btnCancelar-${p.id}-${idx}" style="display:none;" onclick="cancelarEdicaoItem('${p.id}', ${idx})">
+                            <i class="fas fa-times"></i> Cancelar
+                          </button>
+                        ` : `
+                          <button class="btn btn-secondary" disabled title="Edição permitida apenas em 'solicitação recebida'">
+                            <i class="fas fa-lock"></i> Editar
+                          </button>
+                        `}
+                        <select class="form-select" onchange="atualizarStatusItem('${p.id}', ${idx}, this.value)">
+                          ${STATUS_OPTIONS.map(s => 
+                            `<option value="${s}" ${s === (m.status || p.status) ? "selected" : ""}>${s}</option>`
+                          ).join("")}
+                        </select>
+                      </div>
                     </td>
                   </tr>
                 `).join("")}
@@ -3593,6 +3616,111 @@ function selecionarMaterial(item) {
     }
   }
 })();
+</script>
+
+<script>
+function editarItem(pedidoId, idx) {
+  const matSpan = document.getElementById(`mat-${pedidoId}-${idx}`);
+  const qtdSpan = document.getElementById(`qtd-${pedidoId}-${idx}`);
+  const matInput = document.getElementById(`matInput-${pedidoId}-${idx}`);
+  const qtdInput = document.getElementById(`qtdInput-${pedidoId}-${idx}`);
+  const btnEditar = document.getElementById(`btnEditar-${pedidoId}-${idx}`);
+  const btnSalvar = document.getElementById(`btnSalvar-${pedidoId}-${idx}`);
+  const btnCancelar = document.getElementById(`btnCancelar-${pedidoId}-${idx}`);
+  if (!matSpan || !qtdSpan || !matInput || !qtdInput) return;
+
+  matSpan.style.display = "none";
+  qtdSpan.style.display = "none";
+  matInput.style.display = "inline-block";
+  qtdInput.style.display = "inline-block";
+
+  if (btnEditar) btnEditar.style.display = "none";
+  if (btnSalvar) btnSalvar.style.display = "inline-flex";
+  if (btnCancelar) btnCancelar.style.display = "inline-flex";
+}
+
+function cancelarEdicaoItem(pedidoId, idx) {
+  const matSpan = document.getElementById(`mat-${pedidoId}-${idx}`);
+  const qtdSpan = document.getElementById(`qtd-${pedidoId}-${idx}`);
+  const matInput = document.getElementById(`matInput-${pedidoId}-${idx}`);
+  const qtdInput = document.getElementById(`qtdInput-${pedidoId}-${idx}`);
+  const btnEditar = document.getElementById(`btnEditar-${pedidoId}-${idx}`);
+  const btnSalvar = document.getElementById(`btnSalvar-${pedidoId}-${idx}`);
+  const btnCancelar = document.getElementById(`btnCancelar-${pedidoId}-${idx}`);
+  if (!matSpan || !qtdSpan || !matInput || !qtdInput) return;
+
+  matInput.style.display = "none";
+  qtdInput.style.display = "none";
+  matSpan.style.display = "inline";
+  qtdSpan.style.display = "inline";
+
+  if (btnEditar) btnEditar.style.display = "inline-flex";
+  if (btnSalvar) btnSalvar.style.display = "none";
+  if (btnCancelar) btnCancelar.style.display = "none";
+}
+
+async function salvarEdicaoItem(pedidoId, idx) {
+  try {
+    showLoadingIndicator && showLoadingIndicator();
+
+    const matInput = document.getElementById(`matInput-${pedidoId}-${idx}`);
+    const qtdInput = document.getElementById(`qtdInput-${pedidoId}-${idx}`);
+    const novoMaterial = (matInput?.value || "").trim();
+    const novaQtd = parseInt(qtdInput?.value || "0", 10);
+
+    if (!novoMaterial) { showNotification && showNotification("Informe o material.", "warning"); hideLoadingIndicator && hideLoadingIndicator(); return; }
+    if (!(novaQtd > 0)) { showNotification && showNotification("Quantidade inválida.", "warning"); hideLoadingIndicator && hideLoadingIndicator(); return; }
+
+    const ref = db.collection("pedidos").doc(pedidoId);
+    const snap = await ref.get();
+    if (!snap.exists) throw new Error("Pedido não encontrado");
+
+    const dados = snap.data();
+    if ((dados.status || "").toLowerCase() !== "solicitação recebida") {
+      hideLoadingIndicator && hideLoadingIndicator();
+      showNotification && showNotification("Edição permitida apenas quando o pedido está em 'solicitação recebida'.", "error");
+      return;
+    }
+
+    const materiais = Array.isArray(dados.materiais) ? dados.materiais : [];
+    if (idx < 0 || idx >= materiais.length) throw new Error("Índice de item inválido");
+
+    const antigo = { material: materiais[idx].material, quantidade: materiais[idx].quantidade };
+    materiais[idx].material = novoMaterial;
+    materiais[idx].quantidade = novaQtd;
+
+    // histórico do item
+    if (!materiais[idx].historico) materiais[idx].historico = [];
+    const usuario = (window.usuarioLogado && (window.usuarioLogado.nome || window.usuarioLogado.usuario)) || "Sistema";
+    materiais[idx].historico.push({
+      acao: "editar_item",
+      antes: antigo,
+      depois: { material: novoMaterial, quantidade: novaQtd },
+      data: new Date().toISOString(),
+      usuario
+    });
+
+    await ref.update({ materiais });
+
+    hideLoadingIndicator && hideLoadingIndicator();
+    showNotification && showNotification("Item atualizado com sucesso.", "success");
+
+    // Atualiza a UI: voltar para modo leitura e refletir novos valores
+    const matSpan = document.getElementById(`mat-${pedidoId}-${idx}`);
+    const qtdSpan = document.getElementById(`qtd-${pedidoId}-${idx}`);
+    if (matSpan) matSpan.textContent = novoMaterial;
+    if (qtdSpan) qtdSpan.textContent = novaQtd;
+
+    cancelarEdicaoItem(pedidoId, idx);
+
+    // Se houver re-render do painel após update, dispare um evento
+    window.dispatchEvent(new CustomEvent("pedido:item-atualizado", { detail: { pedidoId, idx } }));
+  } catch (err) {
+    console.error(err);
+    hideLoadingIndicator && hideLoadingIndicator();
+    showNotification && showNotification("Erro ao salvar edição do item.", "error");
+  }
+}
 </script>
 </body>
 </html>
