@@ -2157,7 +2157,21 @@ const historico = (p.historico || []).map(h => {
           </div>
           <div class="pedido-info-item">
             <div class="pedido-info-label">Observações:</div>
-            <div class="pedido-info-value">${p.observacoes || "Nenhuma observação"}</div>
+            <div class="pedido-info-value">
+              <span id="obs-${p.id}" class="obs-text">${p.observacoes || "Nenhuma observação"}</span>
+              <textarea id="obsInput-${p.id}" class="form-control" style="display:none; max-width: 100%; margin-top: 6px;">${p.observacoes || ""}</textarea>
+              <div style="margin-top: 8px; display: flex; gap: 8px;">
+                <button class="btn btn-secondary" id="btnObsEditar-${p.id}" onclick="editarObservacaoPedido('${p.id}')">
+                  <i class="fas fa-pen"></i> Editar
+                </button>
+                <button class="btn btn-success" id="btnObsSalvar-${p.id}" style="display:none;" onclick="salvarObservacaoPedido('${p.id}')">
+                  <i class="fas fa-check"></i> Salvar
+                </button>
+                <button class="btn btn-light" id="btnObsCancelar-${p.id}" style="display:none;" onclick="cancelarEdicaoObservacao('${p.id}')">
+                  <i class="fas fa-times"></i> Cancelar
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -2431,6 +2445,81 @@ function atualizarStatusItem(pedidoId, itemIndex, novoStatus) {
       });
     }
   );
+}
+
+// Edição de observações do pedido
+function editarObservacaoPedido(pedidoId) {
+  const txt = document.getElementById(`obs-${pedidoId}`);
+  const input = document.getElementById(`obsInput-${pedidoId}`);
+  const btnEditar = document.getElementById(`btnObsEditar-${pedidoId}`);
+  const btnSalvar = document.getElementById(`btnObsSalvar-${pedidoId}`);
+  const btnCancelar = document.getElementById(`btnObsCancelar-${pedidoId}`);
+  if (!txt || !input) return;
+  input.style.display = '';
+  txt.style.display = 'none';
+  btnEditar && (btnEditar.style.display = 'none');
+  btnSalvar && (btnSalvar.style.display = '');
+  btnCancelar && (btnCancelar.style.display = '');
+  input.focus();
+}
+
+function cancelarEdicaoObservacao(pedidoId) {
+  const txt = document.getElementById(`obs-${pedidoId}`);
+  const input = document.getElementById(`obsInput-${pedidoId}`);
+  const btnEditar = document.getElementById(`btnObsEditar-${pedidoId}`);
+  const btnSalvar = document.getElementById(`btnObsSalvar-${pedidoId}`);
+  const btnCancelar = document.getElementById(`btnObsCancelar-${pedidoId}`);
+  if (!txt || !input) return;
+  input.value = txt.textContent === 'Nenhuma observação' ? '' : txt.textContent;
+  input.style.display = 'none';
+  txt.style.display = '';
+  btnEditar && (btnEditar.style.display = '');
+  btnSalvar && (btnSalvar.style.display = 'none');
+  btnCancelar && (btnCancelar.style.display = 'none');
+}
+
+async function salvarObservacaoPedido(pedidoId) {
+  try {
+    showLoadingIndicator && showLoadingIndicator();
+    const input = document.getElementById(`obsInput-${pedidoId}`);
+    if (!input) return;
+    const novaObs = (input.value || '').trim();
+
+    const ref = db.collection('pedidos').doc(pedidoId);
+    const docSnap = await ref.get();
+    if (!docSnap.exists) {
+      hideLoadingIndicator && hideLoadingIndicator();
+      showNotification && showNotification('Pedido não encontrado.', 'error');
+      return;
+    }
+
+    const dados = docSnap.data();
+    const historico = Array.isArray(dados.historico) ? dados.historico : [];
+    const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
+
+    historico.push({
+      acao: 'editar_observacoes',
+      campo: 'observacoes',
+      de: dados.observacoes || '',
+      para: novaObs,
+      data: new Date().toISOString(),
+      usuario: usuarioLogado ? (usuarioLogado.usuario || usuarioLogado.email || 'sistema') : 'sistema',
+      nome: usuarioLogado ? (usuarioLogado.nome || 'Sistema') : 'Sistema'
+    });
+
+    await ref.update({ observacoes: novaObs, historico: historico });
+
+    const txt = document.getElementById(`obs-${pedidoId}`);
+    if (txt) txt.textContent = novaObs || 'Nenhuma observação';
+    cancelarEdicaoObservacao(pedidoId);
+
+    hideLoadingIndicator && hideLoadingIndicator();
+    showNotification && showNotification('Observações atualizadas com sucesso!', 'success');
+  } catch (err) {
+    console.error(err);
+    hideLoadingIndicator && hideLoadingIndicator();
+    showNotification && showNotification('Erro ao salvar observações.', 'error');
+  }
 }
 
 // Impressão de pedido (itens "Disponível para Retirada")
