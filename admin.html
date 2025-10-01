@@ -2557,22 +2557,39 @@ function atualizarStatusItem(pedidoId, itemIndex, novoStatus) {
           const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
 
           // Adicionar entrada ao histórico do item com informações do usuário
-          materiais[itemIndex].historico.push({
+          const entradaHistoricoItem = {
             status: novoStatus,
             data: new Date().toISOString(),
             usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
-            nome: usuarioLogado ? usuarioLogado.nome : "Sistema",
-            justificativa: ((novoStatus || "").toString().toLowerCase() === "pedido cancelado") ? justificativaCancelamentoItem : undefined
-          });
+            nome: usuarioLogado ? usuarioLogado.nome : "Sistema"
+          };
+          if ((novoStatus || "").toString().toLowerCase() === "pedido cancelado") {
+            entradaHistoricoItem.justificativa = justificativaCancelamentoItem;
+          }
+          materiais[itemIndex].historico.push(entradaHistoricoItem);
 
           // Guardar status antigo para log antes de atualizar
           const statusAntigoItem = materiais[itemIndex].status || dados.status;
+
+          // Atualizar histórico geral do pedido
+          const historicoPedido = Array.isArray(dados.historico) ? dados.historico : [];
+          try {
+            historicoPedido.push({
+              acao: "alterar_status_item",
+              item: materiais[itemIndex].material,
+              de: statusAntigoItem,
+              para: novoStatus,
+              data: new Date().toISOString(),
+              usuario: usuarioLogado ? (usuarioLogado.usuario || "sistema") : "sistema",
+              nome: usuarioLogado ? (usuarioLogado.nome || "Sistema") : "Sistema"
+            });
+          } catch (e) {}
 
           // Atualizar o status do item
           materiais[itemIndex].status = novoStatus;
 
           // Atualizar o documento no Firestore
-          const payloadItem = { materiais: materiais };
+          const payloadItem = { materiais: materiais, historico: historicoPedido };
           if ((novoStatus || "").toString().toLowerCase() === "pedido cancelado") {
             const texto = `PEDIDO CANCELADO DEVIDO A: ${justificativaCancelamentoItem}`;
             payloadItem.observacoes = texto;
