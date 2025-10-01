@@ -2560,8 +2560,8 @@ function atualizarStatusItem(pedidoId, itemIndex, novoStatus) {
           const entradaHistoricoItem = {
             status: novoStatus,
             data: new Date().toISOString(),
-            usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
-            nome: usuarioLogado ? usuarioLogado.nome : "Sistema"
+            usuario: usuarioLogado ? (usuarioLogado.usuario || usuarioLogado.email || "sistema") : "sistema",
+            nome: usuarioLogado ? (usuarioLogado.nome || usuarioLogado.displayName || "Sistema") : "Sistema"
           };
           if ((novoStatus || "").toString().toLowerCase() === "pedido cancelado") {
             entradaHistoricoItem.justificativa = justificativaCancelamentoItem;
