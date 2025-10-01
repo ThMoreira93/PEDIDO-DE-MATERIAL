@@ -2530,68 +2530,83 @@ function atualizarStatusItem(pedidoId, itemIndex, novoStatus) {
       showLoadingIndicator();
       
       const ref = db.collection("pedidos").doc(pedidoId);
-      ref.get().then(doc => {
-        if (doc.exists) {
+      ref.get()
+        .then(doc => {
+          if (!doc.exists) {
+            hideLoadingIndicator();
+            showNotification("Pedido não encontrado.", "error");
+            return;
+          }
+
           const dados = doc.data();
           const materiais = dados.materiais || [];
-          const historicoPedido = dados.historico || [];
-          
-          // Verificar se o índice é válido
-          if (itemIndex >= 0 && itemIndex < materiais.length) {
-            // Criar ou atualizar o histórico do item
-            if (!materiais[itemIndex].historico) {
-              materiais[itemIndex].historico = [];
-            }
-            
-            // Obter usuário logado
-            const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
-            
-            // Adicionar entrada ao histórico do item com informações do usuário
-            materiais[itemIndex].historico.push({
-              status: novoStatus,
-              data: new Date().toISOString(),
-              usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
-              nome: usuarioLogado ? usuarioLogado.nome : "Sistema",
-              justificativa: ((novoStatus || "").toString().toLowerCase() === "pedido cancelado") ? justificativaCancelamentoItem : undefined
-            });
-            
-            // Atualizar o status do item
-            materiais[itemIndex].status = novoStatus;
-            
-            // Atualizar o documento no Firestore
-            const payloadItem = { materiais: materiais };
-            if ((novoStatus || "").toString().toLowerCase() === "pedido cancelado") {
-              const atualObs = (dados.observacoes || "").toString().trim();
-              const texto = `PEDIDO CANCELADO DEVIDO A: ${justificativaCancelamentoItem}`;
-              payloadItem.observacoes = texto;
-            }
 
-            ref.update(payloadItem)
-              .then(() => {
-                hideLoadingIndicator();
-                showNotification(`Status do item atualizado para "${novoStatus}"`, "success");
-                
-                // Registrar ação
-                registrarAcao("Alteração de Status de Item", `Status do item ${materiais[itemIndex].material} alterado para "${novoStatus}"`, {
-                  pedidoId: pedidoId,
-                  numeroPedido: dados.numero,
-                  material: materiais[itemIndex].material,
-                  statusAntigo: materiais[itemIndex].status || dados.status,
-                  statusNovo: novoStatus,
-                  justificativa: ((novoStatus || "").toString().toLowerCase() === "pedido cancelado") ? justificativaCancelamentoItem : undefined
-                });
-                
-                // Reaplicar filtros para manter a filtragem ativa
-                aplicarFiltros();
-              })
-              .catch(error => {
-                console.error("Erro ao atualizar status do item:", error);
-                hideLoadingIndicator();
-                showNotification("Erro ao atualizar o status do item. Tente novamente.", "error");
-              });
+          // Verificar se o índice é válido
+          if (!(itemIndex >= 0 && itemIndex < materiais.length)) {
+            hideLoadingIndicator();
+            showNotification("Item do pedido não encontrado.", "error");
+            return;
           }
-        }
-      });
+
+          // Criar ou atualizar o histórico do item
+          if (!materiais[itemIndex].historico) {
+            materiais[itemIndex].historico = [];
+          }
+
+          // Obter usuário logado
+          const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+
+          // Adicionar entrada ao histórico do item com informações do usuário
+          materiais[itemIndex].historico.push({
+            status: novoStatus,
+            data: new Date().toISOString(),
+            usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
+            nome: usuarioLogado ? usuarioLogado.nome : "Sistema",
+            justificativa: ((novoStatus || "").toString().toLowerCase() === "pedido cancelado") ? justificativaCancelamentoItem : undefined
+          });
+
+          // Guardar status antigo para log antes de atualizar
+          const statusAntigoItem = materiais[itemIndex].status || dados.status;
+
+          // Atualizar o status do item
+          materiais[itemIndex].status = novoStatus;
+
+          // Atualizar o documento no Firestore
+          const payloadItem = { materiais: materiais };
+          if ((novoStatus || "").toString().toLowerCase() === "pedido cancelado") {
+            const texto = `PEDIDO CANCELADO DEVIDO A: ${justificativaCancelamentoItem}`;
+            payloadItem.observacoes = texto;
+          }
+
+          ref.update(payloadItem)
+            .then(() => {
+              hideLoadingIndicator();
+              showNotification(`Status do item atualizado para "${novoStatus}"`, "success");
+
+              // Registrar ação
+              registrarAcao("Alteração de Status de Item", `Status do item ${materiais[itemIndex].material} alterado para "${novoStatus}"`, {
+                pedidoId: pedidoId,
+                numeroPedido: dados.numero,
+                material: materiais[itemIndex].material,
+                statusAntigo: statusAntigoItem,
+                statusNovo: novoStatus,
+                justificativa: ((novoStatus || "").toString().toLowerCase() === "pedido cancelado") ? justificativaCancelamentoItem : undefined
+              });
+
+              // Reaplicar filtros para manter a filtragem ativa
+              aplicarFiltros();
+            })
+            .catch(error => {
+              console.error("Erro ao atualizar status do item:", error);
+              hideLoadingIndicator();
+              showNotification("Erro ao atualizar o status do item. Tente novamente.", "error");
+            });
+        })
+        .catch(error => {
+          console.error("Erro ao carregar pedido:", error);
+          hideLoadingIndicator();
+          showNotification("Erro ao carregar o pedido. Tente novamente.", "error");
+        });
     }
   );
 }
