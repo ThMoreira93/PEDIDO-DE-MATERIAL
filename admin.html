@@ -2020,6 +2020,42 @@ const STATUS_BADGES = {
 let todosPedidos = [];
 let pedidosFiltrados = [];
 let confirmCallback = null;
+// Estado e persistência de filtros
+let filtrosAtuais = { status: "", focal: "", texto: "" };
+let filtrosTimer = null;
+
+function salvarFiltros() {
+  try {
+    localStorage.setItem("filtrosPedidos", JSON.stringify(filtrosAtuais));
+  } catch (e) {}
+}
+
+function restaurarFiltros() {
+  try {
+    const salvo = JSON.parse(localStorage.getItem("filtrosPedidos")) || {};
+    filtrosAtuais = {
+      status: salvo.status || "",
+      focal: salvo.focal || "",
+      texto: salvo.texto || ""
+    };
+    const filtroStatusEl = document.getElementById("filtroStatus");
+    const filtroFocalEl = document.getElementById("filtroFocal");
+    const buscaTextoEl = document.getElementById("buscaTextoPedidos") || document.getElementById("buscaTexto");
+    if (filtroStatusEl) filtroStatusEl.value = filtrosAtuais.status || "";
+    if (filtroFocalEl) filtroFocalEl.value = filtrosAtuais.focal || "";
+    if (buscaTextoEl) buscaTextoEl.value = filtrosAtuais.texto || "";
+  } catch (e) {}
+}
+
+function aplicarFiltrosAgendado() {
+  if (filtrosTimer) {
+    clearTimeout(filtrosTimer);
+  }
+  filtrosTimer = setTimeout(() => {
+    filtrosTimer = null;
+    aplicarFiltros();
+  }, 80);
+}
 
 // Usuários do sistema
 // Autenticação com Firebase
@@ -2219,20 +2255,25 @@ function carregarPedidos() {
   
   db.collection("pedidos").orderBy("data", "desc").onSnapshot(snap => {
     todosPedidos = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    pedidosFiltrados = [...todosPedidos];
-    
-    renderizarPedidos(todosPedidos);
-    atualizarTabelaPedidosRecentes();
-    // Atualiza gráfico de status e demais gráficos com os dados completos
+    if (!pedidosFiltrados || pedidosFiltrados.length === 0) {
+      pedidosFiltrados = [...todosPedidos];
+    }
+
+    // Popular filtros e restaurar seleção antes de render
+    popularFiltroFocal(todosPedidos);
+    restaurarFiltros();
+
+    // Render mínimo necessário e gráficos com dados filtrados
+    aplicarFiltrosAgendado();
+
+    // Gráficos de base total e KPIs (menos frequentes)
     gerarGraficoStatus(todosPedidos);
     gerarGraficoTopColabEntregues(todosPedidos);
     gerarGraficoTopColabSolicitados(todosPedidos);
     gerarGraficoTopItensSolicitados(todosPedidos);
     gerarGraficoTopItensEntregues(todosPedidos);
     gerarGraficoTopFocaisRecebidos(todosPedidos);
-    gerarGraficoStatusFocal(todosPedidos);
     atualizarKPIs(todosPedidos);
-    popularFiltroFocal(todosPedidos);
     inicializarFiltrosExportacao();
     
     hideLoadingIndicator();
@@ -2821,10 +2862,17 @@ function imprimirPedido(pedidoId) {
 // Filtros
 
 function aplicarFiltros() {
-  const status = document.getElementById("filtroStatus") ? document.getElementById("filtroStatus").value : "";
-  const focal = document.getElementById("filtroFocal") ? document.getElementById("filtroFocal").value : "";
-  const textoInput = (document.getElementById("buscaTextoPedidos")?.value || document.getElementById("buscaTexto")?.value || "").toString();
+  const statusEl = document.getElementById("filtroStatus");
+  const focalEl = document.getElementById("filtroFocal");
+  const textoEl = (document.getElementById("buscaTextoPedidos") || document.getElementById("buscaTexto"));
+  const status = statusEl ? statusEl.value : "";
+  const focal = focalEl ? focalEl.value : "";
+  const textoInput = (textoEl?.value || "").toString();
   const texto = textoInput.toLowerCase().trim();
+
+  // Persistir filtros atuais
+  filtrosAtuais = { status, focal, texto: textoInput };
+  salvarFiltros();
 
   pedidosFiltrados = todosPedidos.filter(p => {
     if (status && p.status !== status) return false;
@@ -2887,10 +2935,13 @@ document.addEventListener('DOMContentLoaded', function() {
   const filtroStatus = document.getElementById("filtroStatus");
   const filtroFocal = document.getElementById("filtroFocal");
   
-  if (buscaTexto) buscaTexto.addEventListener("input", aplicarFiltros);
-  if (buscaTextoPedidos) buscaTextoPedidos.addEventListener("input", aplicarFiltros);
-  if (filtroStatus) filtroStatus.addEventListener("change", aplicarFiltros);
-  if (filtroFocal) filtroFocal.addEventListener("change", aplicarFiltros);
+  // Restaurar filtros salvos
+  restaurarFiltros();
+
+  if (buscaTexto) buscaTexto.addEventListener("input", aplicarFiltrosAgendado);
+  if (buscaTextoPedidos) buscaTextoPedidos.addEventListener("input", aplicarFiltrosAgendado);
+  if (filtroStatus) filtroStatus.addEventListener("change", aplicarFiltrosAgendado);
+  if (filtroFocal) filtroFocal.addEventListener("change", aplicarFiltrosAgendado);
 });
 
 // Função para popular o filtro de Focal
@@ -2927,8 +2978,8 @@ function filtrarPorStatus(status) {
     filtroStatus.value = status;
   }
   
-  // Aplicar os filtros
-  aplicarFiltros();
+  // Aplicar e persistir filtros
+  aplicarFiltrosAgendado();
 }
 
 // Atualização em massa
