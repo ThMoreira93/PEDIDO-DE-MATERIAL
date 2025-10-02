@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Gestão de Materiais - Painel Administrativo</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&amp;family=Open+Sans:wght@400;600&amp;display=swap" rel="stylesheet"/>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -15,61 +15,51 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
     :root {
-      /* Cores primárias - Azul moderno */
-      --primary-50: #f0f9ff;
-      --primary-100: #e0f2fe;
-      --primary-200: #bae6fd;
-      --primary-300: #7dd3fc;
-      --primary-400: #38bdf8;
-      --primary-500: #0ea5e9;  /* Cor principal */
-      --primary-600: #0284c7;
-      --primary-700: #0369a1;
-      --primary-800: #075985;
-      --primary-900: #0c4a6e;
+      /* Cores primárias */
+      --primary-50: #e3f2fd;
+      --primary-100: #bbdefb;
+      --primary-200: #90caf9;
+      --primary-300: #64b5f6;
+      --primary-400: #42a5f5;
+      --primary-500: #2196f3;  /* Cor principal */
+      --primary-600: #1e88e5;
+      --primary-700: #1976d2;
+      --primary-800: #1565c0;
+      --primary-900: #0d47a1;
       
-      /* Cores secundárias - Índigo elegante */
-      --secondary-50: #eef2ff;
-      --secondary-100: #e0e7ff;
-      --secondary-200: #c7d2fe;
-      --secondary-300: #a5b4fc;
-      --secondary-400: #818cf8;
-      --secondary-500: #6366f1;  /* Cor secundária */
-      --secondary-600: #4f46e5;
-      --secondary-700: #4338ca;
-      --secondary-800: #3730a3;
-      --secondary-900: #312e81;
+      /* Cores secundárias */
+      --secondary-500: #ff9800;  /* Laranja para destaque */
       
-      /* Cores neutras - Cinza moderno */
-      --neutral-50: #f8fafc;
-      --neutral-100: #f1f5f9;
-      --neutral-200: #e2e8f0;
-      --neutral-300: #cbd5e1;
-      --neutral-400: #94a3b8;
-      --neutral-500: #64748b;
-      --neutral-600: #475569;
-      --neutral-700: #334155;
-      --neutral-800: #1e293b;
-      --neutral-900: #0f172a;
+      /* Cores neutras */
+      --neutral-50: #fafafa;
+      --neutral-100: #f5f5f5;
+      --neutral-200: #eeeeee;
+      --neutral-300: #e0e0e0;
+      --neutral-400: #bdbdbd;
+      --neutral-500: #9e9e9e;
+      --neutral-600: #757575;
+      --neutral-700: #616161;
+      --neutral-800: #424242;
+      --neutral-900: #212121;
       
-      /* Cores de status - Esquema moderno */
-      --status-received: #8b5cf6;     /* Solicitação Recebida - Roxo */
-      --status-generated: #0ea5e9;    /* Reserva Gerada - Azul */
-      --status-waiting: #f59e0b;      /* Aguardando Verba - Âmbar */
-      --status-appropriated: #ec4899; /* Reserva Apropriada - Rosa */
-      --status-available: #6b7280;    /* Disponível para Retirada - Cinza */
-      --status-delivered: #10b981;    /* Material Entregue - Verde */
-      --status-canceled: #ef4444;     /* Pedido Cancelado - Vermelho */
+      /* Cores de status */
+      --status-received: #9c27b0;     /* Solicitação Recebida */
+      --status-generated: #1976d2;    /* Reserva Gerada */
+      --status-waiting: #FFA500;      /* Aguardando Verba */
+      --status-appropriated: #ec407a; /* Reserva Apropriada */
+      --status-available: #757575;    /* Disponível para Retirada */
+      --status-delivered: #2e7d32;    /* Material Entregue */
+      --status-canceled: #ff0000;     /* Pedido Cancelado */
       
-      /* Cores de feedback - Esquema moderno */
-      --success: #10b981;
-      --warning: #f59e0b;
-      --error: #ef4444;
-      --info: #0ea5e9;
+      /* Cores de feedback */
+      --success: #4caf50;
+      --warning: #ff9800;
+      --error: #f44336;
+      --info: #2196f3;
       
-      /* Tipografia moderna */
-      --font-primary: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-      --font-secondary: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+      /* Tipografia */
+      --font-primary: 'Roboto', sans-serif;
+      --font-secondary: 'Open Sans', sans-serif;
       
       /* Espaçamento */
       --space-1: 0.25rem;  /* 4px */
@@ -91,12 +81,9 @@
     
     body {
       font-family: var(--font-primary);
-      background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+      background-color: var(--neutral-100);
       color: var(--neutral-800);
-      line-height: 1.6;
-      font-weight: 400;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+      line-height: 1.5;
     }
     
     /* Layout principal */
@@ -107,26 +94,22 @@
     
     /* Barra lateral */
     .sidebar {
-      width: 280px;
-      background: linear-gradient(180deg, var(--neutral-900) 0%, var(--neutral-800) 100%);
+      width: 260px;
+      background-color: var(--neutral-900);
       color: white;
       display: flex;
       flex-direction: column;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.3s ease;
       position: fixed;
       height: 100vh;
       z-index: 100;
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
-      border-right: 1px solid rgba(255, 255, 255, 0.05);
     }
     
     .sidebar-header {
-      padding: var(--space-6) var(--space-4);
+      padding: var(--space-4);
       display: flex;
       align-items: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.02);
-      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     .logo {
@@ -153,39 +136,21 @@
     .nav-item a {
       display: flex;
       align-items: center;
-      padding: var(--space-4) var(--space-5);
+      padding: var(--space-3) var(--space-4);
       color: var(--neutral-300);
       text-decoration: none;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 0 25px 25px 0;
-      margin-right: var(--space-4);
-      font-weight: 500;
-      position: relative;
+      transition: all 0.2s ease;
     }
     
     .nav-item a:hover {
-      background: linear-gradient(90deg, rgba(14, 165, 233, 0.1) 0%, rgba(14, 165, 233, 0.05) 100%);
-      color: var(--primary-300);
-      transform: translateX(4px);
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
     }
     
     .nav-item.active a {
-      background: linear-gradient(90deg, var(--primary-600) 0%, var(--primary-700) 100%);
+      background-color: var(--primary-700);
       color: white;
-      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
-      transform: translateX(4px);
-    }
-    
-    .nav-item.active a::before {
-      content: '';
-      position: absolute;
-      left: -4px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 4px;
-      height: 20px;
-      background: var(--primary-300);
-      border-radius: 0 2px 2px 0;
+      border-left: 4px solid var(--primary-300);
     }
     
     .nav-item i {
@@ -252,10 +217,9 @@
     /* Conteúdo principal */
     .main-content {
       flex: 1;
-      margin-left: 280px;
-      padding: var(--space-6);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      background: transparent;
+      margin-left: 260px;
+      padding: var(--space-4);
+      transition: all 0.3s ease;
     }
     
     .content-header {
@@ -266,20 +230,15 @@
     }
     
     .page-title h2 {
-      font-size: 2rem;
-      font-weight: 700;
+      font-size: 1.75rem;
+      font-weight: 500;
       color: var(--neutral-800);
-      margin-bottom: var(--space-2);
-      background: linear-gradient(135deg, var(--neutral-800) 0%, var(--primary-600) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      margin-bottom: var(--space-1);
     }
     
     .breadcrumb {
       font-size: 0.875rem;
       color: var(--neutral-500);
-      font-weight: 500;
     }
     
     .header-actions {
@@ -293,41 +252,30 @@
     }
     
     .search-input {
-      padding: var(--space-3) var(--space-4);
-      padding-left: var(--space-10);
-      border: 2px solid var(--neutral-200);
-      border-radius: 12px;
+      padding: var(--space-2) var(--space-4);
+      padding-left: var(--space-8);
+      border: 1px solid var(--neutral-300);
+      border-radius: 4px;
       font-size: 0.875rem;
-      width: 280px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(10px);
+      width: 240px;
+      transition: all 0.2s ease;
     }
     
     .search-input:focus {
       outline: none;
       border-color: var(--primary-400);
-      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
-      background: rgba(255, 255, 255, 0.95);
-      transform: translateY(-1px);
+      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
     }
     
     .btn-search {
       position: absolute;
-      left: var(--space-3);
+      left: var(--space-2);
       top: 50%;
       transform: translateY(-50%);
       background: none;
       border: none;
-      color: var(--primary-500);
+      color: var(--neutral-500);
       cursor: pointer;
-      font-size: 1rem;
-      transition: all 0.2s ease;
-    }
-    
-    .btn-search:hover {
-      color: var(--primary-600);
-      transform: translateY(-50%) scale(1.1);
     }
     
     /* Botões */
@@ -335,30 +283,13 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: var(--space-3) var(--space-5);
-      border-radius: 12px;
-      font-weight: 600;
+      padding: var(--space-2) var(--space-4);
+      border-radius: 4px;
+      font-weight: 500;
       font-size: 0.875rem;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s ease;
       border: none;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.5s;
-    }
-    
-    .btn:hover::before {
-      left: 100%;
     }
     
     .btn i {
@@ -366,27 +297,21 @@
     }
     
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+      background-color: var(--primary-600);
       color: white;
-      box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
     }
     
     .btn-primary:hover {
-      background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+      background-color: var(--primary-700);
     }
     
     .btn-secondary {
-      background: linear-gradient(135deg, var(--neutral-100) 0%, var(--neutral-200) 100%);
-      color: var(--neutral-700);
-      border: 1px solid var(--neutral-300);
+      background-color: var(--neutral-200);
+      color: var(--neutral-800);
     }
     
     .btn-secondary:hover {
-      background: linear-gradient(135deg, var(--neutral-200) 0%, var(--neutral-300) 100%);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      background-color: var(--neutral-300);
     }
     
     .btn-icon {
@@ -423,19 +348,11 @@
     
     /* Cards */
     .card {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       margin-bottom: var(--space-6);
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
     }
     
     .card-header {
@@ -479,31 +396,20 @@
     .kpi-card {
       display: flex;
       align-items: center;
-      padding: var(--space-6);
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(10px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .kpi-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+      padding: var(--space-4);
     }
     
     .kpi-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
-      color: white;
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background-color: var(--primary-100);
+      color: var(--primary-700);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-right: var(--space-5);
-      font-size: 1.75rem;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      margin-right: var(--space-4);
+      font-size: 1.5rem;
     }
     
     .kpi-content {
@@ -566,37 +472,27 @@
     
     .table {
       width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      border-radius: 12px;
-      overflow: hidden;
+      border-collapse: collapse;
     }
     
     .table th, .table td {
-      padding: var(--space-4) var(--space-5);
+      padding: var(--space-3) var(--space-4);
       text-align: left;
       border-bottom: 1px solid var(--neutral-200);
     }
     
     .table th {
-      font-weight: 600;
+      font-weight: 500;
       color: var(--neutral-700);
-      background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+      background-color: var(--neutral-100);
       font-size: 0.875rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
     
-    .table tbody tr {
-      transition: all 0.2s ease;
+    .table tr:hover {
+      background-color: var(--neutral-50);
     }
     
-    .table tbody tr:hover {
-      background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
-      transform: scale(1.01);
-    }
-    
-    .table tbody tr:last-child td {
+    .table tr:last-child td {
       border-bottom: none;
     }
     
@@ -604,54 +500,47 @@
     .badge {
       display: inline-flex;
       align-items: center;
-      padding: var(--space-2) var(--space-3);
-      border-radius: 20px;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
       font-size: 0.75rem;
-      font-weight: 600;
-      line-height: 1.4;
+      font-weight: 500;
+      line-height: 1.5;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      transition: all 0.2s ease;
-    }
-    
-    .badge:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      letter-spacing: 0.05em;
     }
     
     .badge-received {
-      background: linear-gradient(135deg, var(--status-received) 0%, #7c3aed 100%);
+      background-color: var(--status-received);
       color: white;
     }
     
     .badge-generated {
-      background: linear-gradient(135deg, var(--status-generated) 0%, #0284c7 100%);
+      background-color: var(--status-generated);
       color: white;
     }
     
     .badge-waiting {
-      background: linear-gradient(135deg, var(--status-waiting) 0%, #d97706 100%);
+      background-color: var(--status-waiting);
       color: white;
     }
     
     .badge-appropriated {
-      background: linear-gradient(135deg, var(--status-appropriated) 0%, #db2777 100%);
+      background-color: var(--status-appropriated);
       color: white;
     }
     
     .badge-available {
-      background: linear-gradient(135deg, var(--status-available) 0%, #4b5563 100%);
+      background-color: var(--status-available);
       color: white;
     }
     
     .badge-delivered {
-      background: linear-gradient(135deg, var(--status-delivered) 0%, #059669 100%);
+      background-color: var(--status-delivered);
       color: white;
     }
     
     .badge-canceled {
-      background: linear-gradient(135deg, var(--status-canceled) 0%, #dc2626 100%);
+      background-color: var(--status-canceled);
       color: white;
     }
     
@@ -685,67 +574,51 @@
     
     /* Formulários */
     .form-group {
-      margin-bottom: var(--space-5);
+      margin-bottom: var(--space-4);
     }
     
     .form-label {
       display: block;
-      margin-bottom: var(--space-3);
-      font-weight: 600;
+      margin-bottom: var(--space-2);
+      font-weight: 500;
       font-size: 0.875rem;
       color: var(--neutral-700);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
     
     .form-control {
       width: 100%;
-      padding: var(--space-4) var(--space-4);
-      border: 2px solid var(--neutral-200);
-      border-radius: 12px;
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--neutral-300);
+      border-radius: 4px;
       font-size: 0.875rem;
-      font-weight: 500;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
     }
     
     .form-control:focus {
       outline: none;
       border-color: var(--primary-400);
-      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
-      background: rgba(255, 255, 255, 0.95);
-      transform: translateY(-1px);
-    }
-    
-    .form-control::placeholder {
-      color: var(--neutral-400);
-      font-weight: 400;
+      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
     }
     
     .form-select {
       width: 100%;
-      padding: var(--space-4) var(--space-4);
-      border: 2px solid var(--neutral-200);
-      border-radius: 12px;
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--neutral-300);
+      border-radius: 4px;
       font-size: 0.875rem;
-      font-weight: 500;
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(10px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: white;
+      transition: all 0.2s ease;
       appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23616161' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
       background-repeat: no-repeat;
-      background-position: right var(--space-4) center;
+      background-position: right var(--space-3) center;
       background-size: 16px;
     }
     
     .form-select:focus {
       outline: none;
       border-color: var(--primary-400);
-      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
-      background: rgba(255, 255, 255, 0.95);
-      transform: translateY(-1px);
+      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
     }
     
     /* Notificações */
@@ -943,37 +816,19 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+      background-color: var(--neutral-100);
       padding: var(--space-4);
-      position: relative;
-    }
-    
-    .login-container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23ffffff" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="%23ffffff" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="%23ffffff" opacity="0.05"/><circle cx="10" cy="60" r="0.5" fill="%23ffffff" opacity="0.05"/><circle cx="90" cy="40" r="0.5" fill="%23ffffff" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-      opacity: 0.3;
     }
     
     .login-card {
       width: 100%;
-      max-width: 420px;
-      padding: var(--space-10);
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      position: relative;
-      z-index: 1;
+      max-width: 400px;
+      padding: var(--space-8);
     }
     
     .login-header {
       text-align: center;
-      margin-bottom: var(--space-8);
+      margin-bottom: var(--space-6);
     }
     
     .login-logo {
@@ -983,19 +838,15 @@
     }
     
     .login-title {
-      font-size: 1.75rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--neutral-800) 0%, var(--primary-600) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: var(--space-3);
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--neutral-800);
+      margin-bottom: var(--space-2);
     }
     
     .login-subtitle {
       font-size: 0.875rem;
       color: var(--neutral-600);
-      font-weight: 500;
     }
     
     .login-form {
@@ -1264,7 +1115,7 @@
 <div class="login-container" id="loginContainer">
 <div class="card login-card">
 <div class="login-header">
-<div style="width: 64px; height: 64px; background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4); box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);">
+<div style="width: 64px; height: 64px; background-color: var(--primary-600); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">
 <i class="fas fa-boxes" style="font-size: 32px; color: white;"></i>
 </div>
 <h1 class="login-title">Gestão de Materiais</h1>
@@ -1297,7 +1148,7 @@
 <!-- Barra lateral -->
 <aside class="sidebar">
 <div class="sidebar-header">
-<div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);">
+<div style="width: 40px; height: 40px; background-color: var(--primary-600); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
 <i class="fas fa-boxes" style="font-size: 20px; color: white;"></i>
 </div>
 <h1>Gestão de Materiais</h1>
@@ -1339,7 +1190,7 @@
 </nav>
 <div class="sidebar-footer">
 <div class="user-info">
-<div style="width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);">
+<div style="width: 36px; height: 36px; background-color: var(--primary-700); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
 <i class="fas fa-user" style="font-size: 16px; color: white;"></i>
 </div>
 <div class="user-details">
@@ -1545,7 +1396,7 @@
 </div>
 <div class="card chart-card">
   <div class="card-header">
-    <h3>Top Focais - Reservas pendentes de geração</h3>
+    <h3>Top Focais - Solicitações Recebidas</h3>
   </div>
   <div class="card-body">
     <canvas height="250" id="graficoTopFocaisRecebidos"></canvas>
@@ -1618,8 +1469,6 @@
               <option>Disponível para Retirada</option>
               <option>Material Entregue</option>
               <option>Pedido Cancelado</option>
-              <option>Aguardando Almoxarifado</option>
-              <option>Aguardando Material</option>
             </select>
             <select class="form-select" id="filtroFocal" style="width: auto; margin-right: var(--space-3);">
               <option value="">Todos os Focais</option>
@@ -2289,11 +2138,6 @@ const historico = (p.historico || []).map(h => {
           <div class="pedido-numero">Pedido: ${p.numero}</div>
           <div class="pedido-data">${new Date(p.data).toLocaleString()}</div>
         </div>
-        <div class="pedido-acoes" style="display: flex; justify-content: flex-end; margin-top: var(--space-3);">
-          <button class="btn btn-primary" onclick="imprimirPedido('${p.id}')">
-            <i class="fas fa-print"></i> Imprimir Pedido
-          </button>
-        </div>
         
         <div class="pedido-info">
           <div class="pedido-info-item">
@@ -2306,21 +2150,7 @@ const historico = (p.historico || []).map(h => {
           </div>
           <div class="pedido-info-item">
             <div class="pedido-info-label">Observações:</div>
-            <div class="pedido-info-value">
-              <span id="obs-${p.id}" class="obs-text">${p.observacoes || "Nenhuma observação"}</span>
-              <textarea id="obsInput-${p.id}" class="form-control" style="display:none; max-width: 100%; margin-top: 6px;">${p.observacoes || ""}</textarea>
-              <div style="margin-top: 8px; display: flex; gap: 8px;">
-                <button class="btn btn-secondary" id="btnObsEditar-${p.id}" onclick="editarObservacaoPedido('${p.id}')">
-                  <i class="fas fa-pen"></i> Editar
-                </button>
-                <button class="btn btn-success" id="btnObsSalvar-${p.id}" style="display:none;" onclick="salvarObservacaoPedido('${p.id}')">
-                  <i class="fas fa-check"></i> Salvar
-                </button>
-                <button class="btn btn-light" id="btnObsCancelar-${p.id}" style="display:none;" onclick="cancelarEdicaoObservacao('${p.id}')">
-                  <i class="fas fa-times"></i> Cancelar
-                </button>
-              </div>
-            </div>
+            <div class="pedido-info-value">${p.observacoes || "Nenhuma observação"}</div>
           </div>
         </div>
         
@@ -2412,16 +2242,6 @@ function atualizarStatusIndividual(id, valor) {
     "Confirmar alteração de status",
     `Deseja alterar o status do pedido para "${valor}"?`,
     () => {
-      // Se for cancelamento, exigir justificativa
-      let justificativaCancelamento = "";
-      if ((valor || "").toString().toLowerCase() === "pedido cancelado") {
-        justificativaCancelamento = (window.prompt && window.prompt("Informe a justificativa do cancelamento:")) || "";
-        if (!justificativaCancelamento.trim()) {
-          showNotification && showNotification("Justificativa é obrigatória para cancelamento.", "warning");
-          return;
-        }
-      }
-
       showLoadingIndicator();
       
       const ref = db.collection("pedidos").doc(id);
@@ -2453,8 +2273,7 @@ function atualizarStatusIndividual(id, valor) {
             status: valor, 
             data: new Date().toISOString(),
             usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
-            nome: usuarioLogado ? usuarioLogado.nome : "Sistema",
-            justificativa: ((valor || "").toString().toLowerCase() === "pedido cancelado") ? justificativaCancelamento : undefined
+            nome: usuarioLogado ? usuarioLogado.nome : "Sistema"
           };
           
           historico.push(novaEntrada);
@@ -2479,12 +2298,7 @@ function atualizarStatusIndividual(id, valor) {
             material.status = valor;
           });
           
-          const updatePayload = { status: valor, historico: historico, materiais: materiais };
-          if ((valor || "").toString().toLowerCase() === "pedido cancelado") {
-            updatePayload.observacoes = `PEDIDO CANCELADO DEVIDO A: ${justificativaCancelamento}`;
-          }
-
-          ref.update(updatePayload)
+          ref.update({ status: valor, historico: historico, materiais: materiais })
             .then(() => {
               hideLoadingIndicator();
               showNotification(`Status do pedido atualizado para "${valor}"`, "success");
@@ -2494,8 +2308,7 @@ function atualizarStatusIndividual(id, valor) {
                 pedidoId: id,
                 numeroPedido: dados.numero,
                 statusAntigo: dados.status,
-                statusNovo: valor,
-                justificativa: ((valor || "").toString().toLowerCase() === "pedido cancelado") ? justificativaCancelamento : undefined
+                statusNovo: valor
               });
               
               // Reaplicar filtros para manter a filtragem ativa
@@ -2517,16 +2330,6 @@ function atualizarStatusItem(pedidoId, itemIndex, novoStatus) {
     "Confirmar alteração de status",
     `Deseja alterar o status do item para "${novoStatus}"?`,
     () => {
-      // Se for cancelamento, exigir justificativa
-      let justificativaCancelamentoItem = "";
-      if ((novoStatus || "").toString().toLowerCase() === "pedido cancelado") {
-        justificativaCancelamentoItem = (window.prompt && window.prompt("Informe a justificativa do cancelamento do item:")) || "";
-        if (!justificativaCancelamentoItem.trim()) {
-          showNotification && showNotification("Justificativa é obrigatória para cancelamento do item.", "warning");
-          return;
-        }
-      }
-
       showLoadingIndicator();
       
       const ref = db.collection("pedidos").doc(pedidoId);
@@ -2551,22 +2354,14 @@ function atualizarStatusItem(pedidoId, itemIndex, novoStatus) {
               status: novoStatus,
               data: new Date().toISOString(),
               usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
-              nome: usuarioLogado ? usuarioLogado.nome : "Sistema",
-              justificativa: ((novoStatus || "").toString().toLowerCase() === "pedido cancelado") ? justificativaCancelamentoItem : undefined
+              nome: usuarioLogado ? usuarioLogado.nome : "Sistema"
             });
             
             // Atualizar o status do item
             materiais[itemIndex].status = novoStatus;
             
             // Atualizar o documento no Firestore
-            const payloadItem = { materiais: materiais };
-            if ((novoStatus || "").toString().toLowerCase() === "pedido cancelado") {
-              const atualObs = (dados.observacoes || "").toString().trim();
-              const texto = `PEDIDO CANCELADO DEVIDO A: ${justificativaCancelamentoItem}`;
-              payloadItem.observacoes = texto;
-            }
-
-            ref.update(payloadItem)
+            ref.update({ materiais: materiais })
               .then(() => {
                 hideLoadingIndicator();
                 showNotification(`Status do item atualizado para "${novoStatus}"`, "success");
@@ -2577,8 +2372,7 @@ function atualizarStatusItem(pedidoId, itemIndex, novoStatus) {
                   numeroPedido: dados.numero,
                   material: materiais[itemIndex].material,
                   statusAntigo: materiais[itemIndex].status || dados.status,
-                  statusNovo: novoStatus,
-                  justificativa: ((novoStatus || "").toString().toLowerCase() === "pedido cancelado") ? justificativaCancelamentoItem : undefined
+                  statusNovo: novoStatus
                 });
                 
                 // Reaplicar filtros para manter a filtragem ativa
@@ -2594,196 +2388,6 @@ function atualizarStatusItem(pedidoId, itemIndex, novoStatus) {
       });
     }
   );
-}
-
-// Edição de observações do pedido
-function editarObservacaoPedido(pedidoId) {
-  const txt = document.getElementById(`obs-${pedidoId}`);
-  const input = document.getElementById(`obsInput-${pedidoId}`);
-  const btnEditar = document.getElementById(`btnObsEditar-${pedidoId}`);
-  const btnSalvar = document.getElementById(`btnObsSalvar-${pedidoId}`);
-  const btnCancelar = document.getElementById(`btnObsCancelar-${pedidoId}`);
-  if (!txt || !input) return;
-  input.style.display = '';
-  txt.style.display = 'none';
-  btnEditar && (btnEditar.style.display = 'none');
-  btnSalvar && (btnSalvar.style.display = '');
-  btnCancelar && (btnCancelar.style.display = '');
-  input.focus();
-}
-
-function cancelarEdicaoObservacao(pedidoId) {
-  const txt = document.getElementById(`obs-${pedidoId}`);
-  const input = document.getElementById(`obsInput-${pedidoId}`);
-  const btnEditar = document.getElementById(`btnObsEditar-${pedidoId}`);
-  const btnSalvar = document.getElementById(`btnObsSalvar-${pedidoId}`);
-  const btnCancelar = document.getElementById(`btnObsCancelar-${pedidoId}`);
-  if (!txt || !input) return;
-  input.value = txt.textContent === 'Nenhuma observação' ? '' : txt.textContent;
-  input.style.display = 'none';
-  txt.style.display = '';
-  btnEditar && (btnEditar.style.display = '');
-  btnSalvar && (btnSalvar.style.display = 'none');
-  btnCancelar && (btnCancelar.style.display = 'none');
-}
-
-async function salvarObservacaoPedido(pedidoId) {
-  try {
-    showLoadingIndicator && showLoadingIndicator();
-    const input = document.getElementById(`obsInput-${pedidoId}`);
-    if (!input) return;
-    const novaObs = (input.value || '').trim();
-
-    const ref = db.collection('pedidos').doc(pedidoId);
-    const docSnap = await ref.get();
-    if (!docSnap.exists) {
-      hideLoadingIndicator && hideLoadingIndicator();
-      showNotification && showNotification('Pedido não encontrado.', 'error');
-      return;
-    }
-
-    const dados = docSnap.data();
-    const historico = Array.isArray(dados.historico) ? dados.historico : [];
-    const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
-
-    historico.push({
-      acao: 'editar_observacoes',
-      campo: 'observacoes',
-      de: dados.observacoes || '',
-      para: novaObs,
-      data: new Date().toISOString(),
-      usuario: usuarioLogado ? (usuarioLogado.usuario || usuarioLogado.email || 'sistema') : 'sistema',
-      nome: usuarioLogado ? (usuarioLogado.nome || 'Sistema') : 'Sistema'
-    });
-
-    await ref.update({ observacoes: novaObs, historico: historico });
-
-    const txt = document.getElementById(`obs-${pedidoId}`);
-    if (txt) txt.textContent = novaObs || 'Nenhuma observação';
-    cancelarEdicaoObservacao(pedidoId);
-
-    hideLoadingIndicator && hideLoadingIndicator();
-    showNotification && showNotification('Observações atualizadas com sucesso!', 'success');
-  } catch (err) {
-    console.error(err);
-    hideLoadingIndicator && hideLoadingIndicator();
-    showNotification && showNotification('Erro ao salvar observações.', 'error');
-  }
-}
-
-// Impressão de pedido (itens "Disponível para Retirada")
-function imprimirPedido(pedidoId) {
-  try {
-    const pedido = (todosPedidos || []).find(p => p.id === pedidoId);
-    if (!pedido) {
-      showNotification && showNotification("Pedido não encontrado.", "error");
-      return;
-    }
-
-    const itens = (pedido.materiais || []).filter(m => {
-      const st = (m.status || pedido.status || "").toString().toLowerCase();
-      return st === "disponível para retirada";
-    });
-
-    // Montar HTML de impressão
-    const docTitle = `Pedido ${pedido.numero} - Disponível para Retirada`;
-    const dataFmt = pedido.data ? new Date(pedido.data).toLocaleString() : "";
-
-    const estiloImpressao = `
-      <style>
-        body { font-family: Arial, sans-serif; color: #000; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .brand { display: flex; align-items: center; gap: 12px; }
-        .logo-box { width: 48px; height: 48px; border-radius: 10px; background-color: #1e88e5; display: flex; align-items: center; justify-content: center; }
-        .logo-box i { color: #fff; font-size: 22px; }
-        .titulo { font-size: 18px; font-weight: bold; }
-        .sub { color: #444; }
-        .info-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; margin: 12px 0 20px; }
-        .info-label { font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-        th, td { border: 1px solid #000; padding: 8px; text-align: left; }
-        th { background: #f2f2f2; }
-        .assinatura { margin-top: 40px; }
-        .assinatura .linha { border-top: 1px solid #000; width: 320px; margin-top: 40px; }
-        .assinatura .label { margin-top: 6px; font-size: 12px; }
-        .rodape { margin-top: 24px; font-size: 12px; color: #333; }
-        @media print { .no-print { display: none !important; } }
-      </style>
-    `;
-
-    const linhas = itens.map((m, i) => `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${m.material || ""}</td>
-        <td>${m.quantidade || ""}</td>
-        <td>${m.status || pedido.status || ""}</td>
-      </tr>
-    `).join("");
-
-    const tabela = itens.length > 0 ? `
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Material</th>
-            <th>Quantidade</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${linhas}
-        </tbody>
-      </table>
-    ` : `
-      <p><em>Não há itens com status "Disponível para Retirada".</em></p>
-    `;
-
-    const w = window.open("", "_blank");
-    if (!w) { showNotification && showNotification("Bloqueio de pop-up impediu a impressão.", "error"); return; }
-    w.document.write(`
-      <html>
-        <head>
-          <meta charset="utf-8" />
-          <title>${docTitle}</title>
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-          ${estiloImpressao}
-        </head>
-        <body>
-          <div class="header">
-            <div class="brand">
-              <div class="logo-box"><i class="fas fa-boxes"></i></div>
-              <div>
-                <div class="titulo">${docTitle}</div>
-                <div class="sub">Data do Pedido: ${dataFmt}</div>
-              </div>
-            </div>
-          </div>
-          <div class="info-grid">
-            <div><span class="info-label">Número:</span> ${pedido.numero || ""}</div>
-            <div><span class="info-label">Colaborador:</span> ${pedido.colaborador || ""}</div>
-            <div><span class="info-label">Focal:</span> ${pedido.Focal || pedido.focal || ""}</div>
-            <div><span class="info-label">Status do Pedido:</span> ${pedido.status || ""}</div>
-            <div style="grid-column: 1 / -1;"><span class="info-label">Observações:</span> ${pedido.observacoes || "Nenhuma observação"}</div>
-          </div>
-          ${tabela}
-          <div class="assinatura">
-            <div class="linha"></div>
-            <div class="label">Assinatura do Supervisor</div>
-          </div>
-          <div class="rodape">
-            Documento gerado automaticamente pelo sistema de Gestão de Materiais.
-          </div>
-          <script>
-            window.onload = function() { setTimeout(function(){ window.print(); window.close(); }, 200); };
-          <\/script>
-        </body>
-      </html>
-    `);
-    w.document.close();
-  } catch (e) {
-    console.error(e);
-    showNotification && showNotification("Erro ao preparar impressão.", "error");
-  }
 }
 
 // Filtros
@@ -3282,15 +2886,15 @@ function gerarGraficoStatus(pedidos) {
     return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
   }
   
-  // Cores modernas para cada status
+  // Cores reais para cada status
   const coresReais = {
-    "Solicitação Recebida": "#8b5cf6",     // roxo moderno
-    "Reserva Gerada": "#0ea5e9",           // azul moderno
-    "Aguardando Verba": "#f59e0b",         // âmbar moderno
-    "Reserva Apropriada": "#ec4899",       // rosa moderno
-    "Disponível para Retirada": "#6b7280", // cinza moderno
-    "Material Entregue": "#10b981",        // verde moderno
-    "Pedido Cancelado": "#ef4444"          // vermelho moderno
+    "Solicitação Recebida": "#9c27b0",     // roxo
+    "Reserva Gerada": "#1976d2",           // azul
+    "Aguardando Verba": "#FFA500",         // laranja
+    "Reserva Apropriada": "#ec407a",       // rosa
+    "Disponível para Retirada": "#757575", // cinza
+    "Material Entregue": "#2e7d32",        // verde
+    "Pedido Cancelado": "#ff0000"          // vermelho
   };
   
   Object.keys(contagem).forEach(status => {
@@ -3322,78 +2926,25 @@ function gerarGraficoStatus(pedidos) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      layout: {
-        padding: {
-          right: 20,
-          left: 10,
-          top: 10,
-          bottom: 10
-        }
-      },
-      animation: {
-        animateRotate: true,
-        animateScale: true,
-        duration: 2000,
-        easing: 'easeInOutQuart'
-      },
       plugins: {
         legend: {
           position: 'right',
           labels: {
-            padding: 15,
-            boxWidth: 14,
+            padding: 20,
+            boxWidth: 12,
             font: {
-              size: 11,
-              weight: '500',
-              family: 'Inter, sans-serif'
-            },
-            color: '#334155',
-            usePointStyle: true,
-            pointStyle: 'circle',
-            maxWidth: 120,
-            textOverflow: 'ellipsis'
+              size: 12
+            }
           }
         },
         datalabels: {
           color: "#fff",
-          font: { 
-            weight: "bold",
-            size: 10,
-            family: 'Inter, sans-serif'
-          },
-          textShadowColor: 'rgba(0,0,0,0.3)',
-          textShadowBlur: 2,
+          font: { weight: "bold" },
           formatter: (value, ctx) => {
             const total = ctx.dataset.data.reduce((acc, val) => acc + val, 0);
             const percentage = (value * 100 / total).toFixed(1) + '%';
             return value > 0 ? percentage : '';
           }
-        },
-        tooltip: {
-          backgroundColor: 'rgba(15, 23, 42, 0.95)',
-          titleColor: '#f8fafc',
-          bodyColor: '#f8fafc',
-          borderColor: '#e2e8f0',
-          borderWidth: 1,
-          cornerRadius: 8,
-          displayColors: true,
-          titleFont: {
-            size: 14,
-            weight: '600',
-            family: 'Inter, sans-serif'
-          },
-          bodyFont: {
-            size: 13,
-            family: 'Inter, sans-serif'
-          },
-          padding: 12
-        }
-      },
-      elements: {
-        arc: {
-          borderWidth: 0,
-          hoverBorderWidth: 2,
-          hoverBorderColor: '#ffffff'
         }
       }
     },
@@ -3430,96 +2981,25 @@ function gerarGraficoTopColabEntregues(pedidos) {
       datasets: [{
         label: "Itens Entregues",
         data: data,
-        backgroundColor: "#10b981",
-        borderColor: "#059669",
-        borderWidth: 2,
-        borderRadius: 8,
-        borderSkipped: false,
+        backgroundColor: "#2e7d32"
       }]
     },
     options: {
       indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
-      layout: {
-        padding: {
-          right: 10,
-          left: 10,
-          top: 10,
-          bottom: 10
-        }
-      },
-      animation: {
-        duration: 1500,
-        easing: 'easeInOutQuart'
-      },
       plugins: {
-        legend: { 
-          display: false 
-        },
+        legend: { display: false },
         datalabels: {
-          color: "#ffffff",
-          font: {
-            weight: "bold",
-            size: 9,
-            family: 'Inter, sans-serif'
-          },
+          color: "#000",
           anchor: "end",
           align: "end",
-          formatter: (value) => value > 0 ? value : '',
-          offset: 4
-        },
-        tooltip: {
-          backgroundColor: 'rgba(15, 23, 42, 0.95)',
-          titleColor: '#f8fafc',
-          bodyColor: '#f8fafc',
-          borderColor: '#e2e8f0',
-          borderWidth: 1,
-          cornerRadius: 8,
-          titleFont: {
-            size: 14,
-            weight: '600',
-            family: 'Inter, sans-serif'
-          },
-          bodyFont: {
-            size: 13,
-            family: 'Inter, sans-serif'
-          },
-          padding: 12
+          formatter: (value) => value
         }
       },
       scales: {
-        x: { 
-          beginAtZero: true,
-          grid: {
-            color: '#e2e8f0',
-            drawBorder: false
-          },
-          ticks: {
-            font: {
-              family: 'Inter, sans-serif',
-              size: 12
-            },
-            color: '#64748b'
-          }
-        },
-        y: { 
-          beginAtZero: true,
-          grid: {
-            display: false
-          },
-          ticks: {
-            font: {
-              family: 'Inter, sans-serif',
-              size: 10,
-              weight: '500'
-            },
-            color: '#334155',
-            maxRotation: 0,
-            minRotation: 0,
-            maxTicksLimit: 8
-          }
-        }
+        x: { beginAtZero: true },
+        y: { beginAtZero: true }
       }
     },
     plugins: [ChartDataLabels]
@@ -3551,96 +3031,25 @@ function gerarGraficoTopColabSolicitados(pedidos) {
       datasets: [{
         label: "Itens Solicitados",
         data: data,
-        backgroundColor: "#0ea5e9",
-        borderColor: "#0284c7",
-        borderWidth: 2,
-        borderRadius: 8,
-        borderSkipped: false,
+        backgroundColor: "#1976d2"
       }]
     },
     options: {
       indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
-      layout: {
-        padding: {
-          right: 10,
-          left: 10,
-          top: 10,
-          bottom: 10
-        }
-      },
-      animation: {
-        duration: 1500,
-        easing: 'easeInOutQuart'
-      },
       plugins: {
-        legend: { 
-          display: false 
-        },
+        legend: { display: false },
         datalabels: {
-          color: "#ffffff",
-          font: {
-            weight: "bold",
-            size: 9,
-            family: 'Inter, sans-serif'
-          },
+          color: "#000",
           anchor: "end",
           align: "end",
-          formatter: (value) => value > 0 ? value : '',
-          offset: 4
-        },
-        tooltip: {
-          backgroundColor: 'rgba(15, 23, 42, 0.95)',
-          titleColor: '#f8fafc',
-          bodyColor: '#f8fafc',
-          borderColor: '#e2e8f0',
-          borderWidth: 1,
-          cornerRadius: 8,
-          titleFont: {
-            size: 14,
-            weight: '600',
-            family: 'Inter, sans-serif'
-          },
-          bodyFont: {
-            size: 13,
-            family: 'Inter, sans-serif'
-          },
-          padding: 12
+          formatter: (value) => value
         }
       },
       scales: {
-        x: { 
-          beginAtZero: true,
-          grid: {
-            color: '#e2e8f0',
-            drawBorder: false
-          },
-          ticks: {
-            font: {
-              family: 'Inter, sans-serif',
-              size: 12
-            },
-            color: '#64748b'
-          }
-        },
-        y: { 
-          beginAtZero: true,
-          grid: {
-            display: false
-          },
-          ticks: {
-            font: {
-              family: 'Inter, sans-serif',
-              size: 10,
-              weight: '500'
-            },
-            color: '#334155',
-            maxRotation: 0,
-            minRotation: 0,
-            maxTicksLimit: 8
-          }
-        }
+        x: { beginAtZero: true },
+        y: { beginAtZero: true }
       }
     },
     plugins: [ChartDataLabels]
@@ -3672,96 +3081,25 @@ function gerarGraficoTopItensSolicitados(pedidos) {
       datasets: [{
         label: "Quantidade Solicitada",
         data: data,
-        backgroundColor: "#6366f1",
-        borderColor: "#4f46e5",
-        borderWidth: 2,
-        borderRadius: 8,
-        borderSkipped: false,
+        backgroundColor: "#42a5f5"
       }]
     },
     options: {
       indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
-      layout: {
-        padding: {
-          right: 10,
-          left: 10,
-          top: 10,
-          bottom: 10
-        }
-      },
-      animation: {
-        duration: 1500,
-        easing: 'easeInOutQuart'
-      },
       plugins: {
-        legend: { 
-          display: false 
-        },
+        legend: { display: false },
         datalabels: {
-          color: "#ffffff",
-          font: {
-            weight: "bold",
-            size: 9,
-            family: 'Inter, sans-serif'
-          },
+          color: "#000",
           anchor: "end",
           align: "end",
-          formatter: (value) => value > 0 ? value : '',
-          offset: 4
-        },
-        tooltip: {
-          backgroundColor: 'rgba(15, 23, 42, 0.95)',
-          titleColor: '#f8fafc',
-          bodyColor: '#f8fafc',
-          borderColor: '#e2e8f0',
-          borderWidth: 1,
-          cornerRadius: 8,
-          titleFont: {
-            size: 14,
-            weight: '600',
-            family: 'Inter, sans-serif'
-          },
-          bodyFont: {
-            size: 13,
-            family: 'Inter, sans-serif'
-          },
-          padding: 12
+          formatter: (value) => value
         }
       },
       scales: {
-        x: { 
-          beginAtZero: true,
-          grid: {
-            color: '#e2e8f0',
-            drawBorder: false
-          },
-          ticks: {
-            font: {
-              family: 'Inter, sans-serif',
-              size: 12
-            },
-            color: '#64748b'
-          }
-        },
-        y: { 
-          beginAtZero: true,
-          grid: {
-            display: false
-          },
-          ticks: {
-            font: {
-              family: 'Inter, sans-serif',
-              size: 10,
-              weight: '500'
-            },
-            color: '#334155',
-            maxRotation: 0,
-            minRotation: 0,
-            maxTicksLimit: 8
-          }
-        }
+        x: { beginAtZero: true },
+        y: { beginAtZero: true }
       }
     },
     plugins: [ChartDataLabels]
@@ -3795,96 +3133,25 @@ function gerarGraficoTopItensEntregues(pedidos) {
       datasets: [{
         label: "Quantidade Entregue",
         data: data,
-        backgroundColor: "#10b981",
-        borderColor: "#059669",
-        borderWidth: 2,
-        borderRadius: 8,
-        borderSkipped: false,
+        backgroundColor: "#66bb6a"
       }]
     },
     options: {
       indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
-      layout: {
-        padding: {
-          right: 10,
-          left: 10,
-          top: 10,
-          bottom: 10
-        }
-      },
-      animation: {
-        duration: 1500,
-        easing: 'easeInOutQuart'
-      },
       plugins: {
-        legend: { 
-          display: false 
-        },
+        legend: { display: false },
         datalabels: {
-          color: "#ffffff",
-          font: {
-            weight: "bold",
-            size: 9,
-            family: 'Inter, sans-serif'
-          },
+          color: "#000",
           anchor: "end",
           align: "end",
-          formatter: (value) => value > 0 ? value : '',
-          offset: 4
-        },
-        tooltip: {
-          backgroundColor: 'rgba(15, 23, 42, 0.95)',
-          titleColor: '#f8fafc',
-          bodyColor: '#f8fafc',
-          borderColor: '#e2e8f0',
-          borderWidth: 1,
-          cornerRadius: 8,
-          titleFont: {
-            size: 14,
-            weight: '600',
-            family: 'Inter, sans-serif'
-          },
-          bodyFont: {
-            size: 13,
-            family: 'Inter, sans-serif'
-          },
-          padding: 12
+          formatter: (value) => value
         }
       },
       scales: {
-        x: { 
-          beginAtZero: true,
-          grid: {
-            color: '#e2e8f0',
-            drawBorder: false
-          },
-          ticks: {
-            font: {
-              family: 'Inter, sans-serif',
-              size: 12
-            },
-            color: '#64748b'
-          }
-        },
-        y: { 
-          beginAtZero: true,
-          grid: {
-            display: false
-          },
-          ticks: {
-            font: {
-              family: 'Inter, sans-serif',
-              size: 10,
-              weight: '500'
-            },
-            color: '#334155',
-            maxRotation: 0,
-            minRotation: 0,
-            maxTicksLimit: 8
-          }
-        }
+        x: { beginAtZero: true },
+        y: { beginAtZero: true }
       }
     },
     plugins: [ChartDataLabels]
@@ -3914,96 +3181,25 @@ function gerarGraficoTopFocaisRecebidos(pedidos) {
       datasets: [{
         label: "Solicitações Recebidas",
         data: data,
-        backgroundColor: "#8b5cf6",
-        borderColor: "#7c3aed",
-        borderWidth: 2,
-        borderRadius: 8,
-        borderSkipped: false,
+        backgroundColor: "#9c27b0"
       }]
     },
     options: {
       indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
-      layout: {
-        padding: {
-          right: 10,
-          left: 10,
-          top: 10,
-          bottom: 10
-        }
-      },
-      animation: {
-        duration: 1500,
-        easing: 'easeInOutQuart'
-      },
       plugins: {
-        legend: { 
-          display: false 
-        },
+        legend: { display: false },
         datalabels: {
-          color: "#ffffff",
-          font: {
-            weight: "bold",
-            size: 9,
-            family: 'Inter, sans-serif'
-          },
+          color: "#000",
           anchor: "end",
           align: "end",
-          formatter: (value) => value > 0 ? value : '',
-          offset: 4
-        },
-        tooltip: {
-          backgroundColor: 'rgba(15, 23, 42, 0.95)',
-          titleColor: '#f8fafc',
-          bodyColor: '#f8fafc',
-          borderColor: '#e2e8f0',
-          borderWidth: 1,
-          cornerRadius: 8,
-          titleFont: {
-            size: 14,
-            weight: '600',
-            family: 'Inter, sans-serif'
-          },
-          bodyFont: {
-            size: 13,
-            family: 'Inter, sans-serif'
-          },
-          padding: 12
+          formatter: (value) => value
         }
       },
       scales: {
-        x: { 
-          beginAtZero: true,
-          grid: {
-            color: '#e2e8f0',
-            drawBorder: false
-          },
-          ticks: {
-            font: {
-              family: 'Inter, sans-serif',
-              size: 12
-            },
-            color: '#64748b'
-          }
-        },
-        y: { 
-          beginAtZero: true,
-          grid: {
-            display: false
-          },
-          ticks: {
-            font: {
-              family: 'Inter, sans-serif',
-              size: 10,
-              weight: '500'
-            },
-            color: '#334155',
-            maxRotation: 0,
-            minRotation: 0,
-            maxTicksLimit: 8
-          }
-        }
+        x: { beginAtZero: true },
+        y: { beginAtZero: true }
       }
     },
     plugins: [ChartDataLabels]
@@ -4023,17 +3219,17 @@ function gerarGraficoStatusFocal(pedidos) {
   });
   const focais = Array.from(focaisSet);
   const statuses = STATUS_OPTIONS || [];
-  // Cores modernas para cada status
+  // Map real colors for each status (should match status chart)
   const coresReaisStatus = {
-    "Solicitação Recebida": "#8b5cf6",
-    "Reserva Gerada": "#0ea5e9",
-    "Aguardando Verba": "#f59e0b",
-    "Reserva Apropriada": "#ec4899",
-    "Disponível para Retirada": "#6b7280",
-    "Material Entregue": "#10b981",
-    "Pedido Cancelado": "#ef4444",
-    "Aguardando Almoxarifado": "#84cc16",
-    "Aguardando Material": "#f97316"
+    "Solicitação Recebida": "#9c27b0",
+    "Reserva Gerada": "#1976d2",
+    "Aguardando Verba": "#FFA500",
+    "Reserva Apropriada": "#ec407a",
+    "Disponível para Retirada": "#757575",
+    "Material Entregue": "#2e7d32",
+    "Pedido Cancelado": "#ff0000",
+    "Aguardando Almoxarifado": "#7cb342",
+    "Aguardando Material": "#fb8c00"
   };
   const datasets = statuses.map(status => {
     const data = focais.map(f => (contagem[f] && contagem[f][status]) ? contagem[f][status] : 0);
@@ -4057,97 +3253,15 @@ function gerarGraficoStatusFocal(pedidos) {
       indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
-      layout: {
-        padding: {
-          right: 15,
-          left: 10,
-          top: 10,
-          bottom: 10
-        }
-      },
-      animation: {
-        duration: 2000,
-        easing: 'easeInOutQuart'
-      },
       scales: {
-        x: { 
-          stacked: true, 
-          beginAtZero: true,
-          grid: {
-            color: '#e2e8f0',
-            drawBorder: false
-          },
-          ticks: {
-            font: {
-              family: 'Inter, sans-serif',
-              size: 12
-            },
-            color: '#64748b'
-          }
-        },
-        y: { 
-          stacked: true,
-          grid: {
-            display: false
-          },
-          ticks: {
-            font: {
-              family: 'Inter, sans-serif',
-              size: 10,
-              weight: '500'
-            },
-            color: '#334155',
-            maxRotation: 0,
-            minRotation: 0,
-            maxTicksLimit: 8
-          }
-        }
+        x: { stacked: true, beginAtZero: true },
+        y: { stacked: true }
       },
       plugins: {
-        legend: { 
-          position: 'right',
-          labels: {
-            padding: 12,
-            boxWidth: 12,
-            font: {
-              size: 10,
-              weight: '500',
-              family: 'Inter, sans-serif'
-            },
-            color: '#334155',
-            usePointStyle: true,
-            pointStyle: 'rectRounded',
-            maxWidth: 100,
-            textOverflow: 'ellipsis'
-          }
-        },
+        legend: { position: 'right' },
         datalabels: {
-          color: '#ffffff',
-          font: {
-            weight: 'bold',
-            size: 8,
-            family: 'Inter, sans-serif'
-          },
-          formatter: (value) => value > 0 ? value : '',
-          offset: 2
-        },
-        tooltip: {
-          backgroundColor: 'rgba(15, 23, 42, 0.95)',
-          titleColor: '#f8fafc',
-          bodyColor: '#f8fafc',
-          borderColor: '#e2e8f0',
-          borderWidth: 1,
-          cornerRadius: 8,
-          titleFont: {
-            size: 14,
-            weight: '600',
-            family: 'Inter, sans-serif'
-          },
-          bodyFont: {
-            size: 13,
-            family: 'Inter, sans-serif'
-          },
-          padding: 12
+          color: '#fff',
+          formatter: (value) => value > 0 ? value : ''
         }
       }
     },
