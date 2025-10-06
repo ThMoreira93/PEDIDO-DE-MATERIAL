@@ -1059,6 +1059,202 @@
 /* Estilo extra para histórico */
 .pedido-historico-item .hist-time { color: var(--neutral-600); margin-right: 6px; font-size: .85em; }
 .pedido-historico-item .hist-user { color: var(--neutral-700); font-size: .85em; }
+
+/* Estilos para cabeçalho do pedido com botão de impressão */
+.pedido-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.pedido-info-top {
+  flex: 1;
+  min-width: 200px;
+}
+
+.pedido-actions-top {
+  flex-shrink: 0;
+}
+
+.btn-print {
+  box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2);
+  transition: all 0.2s ease;
+}
+
+  .btn-print:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+  }
+
+/* Estilos para container de observações */
+.pedido-info-value-container {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+.pedido-info-value {
+  flex: 1;
+  word-wrap: break-word;
+}
+
+/* Estilos para botão de editar observações */
+.btn-edit-observations {
+  box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-edit-observations:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+}
+
+@media (max-width: 768px) {
+  .pedido-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .pedido-actions-top {
+    align-self: stretch;
+  }
+  
+  .btn-print {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .pedido-info-value-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+  
+  .btn-edit-observations {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0 !important;
+  }
+}
+
+/* Estilos para impressão */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  .print-content, .print-content * {
+    visibility: visible;
+  }
+  
+  .print-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white;
+    color: black;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  
+  .print-header {
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #000;
+    padding-bottom: 10px;
+  }
+  
+  .print-header h1 {
+    font-size: 18px;
+    margin: 0;
+    font-weight: bold;
+  }
+  
+  .print-header h2 {
+    font-size: 16px;
+    margin: 5px 0 0 0;
+    font-weight: normal;
+  }
+  
+  .print-info {
+    margin-bottom: 15px;
+  }
+  
+  .print-info-row {
+    display: flex;
+    margin-bottom: 5px;
+  }
+  
+  .print-info-label {
+    font-weight: bold;
+    width: 120px;
+    flex-shrink: 0;
+  }
+  
+  .print-info-value {
+    flex: 1;
+  }
+  
+  .print-materials {
+    margin-bottom: 20px;
+  }
+  
+  .print-materials h3 {
+    font-size: 14px;
+    margin: 0 0 10px 0;
+    font-weight: bold;
+    border-bottom: 1px solid #000;
+    padding-bottom: 5px;
+  }
+  
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+  }
+  
+  .print-table th,
+  .print-table td {
+    border: 1px solid #000;
+    padding: 5px;
+    text-align: left;
+    font-size: 11px;
+  }
+  
+  .print-table th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+  }
+  
+  .print-signature {
+    margin-top: 30px;
+    border-top: 1px solid #000;
+    padding-top: 10px;
+  }
+  
+  .print-signature-line {
+    border-bottom: 1px solid #000;
+    height: 30px;
+    margin-bottom: 5px;
+  }
+  
+  .print-signature-label {
+    font-size: 10px;
+    text-align: center;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}
 </style>
 <style>
 /* Estilo do prompt customizado */
@@ -1108,6 +1304,109 @@
 }
 .custom-prompt-buttons .cancel {
   background-color: #6c757d;
+}
+
+/* Estilos para modais de justificativa e observações */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-container {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: var(--neutral-800);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--neutral-500);
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.btn-close:hover {
+  background-color: var(--neutral-100);
+  color: var(--neutral-700);
+}
+
+.modal-body {
+  padding: var(--space-6);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  border-top: 1px solid var(--neutral-200);
+}
+
+.modal-body .form-group {
+  margin-bottom: var(--space-4);
+}
+
+.modal-body .form-label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-weight: 500;
+  color: var(--neutral-700);
+}
+
+.modal-body .form-control {
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--neutral-300);
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.modal-body .form-control:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.modal-body textarea.form-control {
+  resize: vertical;
+  min-height: 100px;
 }
 </style></head>
 <body>
@@ -1870,6 +2169,13 @@ let todosPedidos = [];
 let pedidosFiltrados = [];
 let confirmCallback = null;
 
+// Variáveis para manter os filtros
+let filtrosAtivos = {
+  status: "",
+  focal: "",
+  texto: ""
+};
+
 // Usuários do sistema
 // Autenticação com Firebase
 function realizarLogin(e) {
@@ -2070,7 +2376,13 @@ function carregarPedidos() {
     todosPedidos = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     pedidosFiltrados = [...todosPedidos];
     
-    renderizarPedidos(todosPedidos);
+    // Aplicar filtros salvos se existirem
+    if (filtrosAtivos.status || filtrosAtivos.focal || filtrosAtivos.texto) {
+      aplicarFiltrosSalvos();
+    } else {
+      renderizarPedidos(todosPedidos);
+    }
+    
     atualizarTabelaPedidosRecentes();
     // Atualiza gráfico de status e demais gráficos com os dados completos
     gerarGraficoStatus(todosPedidos);
@@ -2135,8 +2447,16 @@ const historico = (p.historico || []).map(h => {
     card.innerHTML = `
       <div class="card-body">
         <div class="pedido-header">
-          <div class="pedido-numero">Pedido: ${p.numero}</div>
-          <div class="pedido-data">${new Date(p.data).toLocaleString()}</div>
+          <div class="pedido-info-top">
+            <div class="pedido-numero">Pedido: ${p.numero}</div>
+            <div class="pedido-data">${new Date(p.data).toLocaleString()}</div>
+          </div>
+          <div class="pedido-actions-top">
+            <button class="btn btn-primary btn-print" onclick="imprimirPedido('${p.id}')" style="display: flex; align-items: center; gap: var(--space-2); padding: var(--space-3) var(--space-4); font-size: 14px; font-weight: 500;">
+              <i class="fas fa-print"></i>
+              Imprimir Pedido
+            </button>
+          </div>
         </div>
         
         <div class="pedido-info">
@@ -2150,7 +2470,13 @@ const historico = (p.historico || []).map(h => {
           </div>
           <div class="pedido-info-item">
             <div class="pedido-info-label">Observações:</div>
-            <div class="pedido-info-value">${p.observacoes || "Nenhuma observação"}</div>
+            <div class="pedido-info-value-container">
+              <div class="pedido-info-value" id="observacoes-${p.id}">${p.observacoes || "Nenhuma observação"}</div>
+              <button class="btn btn-primary btn-edit-observations" onclick="editarObservacoes('${p.id}')" style="margin-left: var(--space-3); padding: var(--space-2) var(--space-4); font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: var(--space-2);">
+                <i class="fas fa-edit"></i>
+                Editar
+              </button>
+            </div>
           </div>
         </div>
         
@@ -2238,6 +2564,12 @@ const historico = (p.historico || []).map(h => {
 
 // Atualização de status
 function atualizarStatusIndividual(id, valor) {
+  // Se for cancelamento, abrir modal de justificativa
+  if (valor === "Pedido Cancelado") {
+    mostrarModalJustificativaCancelamento(id, valor);
+    return;
+  }
+  
   showConfirmationModal(
     "Confirmar alteração de status",
     `Deseja alterar o status do pedido para "${valor}"?`,
@@ -2312,7 +2644,7 @@ function atualizarStatusIndividual(id, valor) {
               });
               
               // Reaplicar filtros para manter a filtragem ativa
-              aplicarFiltros();
+              aplicarFiltrosSalvos();
             })
             .catch(error => {
               console.error("Erro ao atualizar status:", error);
@@ -2397,6 +2729,11 @@ function aplicarFiltros() {
   const focal = document.getElementById("filtroFocal") ? document.getElementById("filtroFocal").value : "";
   const textoInput = (document.getElementById("buscaTextoPedidos")?.value || document.getElementById("buscaTexto")?.value || "").toString();
   const texto = textoInput.toLowerCase().trim();
+  
+  // Salvar os filtros ativos
+  filtrosAtivos.status = status;
+  filtrosAtivos.focal = focal;
+  filtrosAtivos.texto = texto;
 
   pedidosFiltrados = todosPedidos.filter(p => {
     if (status && p.status !== status) return false;
@@ -2452,6 +2789,27 @@ function aplicarFiltros() {
   gerarGraficoStatusFocal(pedidosFiltrados);
   atualizarContadorResultados();
 }
+
+// Função para aplicar filtros salvos após recarregar dados
+function aplicarFiltrosSalvos() {
+  // Restaurar valores dos filtros nos campos
+  if (document.getElementById("filtroStatus")) {
+    document.getElementById("filtroStatus").value = filtrosAtivos.status;
+  }
+  if (document.getElementById("filtroFocal")) {
+    document.getElementById("filtroFocal").value = filtrosAtivos.focal;
+  }
+  if (document.getElementById("buscaTextoPedidos")) {
+    document.getElementById("buscaTextoPedidos").value = filtrosAtivos.texto;
+  }
+  if (document.getElementById("buscaTexto")) {
+    document.getElementById("buscaTexto").value = filtrosAtivos.texto;
+  }
+  
+  // Aplicar os filtros
+  aplicarFiltros();
+}
+
 // Event Listeners para filtros
 document.addEventListener('DOMContentLoaded', function() {
   const buscaTexto = document.getElementById("buscaTexto");
@@ -2470,6 +2828,9 @@ function popularFiltroFocal(pedidos) {
   const filtroFocal = document.getElementById("filtroFocal");
   if (!filtroFocal) return;
   
+  // Salvar o valor atual selecionado
+  const valorAtual = filtroFocal.value;
+  
   // Obter valores únicos de Focal
   const focaisUnicos = [...new Set(pedidos.map(p => p.Focal).filter(focal => focal && focal.trim() !== ""))];
   focaisUnicos.sort();
@@ -2486,6 +2847,11 @@ function popularFiltroFocal(pedidos) {
     option.textContent = focal;
     filtroFocal.appendChild(option);
   });
+  
+  // Restaurar o valor selecionado se ainda existir nas opções
+  if (valorAtual && focaisUnicos.includes(valorAtual)) {
+    filtroFocal.value = valorAtual;
+  }
 }
 
 // Função para filtrar por status ao clicar nos cards do dashboard
@@ -3903,22 +4269,131 @@ function customPrompt(message, callback) {
   document.body.appendChild(backdrop);
 }
 
-// Substitui a função de atualização com prompt estilizado
-const originalAtualizarStatusIndividual = atualizarStatusIndividual;
-atualizarStatusIndividual = function(id, valor) {
-  if (valor === "Reserva Gerada") {
-    customPrompt("Informe o número da reserva:", (numeroReserva) => {
-      if (!numeroReserva || numeroReserva.trim() === "") {
-        showNotification("Por favor, insira o número da reserva.", "warning");
-        return;
-      }
+// Função para mostrar modal de confirmação
+function showConfirmationModal(titulo, mensagem, callback) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-backdrop';
+  modal.innerHTML = `
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>${titulo}</h3>
+        <button class="btn-close" onclick="fecharModalConfirmacao()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>${mensagem}</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="fecharModalConfirmacao()">Cancelar</button>
+        <button class="btn btn-primary" onclick="confirmarAcao()">Confirmar</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Função para fechar modal
+  window.fecharModalConfirmacao = function() {
+    const modal = document.querySelector('.modal-backdrop');
+    if (modal) {
+      modal.remove();
+    }
+  };
+  
+  // Função para confirmar ação
+  window.confirmarAcao = function() {
+    fecharModalConfirmacao();
+    if (callback) callback();
+  };
+}
 
-      processarStatus(id, valor, numeroReserva.trim());
-    });
-  } else {
-    processarStatus(id, valor, null);
-  }
-};
+// Função para processar status com número de reserva
+function processarStatusComReserva(id, valor, numeroReserva) {
+  showConfirmationModal(
+    "Confirmar alteração de status",
+    `Deseja alterar o status do pedido para "${valor}"?`,
+    () => {
+      showLoadingIndicator();
+      const ref = db.collection("pedidos").doc(id);
+      ref.get().then(doc => {
+        if (doc.exists) {
+          const dados = doc.data();
+          const historico = dados.historico || [];
+          
+          // Obter usuário logado
+          const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+          
+          // Criar entrada de histórico
+          const novaEntrada = { 
+            status: valor, 
+            data: new Date().toISOString(),
+            usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
+            nome: usuarioLogado ? usuarioLogado.nome : "Sistema"
+          };
+          
+          historico.push(novaEntrada);
+          
+          // Atualizar observações se for reserva gerada
+          let observacoesAtualizadas = dados.observacoes || "";
+          if (valor === "Reserva Gerada" && numeroReserva) {
+            observacoesAtualizadas = observacoesAtualizadas ? 
+              `${observacoesAtualizadas}\n\nReserva Gerada Nº ${numeroReserva}` :
+              `Reserva Gerada Nº ${numeroReserva}`;
+          }
+          
+          // Atualizar também os status dos itens individuais
+          const materiais = dados.materiais || [];
+          materiais.forEach(material => {
+            if (!material.historico) {
+              material.historico = [];
+            }
+            
+            material.historico.push({
+              status: valor,
+              data: new Date().toISOString(),
+              usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
+              nome: usuarioLogado ? usuarioLogado.nome : "Sistema"
+            });
+            
+            material.status = valor;
+          });
+          
+          const updateData = { 
+            status: valor, 
+            historico: historico, 
+            materiais: materiais
+          };
+          
+          if (observacoesAtualizadas !== dados.observacoes) {
+            updateData.observacoes = observacoesAtualizadas;
+          }
+          
+          ref.update(updateData)
+            .then(() => {
+              hideLoadingIndicator();
+              showNotification(`Status do pedido atualizado para "${valor}"`, "success");
+              
+              // Registrar ação
+              registrarAcao("Alteração de Status", `Status do pedido ${dados.numero} alterado para "${valor}"`, {
+                pedidoId: id,
+                numeroPedido: dados.numero,
+                statusAntigo: dados.status,
+                statusNovo: valor,
+                numeroReserva: numeroReserva
+              });
+              
+              // Reaplicar filtros para manter a filtragem ativa
+              aplicarFiltrosSalvos();
+            })
+            .catch(error => {
+              console.error("Erro ao atualizar status:", error);
+              hideLoadingIndicator();
+              showNotification("Erro ao atualizar status. Tente novamente.", "error");
+            });
+        }
+      });
+    }
+  );
+}
 
 function processarStatus(id, valor, numeroReserva) {
   showConfirmationModal(
@@ -3978,7 +4453,7 @@ function processarStatus(id, valor, numeroReserva) {
               });
               
               // Reaplicar filtros para manter a filtragem ativa
-              aplicarFiltros();
+              aplicarFiltrosSalvos();
             })
             .catch(error => {
               hideLoadingIndicator();
@@ -4091,6 +4566,468 @@ function selecionarMaterial(item) {
     }
   }
 })();
+
+// Função para imprimir pedido
+function imprimirPedido(pedidoId) {
+  // Buscar o pedido específico
+  const pedido = todosPedidos.find(p => p.id === pedidoId);
+  
+  if (!pedido) {
+    showNotification("Pedido não encontrado.", "error");
+    return;
+  }
+  
+  // Filtrar apenas materiais com status "Disponível para Retirada"
+  const materiaisDisponiveis = (pedido.materiais || []).filter(material => 
+    (material.status || pedido.status) === "Disponível para Retirada"
+  );
+  
+  if (materiaisDisponiveis.length === 0) {
+    showNotification("Não há materiais disponíveis para retirada neste pedido.", "warning");
+    return;
+  }
+  
+  // Criar conteúdo para impressão
+  const printContent = `
+    <div class="print-content">
+      <div class="print-header">
+        <div class="print-logo">
+          <div style="width: 48px; height: 48px; background-color: #1976d2; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+            <i class="fas fa-boxes" style="font-size: 24px; color: white;"></i>
+          </div>
+        </div>
+        <h1>PEDIDO DE MATERIAL</h1>
+        <h2>Gestão de Materiais - Sistema Administrativo</h2>
+      </div>
+      
+      <div class="print-info">
+        <div class="print-info-row">
+          <div class="print-info-label">Número do Pedido:</div>
+          <div class="print-info-value">${pedido.numero}</div>
+        </div>
+        <div class="print-info-row">
+          <div class="print-info-label">Data:</div>
+          <div class="print-info-value">${new Date(pedido.data).toLocaleDateString('pt-BR')}</div>
+        </div>
+        <div class="print-info-row">
+          <div class="print-info-label">Colaborador:</div>
+          <div class="print-info-value">${pedido.colaborador}</div>
+        </div>
+        <div class="print-info-row">
+          <div class="print-info-label">Focal:</div>
+          <div class="print-info-value">${pedido.Focal}</div>
+        </div>
+        <div class="print-info-row">
+          <div class="print-info-label">Observações:</div>
+          <div class="print-info-value">${pedido.observacoes || "Nenhuma observação"}</div>
+        </div>
+      </div>
+      
+      <div class="print-materials">
+        <h3>MATERIAIS DISPONÍVEIS PARA RETIRADA</h3>
+        <table class="print-table">
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th>Quantidade</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${materiaisDisponiveis.map(material => `
+              <tr>
+                <td>${material.material}</td>
+                <td>${material.quantidade}</td>
+                <td>${material.status || pedido.status}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="print-signature">
+        <div class="print-signature-line"></div>
+        <div class="print-signature-label">Assinatura do Supervisor</div>
+      </div>
+    </div>
+  `;
+  
+  // Criar uma nova janela para impressão
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Pedido ${pedido.numero} - Impressão</title>
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+      <style>
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          
+          .print-content, .print-content * {
+            visibility: visible;
+          }
+          
+          .print-content {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            background: white;
+            color: black;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+          }
+          
+          .print-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+          }
+          
+          .print-logo {
+            margin-bottom: 10px;
+          }
+          
+          .print-header h1 {
+            font-size: 18px;
+            margin: 0;
+            font-weight: bold;
+          }
+          
+          .print-header h2 {
+            font-size: 16px;
+            margin: 5px 0 0 0;
+            font-weight: normal;
+          }
+          
+          .print-info {
+            margin-bottom: 15px;
+          }
+          
+          .print-info-row {
+            display: flex;
+            margin-bottom: 5px;
+          }
+          
+          .print-info-label {
+            font-weight: bold;
+            width: 120px;
+            flex-shrink: 0;
+          }
+          
+          .print-info-value {
+            flex: 1;
+          }
+          
+          .print-materials {
+            margin-bottom: 20px;
+          }
+          
+          .print-materials h3 {
+            font-size: 14px;
+            margin: 0 0 10px 0;
+            font-weight: bold;
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
+          }
+          
+          .print-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+          }
+          
+          .print-table th,
+          .print-table td {
+            border: 1px solid #000;
+            padding: 5px;
+            text-align: left;
+            font-size: 11px;
+          }
+          
+          .print-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+          }
+          
+          .print-signature {
+            margin-top: 30px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+          }
+          
+          .print-signature-line {
+            border-bottom: 1px solid #000;
+            height: 30px;
+            margin-bottom: 5px;
+          }
+          
+          .print-signature-label {
+            font-size: 10px;
+            text-align: center;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      ${printContent}
+    </body>
+    </html>
+  `);
+  
+  printWindow.document.close();
+  
+  // Aguardar o conteúdo carregar e então imprimir
+  printWindow.onload = function() {
+    printWindow.print();
+    printWindow.close();
+  };
+  
+  // Registrar ação de impressão
+  registrarAcao("Impressão de Pedido", `Pedido ${pedido.numero} impresso com ${materiaisDisponiveis.length} materiais disponíveis para retirada`, {
+    pedidoId: pedidoId,
+    numeroPedido: pedido.numero,
+    materiaisDisponiveis: materiaisDisponiveis.length
+  });
+}
+
+// Modal para justificativa de cancelamento
+function mostrarModalJustificativaCancelamento(pedidoId, novoStatus) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-backdrop';
+  modal.innerHTML = `
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Cancelar Pedido</h3>
+        <button class="btn-close" onclick="fecharModalJustificativa()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Por favor, informe a justificativa para o cancelamento do pedido:</p>
+        <div class="form-group">
+          <label class="form-label" for="justificativaCancelamento">Justificativa:</label>
+          <textarea 
+            id="justificativaCancelamento" 
+            class="form-control" 
+            rows="4" 
+            placeholder="Digite a justificativa para o cancelamento..."
+            required
+          ></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="fecharModalJustificativa()">Cancelar</button>
+        <button class="btn btn-danger" onclick="confirmarCancelamentoComJustificativa('${pedidoId}', '${novoStatus}')">Confirmar Cancelamento</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  document.getElementById('justificativaCancelamento').focus();
+}
+
+function fecharModalJustificativa() {
+  const modal = document.querySelector('.modal-backdrop');
+  if (modal) {
+    modal.remove();
+  }
+}
+
+function confirmarCancelamentoComJustificativa(pedidoId, novoStatus) {
+  const justificativa = document.getElementById('justificativaCancelamento').value.trim();
+  
+  if (!justificativa) {
+    showNotification("Por favor, informe a justificativa para o cancelamento.", "warning");
+    return;
+  }
+  
+  fecharModalJustificativa();
+  
+  showLoadingIndicator();
+  
+  const ref = db.collection("pedidos").doc(pedidoId);
+  ref.get().then(doc => {
+    if (doc.exists) {
+      const dados = doc.data();
+      const historico = dados.historico || [];
+      
+      // Obter usuário logado
+      const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+      
+      // Criar entrada de histórico com informações do usuário
+      const novaEntrada = { 
+        status: novoStatus, 
+        data: new Date().toISOString(),
+        usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
+        nome: usuarioLogado ? usuarioLogado.nome : "Sistema"
+      };
+      
+      historico.push(novaEntrada);
+      
+      // Atualizar observações com a justificativa
+      const observacoesAtuais = dados.observacoes || "";
+      const novaObservacao = observacoesAtuais ? 
+        `${observacoesAtuais}\n\nPEDIDO CANCELADO DEVIDO ${justificativa}` :
+        `PEDIDO CANCELADO DEVIDO ${justificativa}`;
+      
+      // Atualizar também os status dos itens individuais
+      const materiais = dados.materiais || [];
+      materiais.forEach(material => {
+        if (!material.historico) {
+          material.historico = [];
+        }
+        
+        material.historico.push({
+          status: novoStatus,
+          data: new Date().toISOString(),
+          usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
+          nome: usuarioLogado ? usuarioLogado.nome : "Sistema"
+        });
+        
+        material.status = novoStatus;
+      });
+      
+      ref.update({ 
+        status: novoStatus, 
+        historico: historico, 
+        materiais: materiais,
+        observacoes: novaObservacao
+      })
+        .then(() => {
+          hideLoadingIndicator();
+          showNotification(`Pedido cancelado com sucesso. Justificativa: ${justificativa}`, "success");
+          
+          // Registrar ação
+          registrarAcao("Cancelamento de Pedido", `Pedido ${dados.numero} cancelado. Justificativa: ${justificativa}`, {
+            pedidoId: pedidoId,
+            numeroPedido: dados.numero,
+            statusAntigo: dados.status,
+            statusNovo: novoStatus,
+            justificativa: justificativa
+          });
+          
+          // Reaplicar filtros para manter a filtragem ativa
+          aplicarFiltrosSalvos();
+        })
+        .catch(error => {
+          console.error("Erro ao cancelar pedido:", error);
+          hideLoadingIndicator();
+          showNotification("Erro ao cancelar pedido. Tente novamente.", "error");
+        });
+    }
+  });
+}
+
+// Modal para editar observações
+function editarObservacoes(pedidoId) {
+  const pedido = todosPedidos.find(p => p.id === pedidoId);
+  if (!pedido) {
+    showNotification("Pedido não encontrado.", "error");
+    return;
+  }
+  
+  const modal = document.createElement('div');
+  modal.className = 'modal-backdrop';
+  modal.innerHTML = `
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Editar Observações</h3>
+        <button class="btn-close" onclick="fecharModalObservacoes()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="observacoesEdit">Observações:</label>
+          <textarea 
+            id="observacoesEdit" 
+            class="form-control" 
+            rows="6" 
+            placeholder="Digite as observações do pedido..."
+          >${pedido.observacoes || ""}</textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="fecharModalObservacoes()">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarObservacoes('${pedidoId}')">Salvar</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  document.getElementById('observacoesEdit').focus();
+}
+
+function fecharModalObservacoes() {
+  const modal = document.querySelector('.modal-backdrop');
+  if (modal) {
+    modal.remove();
+  }
+}
+
+function salvarObservacoes(pedidoId) {
+  const novasObservacoes = document.getElementById('observacoesEdit').value.trim();
+  
+  fecharModalObservacoes();
+  showLoadingIndicator();
+  
+  const ref = db.collection("pedidos").doc(pedidoId);
+  ref.get().then(doc => {
+    if (doc.exists) {
+      const dados = doc.data();
+      const historico = dados.historico || [];
+      
+      // Obter usuário logado
+      const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+      
+      // Criar entrada de histórico
+      const novaEntrada = { 
+        acao: "editar_observacoes",
+        campo: "observacoes",
+        de: dados.observacoes || "",
+        para: novasObservacoes,
+        data: new Date().toISOString(),
+        usuario: usuarioLogado ? usuarioLogado.usuario : "sistema",
+        nome: usuarioLogado ? usuarioLogado.nome : "Sistema"
+      };
+      
+      historico.push(novaEntrada);
+      
+      ref.update({ 
+        observacoes: novasObservacoes,
+        historico: historico
+      })
+        .then(() => {
+          hideLoadingIndicator();
+          showNotification("Observações atualizadas com sucesso!", "success");
+          
+          // Atualizar o elemento na interface
+          const elementoObservacoes = document.getElementById(`observacoes-${pedidoId}`);
+          if (elementoObservacoes) {
+            elementoObservacoes.textContent = novasObservacoes || "Nenhuma observação";
+          }
+          
+          // Registrar ação
+          registrarAcao("Edição de Observações", `Observações do pedido ${dados.numero} editadas`, {
+            pedidoId: pedidoId,
+            numeroPedido: dados.numero,
+            observacoesAntigas: dados.observacoes || "",
+            observacoesNovas: novasObservacoes
+          });
+          
+          // Reaplicar filtros para manter a filtragem ativa
+          aplicarFiltrosSalvos();
+        })
+        .catch(error => {
+          console.error("Erro ao atualizar observações:", error);
+          hideLoadingIndicator();
+          showNotification("Erro ao atualizar observações. Tente novamente.", "error");
+        });
+    }
+  });
+}
 </script>
 
 <script>
