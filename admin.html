@@ -2570,6 +2570,12 @@ function atualizarStatusIndividual(id, valor) {
     return;
   }
   
+  // Se for reserva gerada, abrir modal para inserir número da reserva
+  if (valor === "Reserva Gerada") {
+    mostrarModalNumeroReserva(id, valor);
+    return;
+  }
+  
   showConfirmationModal(
     "Confirmar alteração de status",
     `Deseja alterar o status do pedido para "${valor}"?`,
@@ -4835,6 +4841,58 @@ function fecharModalJustificativa() {
   if (modal) {
     modal.remove();
   }
+}
+
+function mostrarModalNumeroReserva(pedidoId, novoStatus) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-backdrop';
+  modal.innerHTML = `
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Gerar Reserva</h3>
+        <button class="btn-close" onclick="fecharModalNumeroReserva()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Por favor, informe o número da reserva gerada:</p>
+        <div class="form-group">
+          <label class="form-label" for="numeroReserva">Número da Reserva:</label>
+          <input 
+            type="text" 
+            id="numeroReserva" 
+            class="form-control" 
+            placeholder="Digite o número da reserva..."
+            required
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="fecharModalNumeroReserva()">Cancelar</button>
+        <button class="btn btn-primary" onclick="confirmarReservaComNumero('${pedidoId}', '${novoStatus}')">Confirmar Reserva</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  document.getElementById('numeroReserva').focus();
+}
+
+function fecharModalNumeroReserva() {
+  const modal = document.querySelector('.modal-backdrop');
+  if (modal) {
+    modal.remove();
+  }
+}
+
+function confirmarReservaComNumero(pedidoId, novoStatus) {
+  const numeroReserva = document.getElementById('numeroReserva').value.trim();
+  
+  if (!numeroReserva) {
+    showNotification('Por favor, informe o número da reserva.', 'error');
+    return;
+  }
+  
+  fecharModalNumeroReserva();
+  processarStatusComReserva(pedidoId, novoStatus, numeroReserva);
 }
 
 function confirmarCancelamentoComJustificativa(pedidoId, novoStatus) {
